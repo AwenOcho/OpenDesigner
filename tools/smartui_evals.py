@@ -260,6 +260,8 @@ def run_live(model, runs, pattern, do_render, cases_file="live-cases.json"):
                     ms = (r.get("log") or {}).get("ms") or {}
                     used = {k: {f: v[f] - before.get(k, {}).get(f, 0) for f in v} for k, v in live.USAGE.items()}
                     turns_t.append({"id": c["id"], "skeleton": ms.get("skeleton", full), "first_text": ms.get("first_text", full), "full": full,
+                                    "shell": ms.get("shell"), "first_data": ms.get("first_data"),
+                                    "template": bool((r.get("log") or {}).get("template")), "ui": bool(r.get("answer")),
                                     "calls": sum(u["calls"] for u in used.values()),
                                     "tokens": sum(u["input"] + u["output"] for u in used.values())})
             except RuntimeError as e:
@@ -318,6 +320,12 @@ def run_live(model, runs, pattern, do_render, cases_file="live-cases.json"):
     summary["speed"] = {"turns": len(turns_t),
                         "skeleton_ms_p50": q([t["skeleton"] for t in turns_t], .5), "skeleton_ms_p95": q([t["skeleton"] for t in turns_t], .95),
                         "full_ms_p50": q([t["full"] for t in turns_t], .5), "full_ms_p95": q([t["full"] for t in turns_t], .95),
+                        "shell_ms_p50": q([t["shell"] for t in turns_t if t.get("shell") is not None], .5),
+                        "shell_ms_p95": q([t["shell"] for t in turns_t if t.get("shell") is not None], .95),
+                        "first_data_ms_p50": q([t["first_data"] for t in turns_t if t.get("first_data") is not None and t.get("ui")], .5),
+                        "first_data_ms_p95": q([t["first_data"] for t in turns_t if t.get("first_data") is not None and t.get("ui")], .95),
+                        "parts_shown": sum(1 for t in turns_t if t.get("ui")),
+                        "template_share_pct": round(100 * sum(1 for t in turns_t if t.get("template")) / max(1, sum(1 for t in turns_t if t.get("ui"))), 1),
                         "calls_per_turn": round(sum(t["calls"] for t in turns_t) / max(1, len(turns_t)), 2),
                         "tokens_per_turn": round(sum(t["tokens"] for t in turns_t) / max(1, len(turns_t)))}
     summary["tokens"] = live.USAGE.get(live.MODELS.get(provider, provider))  # API providers only; the claude CLI doesn't report them here

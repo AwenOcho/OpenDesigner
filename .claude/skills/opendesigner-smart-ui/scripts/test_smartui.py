@@ -199,6 +199,28 @@ class Templates(unittest.TestCase):
         self.assertTrue(smartui.validate(smartui.wrap(part), cat, {"source": res})["ok"])
 
 
+class McpTemplate(unittest.TestCase):
+    def test_show_ui_fills_a_template_from_the_data_agents_result(self):
+        import os
+        mcp = ROOT / "server" / "mcp"
+        if not (mcp / "smartui_tool.py").exists():
+            self.skipTest("no MCP server in this copy")
+        sys.path.insert(0, str(mcp))
+        import importlib
+        import live
+        os.environ["OD_PROJECT"] = str(ROOT / "examples" / "smart-ui-fernhollow")
+        self.addCleanup(os.environ.pop, "OD_PROJECT", None)
+        tool = importlib.import_module("smartui_tool")
+        app = live.load_app(ROOT / "examples" / "smart-ui-fernhollow" / "server.py")
+
+        class Refused(Exception):
+            pass
+        sc, _ = tool.show_ui({"template": "list_fines", "data": app.ACTIONS["list_fines"]["fn"]()}, Refused)
+        self.assertEqual(sc["answer"][0]["createSurface"]["components"][0]["component"], "KeyFacts")
+        with self.assertRaises(Refused):
+            tool.show_ui({"template": "no_such_action", "data": {}}, Refused)
+
+
 class CopyRules(unittest.TestCase):
     def test_duplicate_rows_are_text_facts_only(self):
         errs = []
