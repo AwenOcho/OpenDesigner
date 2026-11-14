@@ -3546,6 +3546,144 @@
     }
    }
   },
+  "Toast": {
+   "type": "object",
+   "description": "Short notices that stack in a corner: done with an undo, in progress with a bar, and failed with a retry that keeps the person's work.",
+   "additionalProperties": false,
+   "properties": {
+    "component": {
+     "const": "Toast"
+    },
+    "id": {
+     "type": "string",
+     "maxLength": 64
+    },
+    "@accessibility": {
+     "$ref": "#/$defs/Accessibility"
+    },
+    "@metadata": {
+     "$ref": "#/$defs/Metadata"
+    },
+    "toasts": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 3,
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+       "kind": {
+        "type": "string",
+        "enum": [
+         "busy",
+         "error",
+         "ok"
+        ]
+       },
+       "message": {
+        "type": "string",
+        "maxLength": 48
+       },
+       "detail": {
+        "type": "string",
+        "maxLength": 70
+       },
+       "progress": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 100,
+        "x-od-measure": true
+       },
+       "action": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+         "label",
+         "event"
+        ],
+        "properties": {
+         "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+         },
+         "a11y_label": {
+          "type": "string",
+          "maxLength": 120
+         },
+         "event": {
+          "$ref": "#/$defs/Event"
+         }
+        },
+        "x-od-effect": "none"
+       },
+       "dismiss": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+         "label",
+         "event"
+        ],
+        "properties": {
+         "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+         },
+         "a11y_label": {
+          "type": "string",
+          "maxLength": 120
+         },
+         "event": {
+          "$ref": "#/$defs/Event"
+         }
+        },
+        "x-od-effect": "none"
+       }
+      },
+      "required": [
+       "kind",
+       "message"
+      ],
+      "x-od-name-from": "message"
+     }
+    }
+   },
+   "required": [
+    "component",
+    "id",
+    "toasts"
+   ],
+   "metadata": {
+    "extensions": {
+     "opendesigner": {
+      "slug": "toast-stack",
+      "group": "confirm",
+      "name": "Toast stack",
+      "use": "for short confirmations and background progress",
+      "use_when": [
+       "after an action that can be undone for a few seconds, or a background upload or send the person should not wait on"
+      ],
+      "avoid_when": [
+       "a problem the person must deal with before going on: use alert-banners or confirm-dialog",
+       "a list of past notifications to read later: use notification-inbox",
+       "an error tied to one form field: show it under the field, as in sign-in-form"
+      ],
+      "tags": [
+       "toast",
+       "notification",
+       "undo",
+       "progress",
+       "error"
+      ],
+      "intents": [],
+      "width": "narrow",
+      "name_from": null,
+      "system": true
+     }
+    }
+   }
+  },
   "Column": {
    "type": "object",
    "description": "Two to four parts one under the other, only when the person asked for more than one.",
@@ -3676,6 +3814,9 @@
     },
     {
      "$ref": "#/components/FlightResults"
+    },
+    {
+     "$ref": "#/components/Toast"
     },
     {
      "$ref": "#/components/Column"

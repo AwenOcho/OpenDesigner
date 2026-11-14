@@ -1,0 +1,132 @@
+{
+ "project": "/Users/Kunal/Desktop/Design-System/.claude/worktrees/bold-mayer-187bc2/examples/smart-ui-chat",
+ "read": [
+  "PRODUCT.md",
+  "DESIGN.md",
+  "opendesigner/state.json"
+ ],
+ "not_known": [],
+ "product_type": "work-tool",
+ "product": "A travel booking app: search flights and stays, book, and manage trips, with an assistant in the app",
+ "audience": "regular",
+ "system": "Orvell Travel",
+ "framework": "plain HTML",
+ "ai_sdks": [],
+ "tokens": {
+  "file": "opendesigner/build/css/tokens.css",
+  "kind": "opendesigner",
+  "count": 551
+ },
+ "chat_surface": [
+  "chat.js"
+ ],
+ "actions": [],
+ "intents": [
+  {
+   "intent": "flight results",
+   "phrases": [
+    "flights",
+    "fly to",
+    "cheapest flight"
+   ],
+   "components": [
+    "FlightResults",
+    "ResultList"
+   ],
+   "from": "product type travel"
+  },
+  {
+   "intent": "fare comparison",
+   "phrases": [
+    "fare",
+    "compare fares",
+    "basic vs"
+   ],
+   "components": [
+    "Comparison"
+   ],
+   "from": "product type travel"
+  },
+  {
+   "intent": "stay or place results",
+   "phrases": [
+    "hotels",
+    "places to stay",
+    "near"
+   ],
+   "components": [
+    "ResultList",
+    "LocationCard"
+   ],
+   "from": "product type travel"
+  },
+  {
+   "intent": "trip facts (baggage, check-in, rules)",
+   "phrases": [
+    "baggage",
+    "check-in",
+    "allowance"
+   ],
+   "components": [
+    "KeyFacts"
+   ],
+   "from": "product type travel"
+  },
+  {
+   "intent": "pick a time (transfers, tables, tours)",
+   "phrases": [
+    "available times",
+    "book a time"
+   ],
+   "components": [
+    "TimeSlots"
+   ],
+   "from": "product type travel"
+  },
+  {
+   "intent": "book or pay (asks first)",
+   "phrases": [
+    "book it",
+    "pay"
+   ],
+   "components": [
+    "ApprovalPrompt"
+   ],
+   "from": "product type travel"
+  },
+  {
+   "intent": "booking confirmation",
+   "phrases": [
+    "confirmation",
+    "booked"
+   ],
+   "components": [
+    "Receipt"
+   ],
+   "from": "product type travel"
+  },
+  {
+   "intent": "trip or refund status",
+   "phrases": [
+    "status",
+    "where is my refund"
+   ],
+   "components": [
+    "ProgressStatus"
+   ],
+   "from": "product type travel"
+  }
+ ],
+ "components_proposed": [
+  "ApprovalPrompt",
+  "Comparison",
+  "FlightResults",
+  "KeyFacts",
+  "LocationCard",
+  "ProgressStatus",
+  "Receipt",
+  "ResultList",
+  "TimeSlots"
+ ],
+ "components_confirmed": []
+}

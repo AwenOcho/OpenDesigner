@@ -40,9 +40,15 @@ def flight_info(flight="OV214"):
             "bag_drop_closes": "40 minutes before departure"}
 
 
+HOTEL_PHOTOS = [  # the same Unsplash photos the library's stay card uses (Unsplash licence)
+    {"src": "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=768&h=730&fit=crop&auto=format&q=70", "alt": "Living room with a large window"},
+    {"src": "https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=768&h=730&fit=crop&auto=format&q=70", "alt": "Bedroom with a wooden bed and a garden view"}]
+
+
 def get_hotel():
-    """The traveller's hotel: name, address, distance from the airport, reception hours."""
-    return T[5]["data"]
+    """The traveller's hotel: name, address, distance from the airport, reception hours, and photos of the room."""
+    d = T[5]["data"]
+    return {**d, "hotel": {**d.get("hotel", {}), "photos": HOTEL_PHOTOS}} if isinstance(d.get("hotel"), dict) else d
 
 
 def transfer_times(date="2026-12-04"):

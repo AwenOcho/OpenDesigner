@@ -72,6 +72,15 @@
         "minimum": 0,
         "maximum": 100,
         "x-od-measure": true
+       },
+       "tone": {
+        "type": "string",
+        "enum": [
+         "neutral",
+         "success",
+         "danger"
+        ],
+        "x-od-token": true
        }
       }
      }

@@ -128,6 +128,7 @@ class ODChat extends HTMLElement {
 
   /** Feedback after a change, in the system's own colours, with Undo when the app allows it. Polite, never stealing focus. */
   toast(t) {
+    if (this.catalog?.components?.Toast) return this.systemToast(t);
     if (!this.toasts) {
       this.toasts = el("div", "od-toasts");
       this.toasts.setAttribute("role", "status");
@@ -144,7 +145,32 @@ class ODChat extends HTMLElement {
       box.append(b);
     }
     this.toasts.append(box);
-    setTimeout(() => box.remove(), t.undo ? 8000 : 5000);
+    if (!t.undo && t.tone !== "danger") setTimeout(() => box.remove(), 4000);  // one with Undo, or an error, stays
+  }
+
+  /** The same feedback through the system's own toast part (the library's toast stack), when the catalog has it. */
+  systemToast(t) {
+    if (!this.toastBox) {
+      this.toastBox = el("div", "od-toasts");
+      document.body.append(this.toastBox);
+    }
+    const words = String(t.text || "");
+    let message = words, detail = "";
+    if (words.length > 48) { const cut = words.lastIndexOf(" ", 47); message = words.slice(0, cut > 20 ? cut : 47); detail = words.slice(message.length).trim().slice(0, 70); }
+    const item = { kind: t.tone === "danger" ? "error" : "ok", message, dismiss: { label: "Dismiss", event: { name: "dismiss_toast" } } };
+    if (detail) item.detail = detail;
+    if (t.undo && t.undo.name) item.action = { label: "Undo", event: t.undo };
+    const s = document.createElement("od-surface");
+    s.catalog = this.catalog;
+    this.toastBox.append(s);
+    const ok = s.process([{ version: "1.0", createSurface: { surfaceId: "toast-" + Math.random().toString(36).slice(2, 8), catalogId: this.catalog.catalogId, components: [{ id: "root", component: "Toast", toasts: [item] }] } }]).ok;
+    if (!ok) { s.remove(); this.catalog = { ...this.catalog, components: { ...this.catalog.components, Toast: undefined } }; return this.toast(t); }
+    s.addEventListener("od-action", (e) => {
+      const a = e.detail.action;
+      s.remove();
+      if (a.name !== "dismiss_toast") this.call("/api/press", { session: SID, action: { name: a.name, context: a.context || {} } });
+    });
+    if (!item.action && item.kind === "ok") setTimeout(() => s.remove(), 4000);  // a toast with Undo, or an error, stays
   }
 
   /** While the answer is on its way: the chosen part's skeleton, then the words. Hidden from screen readers until the

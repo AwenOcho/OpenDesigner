@@ -2319,6 +2319,97 @@
     }
    },
    "expect": []
+  },
+  {
+   "name": "bad-tone-against-the-data",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Facts",
+        "title": "Fine",
+        "facts": [
+         {
+          "label": "Status",
+          "value": "Unpaid",
+          "tone": "success"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": [
+    "R6-tone@/0/createSurface/components/0/facts/0/tone"
+   ]
+  },
+  {
+   "name": "ok-tone-from-the-data",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Facts",
+        "title": "Fine",
+        "facts": [
+         {
+          "label": "Status",
+          "value": "Paid",
+          "tone": "success"
+         },
+         {
+          "label": "Other",
+          "value": "Overdue",
+          "tone": "danger"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": []
+  },
+  {
+   "name": "ok-tone-neutral-when-unsure",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Facts",
+        "title": "Fine",
+        "facts": [
+         {
+          "label": "Status",
+          "value": "Unpaid",
+          "tone": "neutral"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": []
   }
  ]
 }

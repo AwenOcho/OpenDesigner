@@ -388,6 +388,13 @@
         "nonstop",
         "departures"
       ]
+    },
+    {
+      "slug": "toast-stack",
+      "as": "Toast",
+      "group": "confirm",
+      "system": true,
+      "intents": []
     }
   ]
 }

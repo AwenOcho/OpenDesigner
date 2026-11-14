@@ -35,6 +35,25 @@ function duplicateRows(v, path, errs, sid) {
   });
 }
 
+const TONE_GOOD = /^(?:paid|done|complete|completed|approved|passed|pass|ok|active|on time|delivered|available|eligible|yes|confirmed|sent|saved|fixed|resolved|in stock)\b/i, TONE_BAD = /^(?:unpaid|overdue|failed|fail|broken|error|declined|refused|cancelled|canceled|rejected|missing|not eligible|no|expired|out of stock|blocked|still needed)\b/i;
+
+/** Colours follow meaning: a good value is never danger, a bad one never success. The data decides the tone. */
+function tonesFromData(comp, path, errs, sid) {
+  const walk = (v, p) => {
+    if (Array.isArray(v)) v.forEach((x, i) => walk(x, `${p}/${i}`));
+    else if (isObj(v)) {
+      if (v.tone === "success" || v.tone === "danger") {
+        const k = ["value", "status", "text", "label"].find((k) => typeof v[k] === "string");
+        const said = k ? v[k].trim() : "", good = TONE_GOOD.test(said), bad = TONE_BAD.test(said);
+        if ((v.tone === "success" && bad && !good) || (v.tone === "danger" && good && !bad))
+          err(errs, "R6-tone", `${p}/tone`, `'${said}' is shown as ${v.tone}`, sid, "let the data set the tone: danger for a bad value, success for a good one, neutral when unsure");
+      }
+      for (const [k, x] of Object.entries(v)) walk(x, `${p}/${k}`);
+    }
+  };
+  walk(comp, path);
+}
+
 const STEP_STATE = { current: "now", now: "now", active: "now", "in progress": "now", done: "done", complete: "done", completed: "done" };
 
 /** R6 for steps: when the data has steps (label and state), a part's steps use those labels and the same states. */
@@ -330,6 +349,7 @@ export function validate(answer, cat, opts = {}) {
       const ctx = { data: surfaces[sid].data, numbers, warnings: warns, names };
       const checked = checkValue(c, schema, cpath, errs, sid, cat, opts, ctx);
       consequences(c, schema, cpath, errs, sid, opts.consequences || {});
+      tonesFromData(c, cpath, errs, sid);
       if (opts.source !== undefined && opts.source !== null) stepsFromData(c, cpath, errs, sid, opts.source);
       if (typeof c.id === "string") surfaces[sid].components[c.id] = { c: isObj(checked) ? checked : c, path: cpath, schema };
     });

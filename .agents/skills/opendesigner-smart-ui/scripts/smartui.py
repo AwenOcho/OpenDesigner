@@ -20,7 +20,10 @@ import argparse
 import datetime
 import html as htmllib
 import inspect
+import importlib.util
 import json
+import time
+import math
 import pathlib
 import re
 import sys
@@ -180,7 +183,7 @@ def build_catalog(tokens_path=None, system="system", allow_images=(), allow_link
         entries += [{"slug": d.name, "as": pascal(d.name), "group": "library", "intents": []}
                     for d in sorted(LIB.iterdir()) if d.is_dir() and d.name not in have]
     for c in entries:
-        if only and c["slug"] not in only:
+        if only and c["slug"] not in only and not c.get("system"):  # a system part (the toast) is in every catalog
             continue
         if not ((LIB / c["slug"] / "component.html").exists() and (LIB / c["slug"] / "meta.json").exists()):
             print(f"{c['slug']}: not in the library yet, left out", file=sys.stderr)
@@ -202,7 +205,7 @@ def build_catalog(tokens_path=None, system="system", allow_images=(), allow_link
         schema["metadata"] = ext({"slug": c["slug"], "group": c["group"], "name": meta.get("name"), "use": meta.get("use"),
                           "use_when": spec.get("use_when", []), "avoid_when": spec.get("avoid_when", []),
                           "tags": meta.get("tags", []), "intents": c.get("intents", []), "width": meta.get("width"),
-                          "name_from": built["name_from"]})
+                          "name_from": built["name_from"], **({"system": True} if c.get("system") else {})})
         comps[c["as"]] = schema
         bundle[c["as"]] = {"slug": c["slug"], "src": src}
     comps["Column"] = {"type": "object", "description": "Two to four parts one under the other, only when the person asked for more than one.",
@@ -491,7 +494,7 @@ def select(msg, catalog, k=3, scope=None, data=None, boost=None):
     for n, w in (boost or {}).items():
         sig[n] = sig.get(n, 0) + w
     for name, c in catalog["components"].items():
-        if od(c).get("container"):
+        if od(c).get("container") or od(c).get("system"):
             continue
         s = score(msg, c) + sig.get(name, 0)
         for it in (scope or {}).get("intents", []):
@@ -510,12 +513,15 @@ def select(msg, catalog, k=3, scope=None, data=None, boost=None):
     short_fact = (len(words(msg)) <= 6 and re.match(r"^\s*(what is|what's|when|who|which|how many|how much|is|are|does|did)\b", norm(msg))
                   and not re.search(r"\b(any|all|every|each)\b|\b(can|could|should) (i|we)\b|^\s*(is|are) there\b|^\s*(did|have|do) (i|we) (get|got|have)\b", norm(msg))
                   and not re.search(r"\b[A-Z]{1,5}-?\d{3,}", msg)
+                  and not re.match(r"\s*which\s+\w{3,}s\b", norm(msg)))  # "which parts", "which invoices": a list, not one fact
+    short_fact = (short_fact
                   and not cue and best_words < 3
                   and not re.search(r"\band (when|what|how|who|where|which)\b", norm(msg)))  # two questions in one are not a short fact
     # "when is the next invoice due?" asks for one date: a sentence, whatever cue word it has
     when_fact = bool(re.match(r"^\s*when\b", norm(msg))) and not re.search(r"\b(each|every|all|list|show|times|slots)\b", norm(msg))
     ui = bool(top) and reason and not short_fact and not when_fact
     return {"ui": ui, "candidates": top if ui else [], "scores": {n: round(s, 2) for s, n in ranked[:k + 2]},
+            "short_fact": bool(short_fact or when_fact),
             "why": ("a cue for UI and a part that fits" if ui else "no reason for UI: answer in text (R1)")}
 
 
@@ -682,6 +688,66 @@ def bind(node, root, cur=None):
                 out[k] = v
         return out
     return node
+
+
+class Matcher:
+    """Finds the prepared part for a question in well under a millisecond, with no model and no network: a small
+    BM25-style index over each template's intent and example phrasings (strongest), its action's name and description,
+    the data fields it binds, its title, and the scope's phrases for that route. Words match on their stems and on a
+    shared start of four letters (renew, renewal). Standard library only, so it runs wherever the skill runs."""
+
+    GENERIC = {"get", "got", "did", "need", "have", "has", "want", "know", "see", "tell", "show", "please", "can", "could", "would"}
+
+    def __init__(self, templates, actions=None, scope=None):
+        self.templates = list(templates)
+        phrases = {}
+        for it in (scope or {}).get("intents", []):
+            m = re.match(r"(GET|POST)\s+(\S+)\s", it.get("from", ""))
+            if m:
+                phrases.setdefault(m.group(2), []).extend(it.get("phrases", []))
+        self.docs = []
+        for t in self.templates:
+            a = (actions or {}).get(t.get("action"), {})
+            fields = {w for ph in _PH.findall(json.dumps(t.get("part", {}))) for w in re.findall(r"[a-z]+", ph.lower())}
+            weighted = [(t.get("intent", ""), 3), (" ".join(t.get("examples", [])), 3), (t.get("action", "").replace("_", " "), 2),
+                        (" ".join(phrases.get(a.get("path", ""), [])), 2), (a.get("description", ""), 1), (" ".join(sorted(fields)), 1),
+                        (str(t.get("part", {}).get("title", "")) if isinstance(t.get("part", {}).get("title"), str) else "", 1)]
+            tf = {}
+            for text, w in weighted:
+                for word in words(text):
+                    tf[word] = tf.get(word, 0) + w
+            self.docs.append(tf)
+        n = max(1, len(self.docs))
+        df = {}
+        for d in self.docs:
+            for w in d:
+                df[w] = df.get(w, 0) + 1
+        self.idf = {w: math.log(1 + (n - c + 0.5) / (c + 0.5)) for w, c in df.items()}
+
+    def _hit(self, q, d):
+        if q in d:
+            return d[q], q
+        if len(q) >= 4:
+            for w, f in d.items():
+                if len(w) >= 4 and (w.startswith(q) or q.startswith(w)):
+                    return f, w
+        return 0, None
+
+    def match(self, message, k=3):
+        """[(score, template)], best first, and how long it took in ms."""
+        t0 = time.perf_counter()
+        q = [w for w in dict.fromkeys(words(message)) if w not in self.GENERIC]
+        out = []
+        for t, d in zip(self.templates, self.docs):
+            sc = 0.0
+            for w in q:
+                f, term = self._hit(w, d)
+                if f:
+                    sc += self.idf.get(term, 0.5) * f * 2.2 / (f + 1.2)
+            if sc > 0:
+                out.append((round(sc, 3), t))
+        out.sort(key=lambda x: -x[0])
+        return out[:k], round((time.perf_counter() - t0) * 1000, 3)
 
 
 def pick_template(templates, action, data, message=""):
@@ -939,6 +1005,30 @@ def duplicate_rows(v, path, errs, sid):
                 _err(errs, "duplicate-row", f"{path}/{i}", f"'{row['value']}' is already shown as '{seen[key]}'", sid, "keep one row for each value")
             else:
                 seen[key] = row.get("label")
+
+
+TONE_GOOD = re.compile(r"^(?:paid|done|complete|completed|approved|passed|pass|ok|active|on time|delivered|available|eligible|yes|confirmed|sent|saved|fixed|resolved|in stock)\b", re.I)
+TONE_BAD = re.compile(r"^(?:unpaid|overdue|failed|fail|broken|error|declined|refused|cancelled|canceled|rejected|missing|not eligible|no|expired|out of stock|blocked|still needed)\b", re.I)
+
+
+def tones_from_data(comp, path, errs, sid):
+    """Colours follow meaning: a value that says good ("Paid", "Passed") is never danger, one that says bad ("Unpaid",
+    "Overdue", "Failed") is never success. The data decides the tone, not the model's taste."""
+    def walk(v, p):
+        if isinstance(v, dict):
+            tone = v.get("tone")
+            if tone in ("success", "danger"):
+                said = next((v[k] for k in ("value", "status", "text", "label") if isinstance(v.get(k), str)), "")
+                good, bad = TONE_GOOD.search(said.strip()), TONE_BAD.search(said.strip())
+                if (tone == "success" and bad and not good) or (tone == "danger" and good and not bad):
+                    _err(errs, "R6-tone", f"{p}/tone", f"'{said}' is shown as {tone}", sid,
+                         "let the data set the tone: danger for a bad value, success for a good one, neutral when unsure")
+            for k, x in v.items():
+                walk(x, f"{p}/{k}")
+        elif isinstance(v, list):
+            for i, x in enumerate(v):
+                walk(x, f"{p}/{i}")
+    walk(comp, path)
 
 
 STEP_STATE = {"current": "now", "now": "now", "active": "now", "in progress": "now", "done": "done", "complete": "done", "completed": "done"}
@@ -1213,6 +1303,7 @@ def validate(answer, cat, opts=None):
             ctx = {"data": surfaces[sid]["data"], "numbers": numbers, "warnings": warns, "names": names}
             checked = check_value(c, schema, cpath, errs, sid, cat, opts, ctx)
             consequences(c, schema, cpath, errs, sid, opts.get("consequences") or {})
+            tones_from_data(c, cpath, errs, sid)
             if opts.get("source") is not None:
                 steps_from_data(c, cpath, errs, sid, opts["source"])
             acc = c.get("@accessibility") or {}
@@ -1647,6 +1738,213 @@ def draft_template(action, result, catalog):
     return None
 
 
+# ----------------------------------------------------------------------------------------------- use cases from evidence
+# Which answer types this product's assistant needs: from its own data and actions, what it is (PRODUCT.md), its
+# research and its screens. Never a fixed list. Each type maps to a library part, or says the library has none.
+
+ANSWER_TYPES = [  # (type, what it is for, parts in preference order; empty: the library has none yet)
+    ("table", "rows of records to scan and sort", ["DataTable"]),
+    ("chart over time", "a number changing month by month", ["LineChart", "BarChart"]),
+    ("share of a whole", "how a total splits", ["DonutBreakdown"]),
+    ("headline numbers", "three or four numbers at a glance", ["KpiStrip"]),
+    ("record details", "one thing with its facts", ["KeyFacts", "SummaryCard"]),
+    ("progress", "where something is, step by step", ["ProgressStatus", "SetupSteps"]),
+    ("compare options", "two to four options side by side", ["Comparison"]),
+    ("results to pick from", "a short list to choose one", ["FlightResults", "ResultList", "ProductCard"]),
+    ("pick a time", "free times to book", ["TimeSlots"]),
+    ("pictures", "a photo, a gallery", ["ImageCard", "ProductCard"]),
+    ("place", "an address on a map", ["LocationCard"]),
+    ("file", "a document to open or download", ["FileCard"]),
+    ("answer with sources", "an answer that cites its sources", ["AnswerSources", "CitationList"]),
+    ("form", "a few fields to fill", ["FormFields"]),
+    ("ask before a change", "pay, book, send or delete, after a yes", ["ApprovalPrompt"]),
+    ("what happened", "the result of a change", ["Receipt"]),
+    ("embed", "a video, a live page or a widget inside the answer", []),
+]
+INDUSTRY_TYPES = {  # what assistants in each kind of product commonly need (a starting point, weighed with the evidence)
+    "travel": ["results to pick from", "pictures", "place", "pick a time", "compare options", "ask before a change"],
+    "commerce": ["results to pick from", "pictures", "compare options", "what happened"],
+    "work-tool": ["table", "chart over time", "headline numbers", "record details", "file"],
+    "public-service": ["progress", "record details", "pick a time", "form", "ask before a change", "place"],
+    "health": ["pick a time", "record details", "place", "form"],
+    "devtools": ["answer with sources", "table", "record details"],
+}
+_IMG = re.compile(r"\.(jpe?g|png|webp|gif|avif)(\?|$)|^https://images\.", re.I)
+
+
+def _walk_shapes(v, key="", out=None):
+    out = out if out is not None else []
+    if isinstance(v, dict):
+        out.append(("record", key, v))
+        for k, x in v.items():
+            _walk_shapes(x, k, out)
+    elif isinstance(v, list) and v and all(isinstance(x, dict) for x in v):
+        out.append(("list", key, v))
+        for k, x in v[0].items():  # inside an item: nested lists and records, not the item itself as a record
+            _walk_shapes(x, k, out)
+    return out
+
+
+def evidence_from_data(name, result):
+    """Answer types a read action's real result points to, each with a short reason."""
+    found = []
+    for kind, key, v in _walk_shapes(result):
+        if kind == "list":
+            first = v[0]
+            nums = [k for k, x in first.items() if isinstance(x, (int, float)) and not isinstance(x, bool)]
+            if {"label", "state"} <= set(first) or "steps" == key:
+                found.append(("progress", f"{name} returns steps with a state"))
+            elif any(k in first for k in ("month", "date", "week", "day")) and nums and len(v) >= 3:
+                found.append(("chart over time", f"{name} returns {key} by {next(k for k in ('month', 'date', 'week', 'day') if k in first)} with numbers"))
+            elif any(re.search(r"slot|time", k) for k in first) and key in ("slots", "times", "days"):
+                found.append(("pick a time", f"{name} returns free {key}"))
+            elif len(first) >= 3:
+                found.append(("table", f"{name} returns {len(v)} {key} with {len(first)} fields each"))
+            if any(k in first for k in ("price", "fare", "cost")) and "id" in first and len(v) >= 2:
+                found.append(("results to pick from", f"{name} returns {len(v)} {key} to choose from, each with a price"))
+            if any(isinstance(x, str) and _IMG.search(x) for x in first.values()) or any(k in first for k in ("image", "photo", "photos")) or ("src" in first and "alt" in first):
+                found.append(("pictures", f"{key} in {name} have pictures"))
+            if len(v) in (2, 3, 4) and re.search(r"plan|option|tier|fare|price", key):
+                found.append(("compare options", f"{name} returns {len(v)} {key} to compare"))
+            if any(k in first for k in ("url", "source", "link")) and any(k in first for k in ("title", "snippet", "quote")):
+                found.append(("answer with sources", f"{name} returns {key} with links"))
+        else:
+            d = v
+            if any(k in d for k in ("address", "lat", "lng", "latitude")) and any(k in d for k in ("name", "title")):
+                found.append(("place", f"{name} returns a place with an address"))
+            if any(isinstance(x, str) and re.search(r"\.pdf(\?|$)", x) for x in d.values()) or "file" in d and d.get("file"):
+                found.append(("file", f"{name} returns a file"))
+            if any(isinstance(x, str) and re.search(r"youtube\.com|vimeo\.com|\.mp4(\?|$)|/embed/", x) for x in d.values()):
+                found.append(("embed", f"{name} returns a video or embed link"))
+            if any(isinstance(x, str) and _IMG.search(x) for x in d.values()) or "image" in d or "photo" in d:
+                found.append(("pictures", f"{name} returns a picture"))
+            scal = [k for k, x in d.items() if isinstance(x, (str, int, float)) and not k.endswith("_in_words")]
+            if key and len(scal) >= 4:
+                found.append(("record details", f"{name} returns one {key} with {len(scal)} facts"))
+            nums = [k for k, x in d.items() if isinstance(x, (int, float)) and not isinstance(x, bool)]
+            if len(nums) >= 3 and key:
+                found.append(("headline numbers", f"{name} returns {len(nums)} numbers for {key}"))
+    return found
+
+
+def use_cases(root, app=None, catalog=None):
+    """The answer types this product's assistant needs, ranked, each with its reasons, evidence and part."""
+    root = pathlib.Path(root)
+    score, why, ev = {}, {}, {}
+
+    def add(t, pts, reason, source):
+        score[t] = score.get(t, 0) + pts
+        why.setdefault(t, []).append(reason)
+        ev.setdefault(t, set()).add(source)
+    scope_doc = _load_json(root / "opendesigner" / "smart-ui" / "scope.json") or {}
+    product = scope_doc.get("product") or ""
+    kind = None
+    p = product.lower()
+    hits = {k: sum(w in p for w in v.get("match", [])) for k, v in PRODUCT_INTENTS.items()}
+    if hits and max(hits.values()):
+        kind = max(hits, key=lambda k: hits[k])
+    for t in INDUSTRY_TYPES.get(kind, []):
+        add(t, 2, f"common in {kind.replace('-', ' ')} assistants", "product: " + (product[:80] or "PRODUCT.md"))
+    gaps = []
+    if app is not None:
+        for name, act in app.ACTIONS.items():
+            if act.get("changes"):
+                add("ask before a change", 3, f"{name} changes data", f"action {name}")
+                add("what happened", 1, f"{name} has a result to show", f"action {name}")
+                if len(act.get("params", {})) >= 3:
+                    add("form", 2, f"{name} takes {len(act['params'])} values", f"action {name}")
+                continue
+            args = {}
+            for k, v in inspect.signature(act["fn"]).parameters.items():
+                if v.default is inspect.Parameter.empty:
+                    desc = act.get("params", {}).get(k, "")
+                    m = re.search(r"such as ([^,;()]+?)(?:[,;()]|$)", desc) or re.match(r"\s*([\w-]+)(?:,| or )", desc)
+                    if m:
+                        args[k] = m.group(1).strip()
+            try:
+                res = act["fn"](**args)
+                if inspect.isgenerator(res):
+                    last = None
+                    for last in res:
+                        pass
+                    res = last
+            except Exception as e:
+                gaps.append(f"{name} could not be run to see its data ({str(e)[:60]})")
+                continue
+            for t, reason in evidence_from_data(name, res):
+                add(t, 3, reason, f"data from {name}")
+    research = root / "opendesigner" / "research"
+    texts = [(f, f.read_text(errors="ignore").lower()) for f in sorted(research.glob("*")) if f.suffix in (".md", ".json")] if research.is_dir() else []
+    words = {"table": "table", "chart over time": "chart|trend|graph", "pictures": "photo|picture|image|gallery", "place": "map|address|location",
+             "pick a time": "booking|appointment|slot", "compare options": "compare|comparison", "answer with sources": "source|citation|cite",
+             "embed": "video|embed", "progress": "status|progress|tracking", "file": "invoice pdf|download|document"}
+    for f, t in texts:
+        for typ, pat in words.items():
+            n = len(re.findall(r"\b(" + pat + r")\b", t))
+            if n:
+                add(typ, min(3, n), f"the research mentions it {n} times", f"research: {f.name}")
+    if not texts:
+        gaps.append("no research on this product's users or on what assistants in its industry show: run "
+                    "`engine.py research plan --brief \"what answers do assistants for <this product> show, and which do people use\"`")
+    for f in sorted(list(root.glob("web/*.html")) + list(root.glob("*.html")) + list(root.glob("src/**/*.tsx")))[:30]:
+        t = f.read_text(errors="ignore").lower()
+        for typ, pat in (("table", r"<table"), ("pictures", r"<img"), ("chart over time", r"chart|<svg[^>]*class=\"[^\"]*chart"), ("place", r"map")):
+            if re.search(pat, t):
+                add(typ, 1, f"the app's own screens already show this ({f.name})", f"screen: {f.name}")
+    lib = {c["as"] for c in json.loads(SET.read_text())["components"]}
+    comps = set((catalog or {}).get("components", {}))
+    out = []
+    for typ, what, parts in ANSWER_TYPES:
+        if typ not in score:
+            continue
+        have = next((x for x in parts if x in comps), None) or next((x for x in parts if x in lib), None)
+        out.append({"type": typ, "for": what, "score": score[typ], "reasons": list(dict.fromkeys(why[typ]))[:4],
+                    "evidence": sorted(ev[typ]), "part": have,
+                    "missing": None if have else "the library has no part for this yet: propose one (library.py add) or answer in text"})
+    out.sort(key=lambda x: -x["score"])
+    return {"product": product, "kind": kind, "answer_types": out, "gaps": gaps}
+
+
+def cmd_usecases(a):
+    app = None
+    root = pathlib.Path(a.project).resolve()
+    if a.app:
+        spec = importlib.util.spec_from_file_location("od_app", a.app)
+        app = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(app)
+    cat = _load_json(root / "opendesigner" / "smart-ui" / "catalog.json")
+    dest = root / "opendesigner" / "smart-ui" / "use-cases.json"
+    if a.confirm:
+        doc = _load_json(dest)
+        if not doc:
+            print("run usecases --write first")
+            return 1
+        keep = [x.strip() for x in a.confirm.split(",") if x.strip()]
+        unknown = [k for k in keep if k not in {t["type"] for t in doc["answer_types"]}]
+        if unknown:
+            print("not in the list: " + ", ".join(unknown))
+            return 1
+        doc["confirmed"] = keep
+        doc["confirmed_on"] = datetime.date.today().isoformat()
+        dest.write_text(json.dumps(doc, indent=1, ensure_ascii=False) + "\n")
+        print(f"confirmed {len(keep)} answer types; next: smartui.py templates --app ... --write")
+        return 0
+    doc = use_cases(root, app, cat)
+    if a.json:
+        print(json.dumps(doc, indent=1, ensure_ascii=False))
+    else:
+        print(f"{doc['product'] or 'This product'} ({doc['kind'] or 'kind not known'}): the answers its assistant needs, best first")
+        for i, t in enumerate(doc["answer_types"], 1):
+            print(f"{i:2}. {t['type']}: {t['part'] or 'NO PART'}  ({'; '.join(t['reasons'][:2])})")
+        for g in doc["gaps"]:
+            print("gap: " + g)
+    if a.write:
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_text(json.dumps(doc, indent=1, ensure_ascii=False) + "\n")
+        print(f"wrote {dest}. Show the list; then: smartui.py usecases --confirm \"table,record details,...\"")
+    return 0
+
+
 def cmd_templates(a):
     """Draft templates.json: run each read action of the app once (defaults, or the example its description gives) and
     bind a part to the shape of what it returns. The owner edits titles and labels; live.py fills them from data."""
@@ -1655,6 +1953,11 @@ def cmd_templates(a):
     app = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(app)
     catalog = json.loads(pathlib.Path(app.CATALOG).read_text())
+    uc = _load_json(pathlib.Path(app.CATALOG).parent / "use-cases.json") or {}
+    if uc.get("confirmed"):  # parts only for the answer types the person confirmed
+        wanted = {dict((t, ps) for t, _, ps in ANSWER_TYPES).get(t, [None])[0] for t in uc["confirmed"]}
+        wanted |= {x["part"] for x in uc.get("answer_types", []) if x["type"] in uc["confirmed"]}
+        catalog = {**catalog, "components": {k: v for k, v in catalog["components"].items() if k in wanted}}
     out, skipped = [], []
     for name, act in app.ACTIONS.items():
         if act.get("changes"):
@@ -1796,6 +2099,12 @@ def main(argv=None):
     p.add_argument("--project", default=".")
     p.add_argument("--json", action="store_true")
     p.add_argument("--write", action="store_true", help="save opendesigner/smart-ui/scope.json")
+    p = sub.add_parser("usecases", help="the answer types this product needs, from its data, research and screens")
+    p.add_argument("--project", default=".")
+    p.add_argument("--app", help="the app module (ACTIONS), to read the shape of its real data")
+    p.add_argument("--write", action="store_true")
+    p.add_argument("--json", action="store_true")
+    p.add_argument("--confirm", help="the types the person kept, comma-separated")
     p = sub.add_parser("templates", help="draft templates.json: a part bound to each read action's data")
     p.add_argument("--app", required=True, help="the app module that defines ACTIONS and CATALOG (like examples/*/server.py)")
     p.add_argument("--write", action="store_true")
@@ -1850,7 +2159,7 @@ def main(argv=None):
     p.add_argument("--no-shots", action="store_true", help="no screenshots (saves disk)")
     p.add_argument("--ledger", action="store_true", help="record each failure with engine.py ledger (asks nothing; read the report first)")
     a = ap.parse_args(argv)
-    return {"scope": cmd_scope, "templates": cmd_templates, "offer": cmd_offer, "confirm": cmd_confirm, "catalog": cmd_catalog, "prompt": cmd_prompt, "validate": cmd_validate,
+    return {"scope": cmd_scope, "usecases": cmd_usecases, "templates": cmd_templates, "offer": cmd_offer, "confirm": cmd_confirm, "catalog": cmd_catalog, "prompt": cmd_prompt, "validate": cmd_validate,
             "text": cmd_text, "audit": cmd_audit, "view": cmd_view, "components": cmd_components}[a.cmd](a)
 
 

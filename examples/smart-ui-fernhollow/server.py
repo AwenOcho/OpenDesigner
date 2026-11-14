@@ -147,7 +147,8 @@ def renew_permit(length="12 months"):
     p = DATA["permit"]
     return {"renewed": {"permit": p["number"], "zone": p["zone"], "vehicle": p["vehicle"], "length": opt["length"],
                         "valid_from": opt["from"], "valid_to": opt["to"], "paid": opt["price"], "card": DATA["resident"]["card"],
-                        "reference": "PRM-448213", "receipt_sent_to": "the email address on your account"}}
+                        "reference": "PRM-448213", "receipt_sent_to": "the email address on your account"},
+            "toast": f"Permit renewed for {opt['length']}"}
 
 
 # ------------------------------------------------------------------------------------------------ fines
@@ -182,7 +183,7 @@ def pay_fine(reference):
     if not f or f["status"] != "Unpaid":
         return _not_found("unpaid penalty charge notice", f"{reference} is not an unpaid penalty charge notice.", "Ask to see your fines to check the reference.")
     amount = f["discounted_amount"] if TODAY <= datetime.date.fromisoformat(f["discount_until"]) else f["amount"]
-    return {"paid": {"notice": f["reference"], "amount": amount, "card": DATA["resident"]["card"], "reference": "PAY-771905",
+    return {"toast": f"{amount} paid. Notice {f['reference']} is closed", "paid": {"notice": f["reference"], "amount": amount, "card": DATA["resident"]["card"], "reference": "PAY-771905",
                      "on": TODAY.isoformat(), "note": "Paying closes the notice. You can no longer challenge it."}}
 
 
@@ -215,7 +216,8 @@ def book_appointment(office, slot, service="Show documents for a parking permit"
     if not s:
         return _not_found("slot", f"Slot {slot} is not free at {office}.", "Ask for the free times again; someone may have booked it.")
     return {"booked": {"office": o["name"], "address": o["address"], "day": s["day"], "time": s["time"], "service": service,
-                       "reference": "APT-30917", "bring": "The paper documents you want to show, and this reference."}}
+                       "reference": "APT-30917", "bring": "The paper documents you want to show, and this reference."},
+            "toast": f"Appointment booked: {s['day']} at {s['time']}"}
 
 
 # ------------------------------------------------------------------------------------------------ applications and documents
@@ -252,7 +254,8 @@ def upload_document(reference, document, file=""):
         return {"error": {"code": "no_file", "message": "Choose the file first. It stays on your device until you send it.",
                           "accepted_files": a["accepted_files"]}}
     return {"uploaded": {"application": a["reference"], "document": document, "file": file, "on": TODAY.isoformat(),
-                         "next": "We check it within 2 working days, then make a decision."}}
+                         "next": "We check it within 2 working days, then make a decision."},
+            "toast": f"{document} sent"}
 
 
 # ------------------------------------------------------------------------------------------------ offices

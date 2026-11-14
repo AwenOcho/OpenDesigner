@@ -1,0 +1,193 @@
+{
+ "about": "Answer types smartui.py usecases found for three example products, from each one's own data, actions, product description and screens (no research files in these examples). Made by the evals' use-cases step.",
+ "date": "2026-11-14",
+ "products": [
+  {
+   "name": "Fernhollow council",
+   "kind": "public-service",
+   "example": "examples/smart-ui-fernhollow",
+   "answer_types": [
+    {
+     "type": "table",
+     "reason": "renewal_quote returns 2 options with 6 fields each",
+     "part": "DataTable",
+     "missing": false
+    },
+    {
+     "type": "record details",
+     "reason": "common in public service assistants",
+     "part": "KeyFacts",
+     "missing": false
+    },
+    {
+     "type": "ask before a change",
+     "reason": "common in public service assistants",
+     "part": "ApprovalPrompt",
+     "missing": false
+    },
+    {
+     "type": "form",
+     "reason": "common in public service assistants",
+     "part": "FormFields",
+     "missing": false
+    },
+    {
+     "type": "progress",
+     "reason": "common in public service assistants",
+     "part": "ProgressStatus",
+     "missing": false
+    },
+    {
+     "type": "pick a time",
+     "reason": "common in public service assistants",
+     "part": "TimeSlots",
+     "missing": false
+    },
+    {
+     "type": "place",
+     "reason": "common in public service assistants",
+     "part": "LocationCard",
+     "missing": false
+    },
+    {
+     "type": "what happened",
+     "reason": "renew_permit has a result to show",
+     "part": "Receipt",
+     "missing": false
+    },
+    {
+     "type": "compare options",
+     "reason": "renewal_quote returns 2 options to compare",
+     "part": "Comparison",
+     "missing": false
+    }
+   ],
+   "gaps": [
+    "no research on this product's users or on what assistants in its industry show: run `engine.py research plan --brief \"what answers do assistants for <this product> show, and which do people use\"`"
+   ]
+  },
+  {
+   "name": "Tallyhaus billing",
+   "kind": "work-tool",
+   "example": "examples/smart-ui-support",
+   "answer_types": [
+    {
+     "type": "ask before a change",
+     "reason": "change_plan changes data",
+     "part": "ApprovalPrompt",
+     "missing": false
+    },
+    {
+     "type": "table",
+     "reason": "common in work tool assistants",
+     "part": "DataTable",
+     "missing": false
+    },
+    {
+     "type": "record details",
+     "reason": "common in work tool assistants",
+     "part": "KeyFacts",
+     "missing": false
+    },
+    {
+     "type": "chart over time",
+     "reason": "common in work tool assistants",
+     "part": "LineChart",
+     "missing": false
+    },
+    {
+     "type": "headline numbers",
+     "reason": "common in work tool assistants",
+     "part": "KpiStrip",
+     "missing": false
+    },
+    {
+     "type": "file",
+     "reason": "common in work tool assistants",
+     "part": "FileCard",
+     "missing": false
+    },
+    {
+     "type": "compare options",
+     "reason": "list_plans returns 3 plans to compare",
+     "part": "Comparison",
+     "missing": false
+    },
+    {
+     "type": "what happened",
+     "reason": "change_plan has a result to show",
+     "part": "Receipt",
+     "missing": false
+    }
+   ],
+   "gaps": [
+    "refund_status could not be run to see its data (refund_status() missing 1 required positional argument: 'inv)",
+    "no research on this product's users or on what assistants in its industry show: run `engine.py research plan --brief \"what answers do assistants for <this product> show, and which do people use\"`"
+   ]
+  },
+  {
+   "name": "Orvell travel",
+   "kind": "travel",
+   "example": "examples/smart-ui-chat",
+   "answer_types": [
+    {
+     "type": "ask before a change",
+     "reason": "common in travel assistants",
+     "part": "ApprovalPrompt",
+     "missing": false
+    },
+    {
+     "type": "table",
+     "reason": "search_flights returns 3 flights with 7 fields each",
+     "part": "DataTable",
+     "missing": false
+    },
+    {
+     "type": "record details",
+     "reason": "get_hotel returns one hotel with 5 facts",
+     "part": "KeyFacts",
+     "missing": false
+    },
+    {
+     "type": "compare options",
+     "reason": "common in travel assistants",
+     "part": "Comparison",
+     "missing": false
+    },
+    {
+     "type": "results to pick from",
+     "reason": "common in travel assistants",
+     "part": "FlightResults",
+     "missing": false
+    },
+    {
+     "type": "pictures",
+     "reason": "common in travel assistants",
+     "part": "ImageCard",
+     "missing": false
+    },
+    {
+     "type": "place",
+     "reason": "common in travel assistants",
+     "part": "LocationCard",
+     "missing": false
+    },
+    {
+     "type": "pick a time",
+     "reason": "common in travel assistants",
+     "part": "TimeSlots",
+     "missing": false
+    },
+    {
+     "type": "what happened",
+     "reason": "book_flight has a result to show",
+     "part": "Receipt",
+     "missing": false
+    }
+   ],
+   "gaps": [
+    "no research on this product's users or on what assistants in its industry show: run `engine.py research plan --brief \"what answers do assistants for <this product> show, and which do people use\"`"
+   ]
+  }
+ ]
+}

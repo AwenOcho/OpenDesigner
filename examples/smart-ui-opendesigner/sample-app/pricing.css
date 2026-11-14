@@ -1,0 +1,30 @@
+/* Tallyline pricing page: a sample product for the Smart UI example. It uses OpenDesigner's tokens almost everywhere,
+   and has three mistakes left in on purpose, so a review has something real to find. */
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--ds-color-surface-base); color: var(--ds-color-text-primary); font: var(--ds-text-body-md); }
+
+.pricing { max-inline-size: 72rem; margin-inline: auto; padding: var(--ds-space-section-sm) var(--ds-space-24); display: grid; gap: var(--ds-space-stack-xl); }
+.intro { display: grid; gap: var(--ds-space-stack-sm); }
+.intro h1 { margin: 0; font: var(--ds-text-headline-sm); }
+.lead { margin: 0; color: var(--ds-color-text-secondary); font: var(--ds-text-body-lg); }
+
+.plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 14px; }
+.plan { display: grid; align-content: start; gap: var(--ds-space-stack-sm); padding: var(--ds-space-inset-lg);
+  background: var(--ds-color-surface-raised); border: var(--ds-border-width-default) solid var(--ds-color-border-subtle);
+  border-radius: var(--ds-radius-container); }
+.plan h2 { margin: 0; font: var(--ds-text-title-md); }
+.plan p { margin: 0; }
+.featured { border-color: var(--ds-color-border-accent); box-shadow: var(--ds-elevation-raised); }
+.price { font: var(--ds-text-title-lg); }
+
+.badge { justify-self: start; padding: var(--ds-space-2) var(--ds-space-8); border-radius: var(--ds-radius-detail);
+  background: #ff5a1f; color: var(--ds-color-text-on-accent); font: var(--ds-text-label-md); white-space: nowrap; }
+
+.button { display: inline-flex; align-items: center; justify-content: center; min-block-size: var(--ds-size-target-touch);
+  padding: 0 var(--ds-space-inset-md); border-radius: var(--ds-radius-control); color: var(--ds-color-text-on-action);
+  background: var(--ds-color-bg-action-primary); font: var(--ds-text-label-lg); text-decoration: none; }
+.button:hover { background: var(--ds-color-bg-action-primary-hover); }
+.button.quiet { color: var(--ds-color-text-primary); background: transparent; border: var(--ds-border-width-default) solid var(--ds-color-border-default); }
+.button:focus-visible { outline: var(--ds-focus-ring-width) solid var(--ds-color-border-focus); outline-offset: var(--ds-focus-ring-offset); }
+
+.small { margin: 0; color: var(--ds-color-text-secondary); font: var(--ds-text-body-sm); }

@@ -1,0 +1,92 @@
+{
+ "about": "Parts made ahead of time for the OpenDesigner assistant's read actions (server.py). Each fills from its action's data by code (smartui.py bind); no model writes them. The first template for an action is the one the live server draws; check_templates.py fills and validates every one.",
+ "templates": [
+  {
+   "action": "review_page",
+   "intent": "review a page",
+   "when": "count(checks) > 1",
+   "part": {
+    "component": "KeyFacts",
+    "title": "{page_name} page, checked against your system",
+    "subtitle": "{summary}",
+    "facts": {
+     "each": "checks",
+     "item": {
+      "label": "{.title}",
+      "value": "{.verdict}: {.result}",
+      "tone": {"tone": ".status", "map": {"pass": "success", "look": "warning", "broken": "danger"}},
+      "note": "{.detail}"
+     }
+    },
+    "action": {
+     "when": "next_fix",
+     "then": {"label": "{next_fix.label}", "a11y_label": "Fix: {next_fix.title}", "event": {"name": "fix_check", "context": {"id": "{next_fix.id}"}}}
+    }
+   }
+  },
+  {
+   "action": "suggest_parts",
+   "intent": "library parts for a kind of page",
+   "when": "count(parts) > 0",
+   "part": {
+    "component": "ResultList",
+    "title": "Parts for a {page} page",
+    "note": "{note}",
+    "results": {
+     "each": "parts",
+     "item": {
+      "title": "{.name}",
+      "meta": "{.kind}",
+      "detail": "{.for}",
+      "badge": {"when": ".tokens_only", "then": "Tokens only"},
+      "action": {"label": "Add to kit", "a11y_label": "Add {.name} to your kit", "event": {"name": "add_part", "context": {"id": "{.id}"}}}
+     }
+    }
+   }
+  },
+  {
+   "action": "token_use",
+   "intent": "how much of the code uses the tokens",
+   "when": "total.values > 0",
+   "part": {
+    "component": "KpiStrip",
+    "label": "How much of your CSS uses tokens",
+    "stats": [
+     {"label": "All values", "value": "{total.share}%", "share": "{total.share}", "note": "{total.from_tokens} of {total.values} from tokens"},
+     {"when": "count(kinds) > 0", "then": {"label": "{kinds[0].kind}", "value": "{kinds[0].share}%", "share": "{kinds[0].share}",
+      "warning": {"when": "kinds[0].by_hand > 0", "then": "{kinds[0].by_hand} typed by hand"}, "note": "{kinds[0].from_tokens} of {kinds[0].values} from tokens"}},
+     {"when": "count(kinds) > 1", "then": {"label": "{kinds[1].kind}", "value": "{kinds[1].share}%", "share": "{kinds[1].share}",
+      "warning": {"when": "kinds[1].by_hand > 0", "then": "{kinds[1].by_hand} typed by hand"}, "note": "{kinds[1].from_tokens} of {kinds[1].values} from tokens"}},
+     {"when": "count(kinds) > 2", "then": {"label": "{kinds[2].kind}", "value": "{kinds[2].share}%", "share": "{kinds[2].share}",
+      "warning": {"when": "kinds[2].by_hand > 0", "then": "{kinds[2].by_hand} typed by hand"}, "note": "{kinds[2].from_tokens} of {kinds[2].values} from tokens"}}
+    ]
+   }
+  },
+  {
+   "action": "token_use",
+   "intent": "token use for every kind, as a table",
+   "when": "count(kinds) > 0",
+   "part": {
+    "component": "DataTable",
+    "title": "Token use by kind",
+    "summary": "{total.from_tokens} of {total.values} values come from tokens ({total.share}%), weakest first.",
+    "columns": [{"label": "Kind"}, {"label": "From tokens", "align": "end"}, {"label": "Share", "align": "end"}],
+    "rows": {"each": "kinds", "item": {"cells": [{"text": "{.kind}"}, {"text": "{.from_tokens} of {.values}"}, {"text": "{.share}%"}]}}
+   }
+  },
+  {
+   "action": "preview_corners",
+   "intent": "what a corner change would do, to approve",
+   "when": "count(radius) > 0",
+   "part": {
+    "component": "ApprovalPrompt",
+    "title": {"tone": "step", "map": {"up": "Make the corners rounder", "down": "Make the corners sharper"}},
+    "summary": "Roundness goes from {dial.from} to {dial.to}. {places.total} places use these tokens.",
+    "details": {"each": "radius", "max": 6, "item": {"label": "{.role}", "value": "{.change}"}},
+    "warning": "This changes every screen that uses these radius tokens.",
+    "cancel": {"label": "Keep them", "event": {"name": "cancel"}},
+    "approve": {"label": "Change corners", "event": {"name": "change_corners", "context": {"step": "{step}"}}}
+   }
+  }
+ ]
+}

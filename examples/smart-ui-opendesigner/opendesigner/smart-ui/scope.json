@@ -1,0 +1,250 @@
+{
+ "project": "/Users/Kunal/Desktop/Design-System/.claude/worktrees/bold-mayer-187bc2/examples/smart-ui-opendesigner",
+ "read": [
+  "opendesigner/state.json"
+ ],
+ "not_known": [],
+ "product_type": "marketing",
+ "product": "marketing docs-content",
+ "audience": "regular",
+ "system": "OpenDesigner brand",
+ "framework": "plain HTML",
+ "ai_sdks": [],
+ "tokens": {
+  "file": "opendesigner/build/css/tokens.css",
+  "kind": "opendesigner",
+  "count": 531
+ },
+ "chat_surface": [
+  "web/assistant.js"
+ ],
+ "actions": [
+  {
+   "kind": "route",
+   "method": "GET",
+   "path": "/api/pages/<page>/review",
+   "file": "server.py",
+   "name": "review_page",
+   "doc": "Check one page of the sample app against the design system: text contrast, corners, type, focus, labels that can't wrap, and engine.py review's hard-coded colours and spacing. Each check is pass, look or broken, with a short fix when there is one. Yields the result as each check lands.",
+   "changes_data": false
+  },
+  {
+   "kind": "route",
+   "method": "POST",
+   "path": "/api/pages/<page>/fixes",
+   "file": "server.py",
+   "name": "fix_check",
+   "doc": "Apply one review fix to the sample app (a scratch copy in work/): a hard-coded colour becomes a token, a gap moves onto the scale, or a label is allowed to wrap. Changes the page; Undo puts it back.",
+   "changes_data": true
+  },
+  {
+   "kind": "route",
+   "method": "POST",
+   "path": "/api/pages/<page>/fixes/undo",
+   "file": "server.py",
+   "name": "undo_fix",
+   "doc": "Take back one fix to the sample app: its CSS goes back to what it was before.",
+   "changes_data": true
+  },
+  {
+   "kind": "route",
+   "method": "GET",
+   "path": "/api/library/suggest",
+   "file": "server.py",
+   "name": "suggest_parts",
+   "doc": "The component library's best parts for one kind of page (3 to 5): name, what each is for, its kind and style, and whether it uses only your design tokens.",
+   "changes_data": false
+  },
+  {
+   "kind": "route",
+   "method": "POST",
+   "path": "/api/kit",
+   "file": "server.py",
+   "name": "add_part",
+   "doc": "Add one library part to the project's kit (a scratch folder in work/kit): its HTML, ready to use with your tokens. Undo removes it.",
+   "changes_data": true
+  },
+  {
+   "kind": "route",
+   "method": "POST",
+   "path": "/api/kit/remove",
+   "file": "server.py",
+   "name": "remove_part",
+   "doc": "Take one part back out of the kit.",
+   "changes_data": true
+  },
+  {
+   "kind": "route",
+   "method": "GET",
+   "path": "/api/tokens/use",
+   "file": "server.py",
+   "name": "token_use",
+   "doc": "How much of the sample app's CSS uses the design tokens: values that come from var(--ds-*) and values typed by hand, in total and per kind (colour, spacing, corners, type, shadows), as counts and percentages, with each value typed by hand and where it is.",
+   "changes_data": false
+  },
+  {
+   "kind": "route",
+   "method": "GET",
+   "path": "/api/glossary/<term>",
+   "file": "server.py",
+   "name": "define",
+   "doc": "What one design-system word means, in plain words, from OpenDesigner's glossary: the definition, other names for it, and what designers and code call it.",
+   "changes_data": false
+  },
+  {
+   "kind": "route",
+   "method": "GET",
+   "path": "/api/system/corners/preview",
+   "file": "server.py",
+   "name": "preview_corners",
+   "doc": "What changing the corner radius one step would do, without changing anything: each radius token before and after, and how many places use them.",
+   "changes_data": false
+  },
+  {
+   "kind": "route",
+   "method": "POST",
+   "path": "/api/system/corners",
+   "file": "server.py",
+   "name": "change_corners",
+   "doc": "Change the design system's corner radius one step (rounder or sharper) with the engine, on the scratch copy of the system: every radius token moves together. Changes the system; Undo puts it back.",
+   "changes_data": true
+  },
+  {
+   "kind": "route",
+   "method": "POST",
+   "path": "/api/system/corners/undo",
+   "file": "server.py",
+   "name": "undo_corners",
+   "doc": "Take back a corner change: the system's state and tokens go back to what they were before it.",
+   "changes_data": true
+  }
+ ],
+ "intents": [
+  {
+   "intent": "results to browse",
+   "phrases": [
+    "show me",
+    "recommend"
+   ],
+   "components": [
+    "ResultList"
+   ],
+   "from": "product type content"
+  },
+  {
+   "intent": "a picture",
+   "phrases": [
+    "photo",
+    "what does it look like"
+   ],
+   "components": [
+    "ImageCard"
+   ],
+   "from": "product type content"
+  },
+  {
+   "intent": "an answer with sources",
+   "phrases": [
+    "according to",
+    "sources"
+   ],
+   "components": [
+    "AnswerSources",
+    "CitationList"
+   ],
+   "from": "product type content"
+  },
+  {
+   "intent": "follow-up choices",
+   "phrases": [
+    "what next",
+    "more like this"
+   ],
+   "components": [
+    "QuickReplies"
+   ],
+   "from": "product type content"
+  },
+  {
+   "intent": "POST /api/pages/<page>/fixes",
+   "phrases": [],
+   "components": [
+    "ApprovalPrompt",
+    "Receipt",
+    "ErrorRetry"
+   ],
+   "from": "route in server.py"
+  },
+  {
+   "intent": "POST /api/pages/<page>/fixes/undo",
+   "phrases": [],
+   "components": [
+    "ApprovalPrompt",
+    "Receipt",
+    "ErrorRetry"
+   ],
+   "from": "route in server.py"
+  },
+  {
+   "intent": "POST /api/kit",
+   "phrases": [],
+   "components": [
+    "ApprovalPrompt",
+    "Receipt",
+    "ErrorRetry"
+   ],
+   "from": "route in server.py"
+  },
+  {
+   "intent": "POST /api/kit/remove",
+   "phrases": [],
+   "components": [
+    "ApprovalPrompt",
+    "Receipt",
+    "ErrorRetry"
+   ],
+   "from": "route in server.py"
+  },
+  {
+   "intent": "POST /api/system/corners",
+   "phrases": [],
+   "components": [
+    "ApprovalPrompt",
+    "Receipt",
+    "ErrorRetry"
+   ],
+   "from": "route in server.py"
+  },
+  {
+   "intent": "POST /api/system/corners/undo",
+   "phrases": [],
+   "components": [
+    "ApprovalPrompt",
+    "Receipt",
+    "ErrorRetry"
+   ],
+   "from": "route in server.py"
+  }
+ ],
+ "components_proposed": [
+  "AnswerSources",
+  "ApprovalPrompt",
+  "CitationList",
+  "ErrorRetry",
+  "ImageCard",
+  "QuickReplies",
+  "Receipt",
+  "ResultList"
+ ],
+ "components_confirmed": [
+  "approval-prompt",
+  "data-table",
+  "empty-state",
+  "error-retry",
+  "key-facts",
+  "kpi-strip",
+  "receipt",
+  "result-list"
+ ],
+ "confirmed_on": "2026-11-14"
+}

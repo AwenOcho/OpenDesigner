@@ -312,6 +312,8 @@ class Conversation:
         self.case_fixed, self.first_case_errors, self.routed_by_model, self.last_calls = 0, [], False, []
         tp = pathlib.Path(app.CATALOG).parent / "templates.json"  # parts made ahead of time for the app's read actions
         self.templates = (json.loads(tp.read_text()).get("templates", []) if tp.is_file() and self.USE_TEMPLATES else [])
+        self.matcher = smartui.Matcher(self.templates, app.ACTIONS, self.scope)  # finds the prepared part for a question
+        self.matched = ([], 0.0)
 
     # -- routing: which read actions to run
     def fast_route(self, message):
@@ -320,6 +322,13 @@ class Conversation:
         parameter's listed choices ("Hollow Lane", "visitor") fills a parameter. Returns (calls, sure). Not sure when
         nothing clearly matches before any data was fetched, or when the best match needs a value the message doesn't
         give ("the refunded one"): then a model routes."""
+        m = re.match(r"\s*(?:what is|what's|what are|define|what does)\s+(?:an?\s+|the\s+)?(.+?)(?:\s+mean)?\s*\??\s*$", message, re.I)
+        if m:  # "what is a design token?": the app's own definition, when it has an action for one
+            for name, a in self.app.ACTIONS.items():
+                if not a.get("changes") and re.search(r"defin|glossar|meaning", (a.get("description", "") + name).lower()):
+                    k = next((k for k in a.get("params", {}) if k in ("term", "word", "phrase", "query")), None)
+                    if k:
+                        return [(name, {k: m.group(1).strip()})], True
         # words that say nothing about which data ("did I get", "do I need") don't count as a match
         msg = set(smartui.words(message)) - {"get", "got", "did", "need", "have", "has", "want", "know", "see", "tell"}
         ids = re.findall(r"\b[A-Z]{1,5}[- ]?\d{2,}[A-Z0-9]*\b", message)
@@ -385,12 +394,42 @@ class Conversation:
         return bool(self.CHANGE_WORDS.search(message)) or any(
             (set(smartui.words(a["fn"].__name__.replace("_", " "))) - verbs) <= msg for a in self.app.ACTIONS.values() if a.get("changes"))
 
+    def _args(self, name, message):
+        """The values one action needs, from the message (an id in the action's own shape, a listed choice), or None."""
+        a = self.app.ACTIONS[name]
+        msg = set(smartui.words(message))
+        ids = re.findall(r"\b[A-Z]{1,5}[- ]?\d{2,}[A-Z0-9]*\b", message)
+        negated = bool(re.search(r"\b(not|no|never|without)\b|n't\b|\bun[a-z]+", message.lower()))
+        sig = inspect.signature(a["fn"]).parameters
+        args = {}
+        for k, desc in a.get("params", {}).items():
+            hit = None if negated else next((o for o in _choices(desc) if o.lower() not in {"all", "any", "none", "both", "default"}
+                                             and smartui.words(o.replace("-", " ")) and set(smartui.words(o.replace("-", " "))) <= msg), None)
+            if k in sig and hit:
+                args[k] = hit
+        for k, v in sig.items():
+            if v.default is inspect.Parameter.empty and k not in args:
+                if len(ids) == 1 and _fits(ids[0], a.get("params", {}).get(k, "")):
+                    args[k] = ids[0]
+                else:
+                    return None
+        return args
+
     def route(self, message):
         if self.provider == "recorded":
             return []
         calls, sure = self.fast_route(message)
+        self.matched = self.matcher.match(message)
         if sure:
             return calls
+        # the prepared parts know this product's questions too: a clear winner runs its action, still with no model
+        best, _ = self.matched
+        if best and not self.names_a_change(message):
+            top, t = best[0]
+            second = next((sc for sc, t2 in best[1:] if t2.get("action") != t.get("action")), 0)
+            args = self._args(t["action"], message) if top >= 2.0 and top >= 1.3 * second else None
+            if args is not None:
+                return [(t["action"], args)]
         self.routed_by_model = True
         system = ROUTE.format(reads=actions_text(self.app.ACTIONS, False), changes=actions_text(self.app.ACTIONS, True))
         schema = {"type": "object", "required": ["calls"], "properties": {"calls": {"type": "array", "items": {
@@ -437,7 +476,9 @@ class Conversation:
         calls = self.route(message)  # by its words, in a few milliseconds; a model only when it is unclear
         lane("data", "Find the data", "done")
         # The UI lane: the part made ahead of time for this question (templates.json), announced and drawn at once
-        planned = None if self.names_a_change(message) else self._planned(calls)
+        planned = self._planned(calls)
+        if planned and self.names_a_change(message) and planned[0]["part"].get("component") != "ApprovalPrompt":
+            planned = None  # a change gets its approval: a prepared one (the before and after, from the data), or the model's
         if planned:  # R1 first: a short fact ("when does my permit run out?") stays a sentence, template or not
             early = {}
             for name, _ in calls:
@@ -445,9 +486,16 @@ class Conversation:
                     early[part] = early.get(part, 0) + (3 if i == 0 else 2)
             pre = smartui.select(message, self.catalog, 3, self.scope, None, early)
             planned = self._planned(calls, pre["candidates"])  # the part the question wants most, among those made ahead
-            fits = set(self.route_parts.get(planned[1], [])) | set(pre["candidates"])
-            if not pre["ui"] or planned[0]["part"].get("component") not in fits:
+            mapped = set(self.route_parts.get(planned[1], []))
+            comp = planned[0]["part"].get("component")
+            # a prepared part is the owner's own answer for that action: used unless the question is a short fact, or
+            # the scope maps the action to a different part the question wants (usage as a chart, not the drafted table)
+            wants_other = bool(mapped) and comp not in mapped and comp != (pre["candidates"] or [None])[0]
+            fits = mapped | set(pre["candidates"]) | {comp}
+            if pre.get("short_fact") or wants_other:
                 planned = None  # a template only for a part this question wants (usage as a chart, not the table drafted)
+            else:
+                variants = [t for t in self.templates if t.get("action") == planned[1] and t["part"].get("component") in fits]
         if planned:
             t, act = planned
             comp = t["part"].get("component")
@@ -458,10 +506,11 @@ class Conversation:
             lane("ui", "Draw the outline", "done")
         # The data lane runs beside it; each chunk of data that lands fills the part further
         fresh, view = {}, None
+        ms["match"] = self.matched[1]
         for name, value, final in self.stream(calls, lane):
             fresh[name] = value
             if planned and name == planned[1]:
-                hit = smartui.pick_template([planned[0]], name, value)
+                hit = smartui.pick_template(variants, name, value)  # the variant the data fits (one unpaid fine: its card)
                 if hit:
                     msgs = smartui.wrap(hit[1], surface)
                     if smartui.validate(msgs, self.catalog, {"source": {**self.data, **fresh}, "copy": True})["ok"]:
@@ -505,10 +554,12 @@ class Conversation:
         lane("text", "Write the sentence", "run")
         system, sel = smartui.build_prompt(message, self.catalog, 3, self.scope, data, boost, always, structured=True, sel=sel)
         if view:
-            system += ("\n\nThe person already sees this part, built by the app from the data:\n"
-                       + json.dumps(view[0]["createSurface"]["components"][0], ensure_ascii=False)
+            shown = view[0]["createSurface"]["components"][0]
+            system += ("\n\nThe person already sees this part, built by the app from the data:\n" + json.dumps(shown, ensure_ascii=False)
                        + "\nWrite only the text: one or two plain sentences with what matters most (for a fine: the amount to pay "
-                         "now and the day that ends). Don't list every detail and don't add a part.")
+                         "now and the day that ends). Don't list every detail and don't add a part."
+                       + (" Nothing has happened yet: say what would change and that it waits for their yes. Never say it is done."
+                          if shown.get("component") == "ApprovalPrompt" else ""))
         names = (list(sel["candidates"]) + [a for a in always if a not in sel["candidates"] and a in self.catalog["components"]]) if sel["ui"] else []
         smaller = [names, names[:2] + [a for a in always if a in names[2:]], names[:1] + [a for a in always if a in names[1:]]]
         schema = [smartui.response_schema(self.catalog, n) for i, n in enumerate(smaller) if n and n not in smaller[:i]] \
@@ -584,11 +635,12 @@ class Conversation:
         return {"text": text, "answer": result["answer"], "data": data, "log": entry}
 
     def _planned(self, calls, rank=()):
-        """The template made ahead of time (templates.json) for an action this turn runs: (template, action). With rank
-        (the selector's parts, best first), the template whose part ranks highest."""
+        """The template made ahead of time (templates.json) for an action this turn runs: (template, action). The
+        matcher's score for the question comes first; then rank (the selector's parts, best first)."""
+        score = {id(t): sc for sc, t in self.matched[0]}
         found = [(t, name) for name, _ in calls for t in self.templates if t.get("action") == name]
-        if rank:
-            found.sort(key=lambda tn: list(rank).index(tn[0]["part"].get("component")) if tn[0]["part"].get("component") in rank else 99)
+        found.sort(key=lambda tn: (-score.get(id(tn[0]), 0),
+                                   list(rank).index(tn[0]["part"].get("component")) if tn[0]["part"].get("component") in rank else 99))
         return found[0] if found else None
 
     def stream(self, calls, lane=lambda *a: None):
