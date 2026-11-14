@@ -69,7 +69,7 @@ python3 skills/opendesigner/scripts/engine.py pick Q-shape-01 subtle --set-by ch
 python3 skills/opendesigner/scripts/engine.py set dials.roundness 45 --set-by delegated --why "..."   (fonts, brand color, dials and answers say how they were set; chosen needs --quote)
 python3 skills/opendesigner/scripts/engine.py generate && python3 skills/opendesigner/scripts/engine.py validate
 python3 skills/opendesigner/scripts/engine.py design-md        (DESIGN.md and PRODUCT.md at the project root)
-python3 skills/opendesigner/scripts/engine.py export --format css|tailwind|figma|paper|swift|compose|dtcg|artifact|brand|all
+python3 skills/opendesigner/scripts/engine.py export --format css|tailwind|figma|paper|swift|compose|dtcg|artifact|brand|status|all
 python3 skills/opendesigner/scripts/engine.py build     (generate + validate; if no errors: exports + DESIGN.md + overview + preview; --force exports anyway)
 python3 skills/opendesigner/scripts/engine.py overview --open   (overview.html: the person's whole system on one page; what is missing says "Not enough information")
 python3 skills/opendesigner/scripts/engine.py audit-page --open   (audit.html: the system as the code builds it; every inconsistency with file:line evidence and options to preview and copy; reports only)
@@ -174,6 +174,7 @@ python3 tools/test_wiki.py               learning wiki tests (.venv-wiki/bin/pyt
 python3 tools/test_plugin_hook.py        the plugin's start-of-session hook: read-only and fast, one offer per project, silent otherwise
 python3 tools/test_checkins.py           check-ins: every N decisions, closed rounds, settings, none before the first result
 python3 tools/test_review_drift.py       review flags unknown token names, typed fonts, off-system weights and unapproved od-ignore
+python3 tools/test_status_feedback.py    the status map (build/status.json), DESIGN.md's Status and Feedback rules, review's judgment notes
 python3 tools/design_evals.py --check --no-save   the engine on 20 fixed briefs: every required check passes (evals/README.md)
 python3 skills/opendesigner/scripts/library.py check   every library component uses only tokens every engine system writes, is scoped, and has complete tags, a complete spec, and library.json is current (else: library.py catalog)
 python3 server/mcp/test_server.py           the library MCP server over stdio: read-only tools, the gallery view, both protocol versions
