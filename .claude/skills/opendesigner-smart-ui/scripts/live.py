@@ -290,6 +290,8 @@ Reply with JSON only: {{"calls": [{{"action": "<name>", "args": {{...}}}}]}}. Us
 class Conversation:
     """One person's chat: the turns so far, and every piece of data the app returned (what later answers may use)."""
 
+    USE_TEMPLATES = True  # parts made ahead of time; tests of the model-written path turn this off
+
     def __init__(self, app, provider, catalog=None):
         self.app, self.provider = app, provider
         self.catalog = catalog or json.loads(pathlib.Path(app.CATALOG).read_text())
@@ -309,7 +311,7 @@ class Conversation:
         self.offered = []      # the changes an answer offered as buttons: (name, context); a press must match one (R3)
         self.case_fixed, self.first_case_errors, self.routed_by_model, self.last_calls = 0, [], False, []
         tp = pathlib.Path(app.CATALOG).parent / "templates.json"  # parts made ahead of time for the app's read actions
-        self.templates = (json.loads(tp.read_text()).get("templates", []) if tp.is_file() else [])
+        self.templates = (json.loads(tp.read_text()).get("templates", []) if tp.is_file() and self.USE_TEMPLATES else [])
 
     # -- routing: which read actions to run
     def fast_route(self, message):
@@ -441,8 +443,11 @@ class Conversation:
             for name, _ in calls:
                 for i, part in enumerate(self.route_parts.get(name, [])):
                     early[part] = early.get(part, 0) + (3 if i == 0 else 2)
-            if not smartui.select(message, self.catalog, 3, self.scope, None, early)["ui"]:
-                planned = None
+            pre = smartui.select(message, self.catalog, 3, self.scope, None, early)
+            planned = self._planned(calls, pre["candidates"])  # the part the question wants most, among those made ahead
+            fits = set(self.route_parts.get(planned[1], [])) | set(pre["candidates"])
+            if not pre["ui"] or planned[0]["part"].get("component") not in fits:
+                planned = None  # a template only for a part this question wants (usage as a chart, not the table drafted)
         if planned:
             t, act = planned
             comp = t["part"].get("component")
@@ -578,13 +583,13 @@ class Conversation:
         self.log.append(entry)
         return {"text": text, "answer": result["answer"], "data": data, "log": entry}
 
-    def _planned(self, calls):
-        """The first template made ahead of time (templates.json) for an action this turn runs: (template, action)."""
-        for name, _ in calls:
-            t = next((t for t in self.templates if t.get("action") == name), None)
-            if t:
-                return t, name
-        return None
+    def _planned(self, calls, rank=()):
+        """The template made ahead of time (templates.json) for an action this turn runs: (template, action). With rank
+        (the selector's parts, best first), the template whose part ranks highest."""
+        found = [(t, name) for name, _ in calls for t in self.templates if t.get("action") == name]
+        if rank:
+            found.sort(key=lambda tn: list(rank).index(tn[0]["part"].get("component")) if tn[0]["part"].get("component") in rank else 99)
+        return found[0] if found else None
 
     def stream(self, calls, lane=lambda *a: None):
         """The data lane: run the read actions on a worker thread, yielding (action, value, final) as data lands. An

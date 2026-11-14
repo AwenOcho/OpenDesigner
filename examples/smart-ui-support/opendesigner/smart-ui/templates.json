@@ -1,0 +1,201 @@
+{
+ "about": "Parts made ahead of time for this app's read actions, bound to their data (smartui.py templates). live.py fills them by code; the model writes only the sentence.",
+ "templates": [
+  {
+   "action": "list_invoices",
+   "intent": "List invoices",
+   "part": {
+    "component": "DataTable",
+    "title": "Invoices",
+    "columns": [
+     {
+      "label": "Number"
+     },
+     {
+      "label": "Date"
+     },
+     {
+      "label": "Amount"
+     },
+     {
+      "label": "Status"
+     },
+     {
+      "label": "Due"
+     }
+    ],
+    "rows": {
+     "each": "invoices",
+     "item": {
+      "cells": [
+       {
+        "text": "{.number|or:–}"
+       },
+       {
+        "text": "{.date|or:–}"
+       },
+       {
+        "text": "{.amount|or:–}"
+       },
+       {
+        "text": "{.status|or:–}"
+       },
+       {
+        "text": "{.due|or:–}"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "action": "get_invoice",
+   "intent": "Get invoice",
+   "part": {
+    "component": "DataTable",
+    "title": "Lines",
+    "columns": [
+     {
+      "label": "Label"
+     },
+     {
+      "label": "Amount"
+     }
+    ],
+    "rows": {
+     "each": "invoice.lines",
+     "item": {
+      "cells": [
+       {
+        "text": "{.label|or:–}"
+       },
+       {
+        "text": "{.amount|or:–}"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "action": "get_usage",
+   "intent": "Get usage",
+   "part": {
+    "component": "DataTable",
+    "title": "Usage",
+    "columns": [
+     {
+      "label": "Month"
+     },
+     {
+      "label": "Calls"
+     },
+     {
+      "label": "Seats"
+     }
+    ],
+    "rows": {
+     "each": "usage",
+     "item": {
+      "cells": [
+       {
+        "text": "{.month|or:–}"
+       },
+       {
+        "text": "{.calls|text|or:–}"
+       },
+       {
+        "text": "{.seats|text|or:–}"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "action": "list_plans",
+   "intent": "List plans",
+   "part": {
+    "component": "DataTable",
+    "title": "Plans",
+    "columns": [
+     {
+      "label": "Name"
+     },
+     {
+      "label": "Price per seat"
+     },
+     {
+      "label": "Calls"
+     },
+     {
+      "label": "Support"
+     },
+     {
+      "label": "Sso"
+     }
+    ],
+    "rows": {
+     "each": "plans",
+     "item": {
+      "cells": [
+       {
+        "text": "{.name|or:–}"
+       },
+       {
+        "text": "{.price_per_seat|text|or:–}"
+       },
+       {
+        "text": "{.calls|or:–}"
+       },
+       {
+        "text": "{.support|or:–}"
+       },
+       {
+        "text": "{.sso|or:–}"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "action": "get_subscription",
+   "intent": "Get subscription",
+   "part": {
+    "component": "KeyFacts",
+    "title": "Subscription",
+    "facts": [
+     {
+      "label": "Plan",
+      "value": "{subscription.plan}"
+     },
+     {
+      "label": "Seats",
+      "value": "{subscription.seats|text}"
+     },
+     {
+      "label": "Price per seat",
+      "value": "{subscription.price_per_seat|text}"
+     },
+     {
+      "label": "Monthly",
+      "value": "{subscription.monthly}"
+     },
+     {
+      "label": "Renews",
+      "value": "{subscription.renews}"
+     },
+     {
+      "label": "Card",
+      "value": "{subscription.card}"
+     },
+     {
+      "label": "Calls included",
+      "value": "{subscription.calls_included|text}"
+     }
+    ]
+   }
+  }
+ ]
+}

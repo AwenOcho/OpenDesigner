@@ -286,6 +286,8 @@ class Live(unittest.TestCase):
         self.live = live
         self.app = live.load_app(ROOT / "examples" / "smart-ui-support" / "server.py")
         self.ran = []
+        live.Conversation.USE_TEMPLATES = False  # these test the model-written path
+        self.addCleanup(setattr, live.Conversation, "USE_TEMPLATES", True)
         a = self.app.ACTIONS["pay_invoice"]
         a["fn"] = (lambda f: (lambda **kw: (self.ran.append(kw), f(**kw))[1]))(a["fn"])
 
@@ -379,6 +381,21 @@ class Live(unittest.TestCase):
         self.assertEqual(done, ["c3", "undo c3"])
         self.assertEqual(conv.press({"name": "fix", "context": {"id": "c3"}}).get("toast"), None)  # the offer was used
         self.assertEqual(done, ["c3", "undo c3"])
+
+    def test_a_template_fills_the_part_and_the_model_writes_the_sentence(self):
+        self.live.Conversation.USE_TEMPLATES = True
+        app = self.live.load_app(ROOT / "examples" / "smart-ui-fernhollow" / "server.py")
+        self.script([json.dumps({"text": "You have one unpaid fine: £35.00 until Thursday 19 November.", "part": None})])
+        events = []
+        r = self.live.Conversation(app, "scripted").answer("have I got any parking fines?", on_event=events.append)
+        kinds = [e["type"] for e in events]
+        self.assertTrue(kinds.index("call") < kinds.index("shell") < kinds.index("part"))
+        self.assertTrue(r["log"]["template"])
+        part = r["answer"][0]["createSurface"]["components"][0]
+        self.assertEqual(part["component"], "KeyFacts")
+        self.assertEqual(part["action"]["event"], {"name": "pay_fine", "context": {"reference": "FH40018273"}})
+        self.assertNotIn("KeyFacts", json.dumps(self.asked[0]))  # the model was asked for text only
+        self.assertEqual(r["log"]["first_errors"], [])
 
     def test_change_needs_the_renderers_approval(self):
         self.script(["It's paid.", "It's paid."])

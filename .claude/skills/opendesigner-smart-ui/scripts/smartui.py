@@ -508,10 +508,13 @@ def select(msg, catalog, k=3, scope=None, data=None, boost=None):
     # a question about one attribute ("how many seats", "which zone", "does it include SSO") is a short fact; "do I have
     # any fines", "can I get a visitor permit" and "what is fine FH40018273 for" ask for a whole record or a list
     short_fact = (len(words(msg)) <= 6 and re.match(r"^\s*(what is|what's|when|who|which|how many|how much|is|are|does|did)\b", norm(msg))
-                  and not re.search(r"\b(any|all|every|each)\b|\b(can|could|should) (i|we)\b", norm(msg)) and not re.search(r"\b[A-Z]{1,5}-?\d{3,}", msg)
+                  and not re.search(r"\b(any|all|every|each)\b|\b(can|could|should) (i|we)\b|^\s*(is|are) there\b|^\s*(did|have|do) (i|we) (get|got|have)\b", norm(msg))
+                  and not re.search(r"\b[A-Z]{1,5}-?\d{3,}", msg)
                   and not cue and best_words < 3
                   and not re.search(r"\band (when|what|how|who|where|which)\b", norm(msg)))  # two questions in one are not a short fact
-    ui = bool(top) and reason and not short_fact
+    # "when is the next invoice due?" asks for one date: a sentence, whatever cue word it has
+    when_fact = bool(re.match(r"^\s*when\b", norm(msg))) and not re.search(r"\b(each|every|all|list|show|times|slots)\b", norm(msg))
+    ui = bool(top) and reason and not short_fact and not when_fact
     return {"ui": ui, "candidates": top if ui else [], "scores": {n: round(s, 2) for s, n in ranked[:k + 2]},
             "why": ("a cue for UI and a part that fits" if ui else "no reason for UI: answer in text (R1)")}
 
