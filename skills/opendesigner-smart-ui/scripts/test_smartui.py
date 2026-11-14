@@ -164,6 +164,41 @@ class Catalog(unittest.TestCase):
         walk(cat["components"])
 
 
+class Templates(unittest.TestCase):
+    DATA = {"vehicle": "AB12 CDE", "seats": 12, "fines": [
+        {"reference": "FH1", "status": "Unpaid", "amount": "£70.00", "file": None},
+        {"reference": "FH2", "status": "Paid", "amount": "£35.00", "file": "a.pdf"}]}
+
+    def test_bind_paths_lists_tones_and_conditions(self):
+        t = {"component": "KeyFacts", "title": "Fines for {vehicle}", "facts": [
+            {"label": "Seats", "value": "{seats|text}"},
+            {"label": "Unpaid", "value": "{fines[status=Unpaid][0].reference}", "tone": {"tone": "fines[status=Unpaid][0].status", "map": {"Unpaid": "warning", "*": "success"}}},
+            {"when": "count(fines[status=Unpaid]) > 5", "then": {"label": "Many", "value": "yes"}}],
+            "rows": {"each": "fines", "item": {"cells": [{"text": "{.reference}"}, {"text": "{.file|or:–}"}]}}}
+        out = smartui.bind(t, self.DATA)
+        self.assertEqual(out["title"], "Fines for AB12 CDE")
+        self.assertEqual(out["facts"][0]["value"], "12")
+        self.assertEqual(out["facts"][1], {"label": "Unpaid", "value": "FH1", "tone": "warning"})
+        self.assertEqual(len(out["facts"]), 2)  # the condition did not hold
+        self.assertEqual(out["rows"][0]["cells"][1]["text"], "–")
+
+    def test_pick_the_first_template_whose_condition_holds(self):
+        ts = [{"action": "list_fines", "when": "count(fines[status=Unpaid]) == 2", "part": {"component": "A"}},
+              {"action": "list_fines", "when": "count(fines[status=Unpaid]) == 1", "part": {"component": "B"}},
+              {"action": "list_fines", "part": {"component": "C"}}]
+        self.assertEqual(smartui.pick_template(ts, "list_fines", self.DATA)[1]["component"], "B")
+        self.assertIsNone(smartui.pick_template(ts, "other", self.DATA))
+
+    def test_drafts_fit_the_data_they_came_from(self):
+        cat = json.loads((ROOT / "examples" / "smart-ui-fernhollow" / "opendesigner" / "smart-ui" / "catalog.json").read_text())
+        res = {"application": {"reference": "RP-1", "steps": [{"label": "Sent", "state": "done"}, {"label": "Checked", "state": "current"}]}}
+        t = smartui.draft_template("application_status", res, cat)
+        part = smartui.bind(t["part"], res)
+        self.assertEqual(part["component"], "ProgressStatus")
+        self.assertEqual(part["status"], "Checked")
+        self.assertTrue(smartui.validate(smartui.wrap(part), cat, {"source": res})["ok"])
+
+
 class CopyRules(unittest.TestCase):
     def test_duplicate_rows_are_text_facts_only(self):
         errs = []
@@ -307,7 +342,10 @@ class Live(unittest.TestCase):
         self.script([reply])
         events = []
         r = self.live.Conversation(self.app, "scripted").answer("Show my open invoices", on_event=events.append)
-        self.assertEqual(events[0]["type"], "skeleton")  # drawn before the model's answer
+        kinds = [e["type"] for e in events]
+        self.assertIn("skeleton", kinds)
+        self.assertLess(kinds.index("skeleton"), kinds.index("done") if "done" in kinds else len(kinds))  # drawn before the answer
+        self.assertIn("call", kinds)  # the tool-call chip (show_ui)
         self.assertEqual(r["log"]["part"], "KeyFacts")
         self.assertIn("KeyFacts", json.dumps(self.asked[0]))  # the reply was constrained to the chosen parts
         self.assertIn("skeleton", r["log"]["ms"])
@@ -320,6 +358,27 @@ class Live(unittest.TestCase):
         self.assertEqual(r["log"]["part"], "KeyFacts")
         sch = smartui.response_schema(self.live.Conversation(self.app, "scripted").catalog, ["KeyFacts", "DataTable"])
         self.assertEqual(sorted(sch["properties"]["part"]["properties"]), ["DataTable", "KeyFacts"])  # one key per part
+
+    def test_a_reversible_change_runs_on_its_shown_button_with_a_toast(self):
+        done = []
+        fix = lambda id: (done.append(id), {"fixed": id, "toast": f"Fixed {id}", "undo": {"name": "unfix", "context": {"id": id}}})[1]
+        unfix = lambda id: (done.append("undo " + id), {"toast": "Change undone"})[1]
+        self.app.ACTIONS["fix"] = {"description": "Fix a check.", "changes": True, "reversible": True, "fn": fix, "params": {"id": "check"}}
+        self.app.ACTIONS["unfix"] = {"description": "Undo a fix.", "changes": True, "reversible": True, "fn": unfix, "params": {"id": "check"}}
+        self.script(["Do you want me to fix it?"] * 3)
+        conv = self.live.Conversation(self.app, "scripted")
+        r = conv.press({"name": "fix", "context": {"id": "c3"}})  # never shown: asks, runs nothing
+        self.assertEqual(done, [])
+        conv._remember_offers([{"createSurface": {"components": [{"x": {"label": "Fix", "event": {"name": "fix", "context": {"id": "c3"}}}}]}}])
+        r = conv.press({"name": "fix", "context": {"id": "c3"}})
+        self.assertEqual(done, ["c3"])
+        self.assertEqual(r["toast"]["text"], "Fixed c3")
+        self.assertEqual(r["toast"]["undo"]["name"], "unfix")
+        conv.press(r["toast"]["undo"])  # Undo, once
+        conv.press(r["toast"]["undo"])
+        self.assertEqual(done, ["c3", "undo c3"])
+        self.assertEqual(conv.press({"name": "fix", "context": {"id": "c3"}}).get("toast"), None)  # the offer was used
+        self.assertEqual(done, ["c3", "undo c3"])
 
     def test_change_needs_the_renderers_approval(self):
         self.script(["It's paid.", "It's paid."])

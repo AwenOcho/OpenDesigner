@@ -19,6 +19,7 @@ no network. The rules (R1 to R7) are in ../references/rules.md.
 import argparse
 import datetime
 import html as htmllib
+import inspect
 import json
 import pathlib
 import re
@@ -568,6 +569,129 @@ def build_prompt(msg, catalog, k=3, scope=None, data=None, boost=None, always=()
     if data is not None:
         lines += ["", "Data you may use (every number you show must come from here):", json.dumps(data, ensure_ascii=False)[:6000]]
     return "\n".join(lines), sel
+
+
+# ----------------------------------------------------------------------------------------------- bound templates
+# A template is a part made ahead of time for one of the app's read actions (opendesigner/smart-ui/templates.json), with
+# its slots bound to the action's data. At run time it fills from the data by code: no model writes the part.
+#
+#   {"action": "list_fines", "when": "count(fines[status=Unpaid]) == 1", "intent": "a parking fine",
+#    "part": {"component": "KeyFacts", "title": "Unpaid parking fine", "subtitle": "Vehicle {vehicle}",
+#             "facts": [{"label": "Reference", "value": "{fines[status=Unpaid][0].reference}"}, ...],
+#             "action": {"label": "Pay {fines[status=Unpaid][0].to_pay_now}", "event": {"name": "pay_fine", "context": {...}}}}}
+#
+# Paths: a.b.c, list[0], list[field=value] (keeps matching items), count(path). Inside {"each": "path", "item": {...}},
+# ".field" is the current item. {"tone": "path", "map": {"Unpaid": "warning", "*": "success"}} sets a semantic tone from
+# the data (green for good, red for bad come from the system's tokens, never from a model). {"when": "...", "then": X}
+# keeps X only when the condition holds. A string that is one placeholder keeps the value's type (a number stays one).
+
+_PH = re.compile(r"\{([^{}]+)\}")
+
+
+def _get(path, root, cur=None):
+    path = path.strip()
+    if "|or:" in path:  # "{.file|or:–}": a cell shows a dash when the data has no value
+        base, _, alt = path.partition("|or:")
+        v = _get(base, root, cur)
+        return alt if v is None or v == "" else v
+    if path.endswith("|text"):  # "{seats|text}": the value as words, for a text slot (12 -> "12")
+        v = _get(path[:-5], root, cur)
+        return None if v is None else str(v)
+    m = re.fullmatch(r"count\((.+)\)", path)
+    if m:
+        v = _get(m.group(1), root, cur)
+        return len(v) if isinstance(v, list) else (0 if v is None else 1)
+    node = cur if path.startswith(".") else root
+    for tok in re.findall(r"\.?([A-Za-z_][\w-]*)|\[([^\]]+)\]", path):
+        key, br = tok
+        if node is None:
+            return None
+        if key:
+            node = node.get(key) if isinstance(node, dict) else None
+        elif re.fullmatch(r"-?\d+", br):
+            i = int(br)
+            node = node[i] if isinstance(node, list) and -len(node) <= i < len(node) else None
+        else:
+            k, _, want = br.partition("=")
+            node = [x for x in node if isinstance(x, dict) and str(x.get(k.strip())) == want.strip()] if isinstance(node, list) else None
+    return node
+
+
+def _holds(cond, root, cur=None):
+    m = re.fullmatch(r"\s*(.+?)\s*(==|!=|>=|<=|>|<)\s*(.+?)\s*", cond)
+    if not m:
+        v = _get(cond, root, cur)
+        return bool(v)
+    a, op, b = m.groups()
+    av = _get(a, root, cur)
+    bv = b.strip("'\"")
+    try:
+        av, bv = float(av), float(bv)
+    except (TypeError, ValueError):
+        av = "" if av is None else str(av)
+    return {"==": av == bv, "!=": av != bv, ">=": av >= bv, "<=": av <= bv, ">": av > bv, "<": av < bv}[op]
+
+
+def bind(node, root, cur=None):
+    """Fill a template from data. Returns the filled value, or None for a slot whose data is missing."""
+    if isinstance(node, str):
+        whole = _PH.fullmatch(node)
+        if whole:
+            return _get(whole.group(1), root, cur)
+        out, missing = [], False
+
+        def sub(m):
+            nonlocal missing
+            v = _get(m.group(1), root, cur)
+            if v is None:
+                missing = True
+                return ""
+            return str(v)
+        text = _PH.sub(sub, node)
+        return None if missing else text
+    if isinstance(node, list):
+        out = []
+        for x in node:
+            if isinstance(x, dict) and "when" in x and "then" in x:
+                if _holds(x["when"], root, cur):
+                    v = bind(x["then"], root, cur)
+                    if v is not None:
+                        out.append(v)
+                continue
+            v = bind(x, root, cur)
+            if v is not None:
+                out.append(v)
+        return out
+    if isinstance(node, dict):
+        if "each" in node and "item" in node:
+            items = _get(node["each"], root, cur)
+            items = items if isinstance(items, list) else []
+            return [v for v in (bind(node["item"], root, it) for it in items[: node.get("max", 50)]) if v is not None]
+        if "tone" in node and "map" in node:
+            v = _get(node["tone"], root, cur)
+            return node["map"].get(str(v), node["map"].get("*"))
+        if "when" in node and "then" in node:
+            return bind(node["then"], root, cur) if _holds(node["when"], root, cur) else None
+        out = {}
+        for k, x in node.items():
+            v = bind(x, root, cur)
+            if v is not None and v != [] and v != "":
+                out[k] = v
+        return out
+    return node
+
+
+def pick_template(templates, action, data, message=""):
+    """The first template for this action whose condition holds for the data, filled; or None."""
+    for t in templates:
+        if t.get("action") != action:
+            continue
+        if t.get("when") and not _holds(t["when"], data):
+            continue
+        part = bind(t["part"], data)
+        if isinstance(part, dict) and part.get("component"):
+            return t, part
+    return None
 
 
 def response_schema(catalog, names):
@@ -1450,6 +1574,136 @@ def propose_intents(product, actions):
     return out
 
 
+GOOD = re.compile(r"^(paid|done|ok|active|open now|available|approved|passed?|complete|completed|on time|eligible|yes|in stock|delivered)\b", re.I)
+BAD = re.compile(r"^(unpaid|overdue|failed|error|broken|declined|refused|closed|cancelled|no|not|out of stock|delayed|missing|still needed)\b", re.I)
+WAIT = re.compile(r"^(pending|waiting|look|review|in progress|processing|due|warning)\b", re.I)
+
+
+def _label(key):
+    return key.replace("_", " ").strip().capitalize()
+
+
+def _tone_map(values):
+    m = {}
+    for v in values:
+        t = "success" if GOOD.search(v) else "danger" if BAD.search(v) else "warning" if WAIT.search(v) else None
+        if t:
+            m[v] = t
+    return m
+
+
+def draft_template(action, result, catalog):
+    """A first bound template for one read action, from the shape of its real result (the owner edits the labels)."""
+    comps = catalog["components"]
+    if not isinstance(result, dict) or "error" in result:
+        return None
+    def scalars(d, limit=80):
+        keys = [k for k, v in d.items() if isinstance(v, (str, int, float)) and not isinstance(v, bool) and not k.endswith("_in_words") and v != ""]
+        out = []
+        for k in keys:
+            f = f"{k}_in_words" if f"{k}_in_words" in d else k
+            if len(str(d[f])) <= limit:
+                out.append((k, f + ("|text" if isinstance(d[f], (int, float)) else "")))
+        return out
+    lists = [(k, v) for k, v in result.items() if isinstance(v, list) and v and all(isinstance(x, dict) for x in v)]
+    for rk, rv in result.items():  # one level down: {"application": {"steps": [...]}}
+        if isinstance(rv, dict):
+            lists += [(f"{rk}.{k}", v) for k, v in rv.items() if isinstance(v, list) and v and all(isinstance(x, dict) for x in v)]
+    for k, v in lists:  # steps: label and state
+        if "ProgressStatus" in comps and all("label" in x and "state" in x for x in v):
+            states = {"done": "done", "complete": "done", "current": "now", "now": "now", "next": "next"}
+            now = next((x["state"] for x in v if str(x.get("state")).lower() in ("current", "now")), "current")
+            return {"action": action, "intent": _label(action), "part": {"component": "ProgressStatus", "title": _label(k.split(".")[0]),
+                    "tone": "info", "status": "{%s[state=%s][0].label|or:In progress}" % (k, now), "steps": {
+                "each": k, "item": {"label": "{.label}", "state": {"tone": ".state", "map": {**states, "*": "next"}}}}}}
+    if lists and "DataTable" in comps:
+        k, v = max(lists, key=lambda kv: len(kv[1]))
+        cols = scalars(v[0])[:5]
+        if len(cols) >= 2:
+            return {"action": action, "intent": _label(action), "part": {"component": "DataTable", "title": _label(k.split(".")[-1]),
+                    "columns": [{"label": _label(c)} for c, _ in cols],
+                    "rows": {"each": k, "item": {"cells": [{"text": "{.%s|or:–}" % (f if f.endswith("|text") else f)} for _, f in cols]}}}}
+    rec = result
+    nested = [v for v in result.values() if isinstance(v, dict)]
+    if len(nested) == 1 and len(scalars(nested[0])) >= 2:
+        rec = nested[0]
+        prefix = next(k for k, v in result.items() if v is rec) + "."
+    else:
+        prefix = ""
+    fields = scalars(rec, 120)[:8]
+    if "KeyFacts" in comps and len(fields) >= 2:
+        facts = []
+        for k, f in fields:
+            fact = {"label": _label(k), "value": "{%s%s}" % (prefix, f)}
+            if re.search(r"status|state", k) and isinstance(rec.get(k), str):
+                tones = _tone_map([rec[k]])
+                if tones:
+                    fact["tone"] = {"tone": prefix + k, "map": {**tones, "*": "neutral"}}
+            facts.append(fact)
+        return {"action": action, "intent": _label(action), "part": {"component": "KeyFacts", "title": _label(action.split("_", 1)[-1]), "facts": facts}}
+    return None
+
+
+def cmd_templates(a):
+    """Draft templates.json: run each read action of the app once (defaults, or the example its description gives) and
+    bind a part to the shape of what it returns. The owner edits titles and labels; live.py fills them from data."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("od_app", a.app)
+    app = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(app)
+    catalog = json.loads(pathlib.Path(app.CATALOG).read_text())
+    out, skipped = [], []
+    for name, act in app.ACTIONS.items():
+        if act.get("changes"):
+            continue
+        sig = inspect.signature(act["fn"]).parameters
+        args = {}
+        for k, v in sig.items():
+            if v.default is inspect.Parameter.empty:
+                desc = act.get("params", {}).get(k, "")
+                m = re.search(r"such as ([^,;()]+?)(?:[,;()]|$)", desc)
+                choice = re.match(r"\s*([\w-]+)(?:,| or )", desc)  # "hollow-lane, marsh-road or eastgate": the first
+                if not (m or choice):
+                    break
+                args[k] = (m or choice).group(1).strip()
+        else:
+            try:
+                res = act["fn"](**args)
+                if inspect.isgenerator(res):
+                    last = None
+                    for last in res:
+                        pass
+                    res = last
+            except Exception as e:
+                skipped.append(f"{name}: {e}")
+                continue
+            t = draft_template(name, res, catalog)
+            if t:
+                part = bind(t["part"], res)
+                errs = validate(wrap(part), catalog, {"source": res})["errors"] if part else ["empty"]
+                if not errs:
+                    out.append(t)
+                    print(f"{name}: {t['part']['component']}")
+                    continue
+                skipped.append(f"{name}: the draft fails its own data ({errs[0]['rule'] if isinstance(errs[0], dict) else errs[0]})")
+                continue
+            skipped.append(f"{name}: no part fits the shape of its data")
+            continue
+        skipped.append(f"{name}: needs a value with no example in its description")
+    for x in skipped:
+        print("skipped " + x)
+    dest = pathlib.Path(app.CATALOG).parent / "templates.json"
+    if a.write:
+        if dest.exists() and not a.force:
+            print(f"{dest} exists: drafts not written (--force replaces it; edits there are the owner's)")
+            return 1
+        dest.write_text(json.dumps({"about": "Parts made ahead of time for this app's read actions, bound to their data "
+                                    "(smartui.py templates). live.py fills them by code; the model writes only the sentence.",
+                                    "templates": out}, indent=1, ensure_ascii=False) + "\n")
+        print(f"wrote {dest}")
+    return 0
+
+
 def cmd_scope(a):
     s = scope(a.project)
     if a.write:
@@ -1539,6 +1793,10 @@ def main(argv=None):
     p.add_argument("--project", default=".")
     p.add_argument("--json", action="store_true")
     p.add_argument("--write", action="store_true", help="save opendesigner/smart-ui/scope.json")
+    p = sub.add_parser("templates", help="draft templates.json: a part bound to each read action's data")
+    p.add_argument("--app", required=True, help="the app module that defines ACTIONS and CATALOG (like examples/*/server.py)")
+    p.add_argument("--write", action="store_true")
+    p.add_argument("--force", action="store_true")
     p = sub.add_parser("offer", help="read-only: is there a reason to suggest Smart UI in this project?")
     p.add_argument("--project", default=".")
     p = sub.add_parser("confirm", help="record the components the person confirmed")
@@ -1589,7 +1847,7 @@ def main(argv=None):
     p.add_argument("--no-shots", action="store_true", help="no screenshots (saves disk)")
     p.add_argument("--ledger", action="store_true", help="record each failure with engine.py ledger (asks nothing; read the report first)")
     a = ap.parse_args(argv)
-    return {"scope": cmd_scope, "offer": cmd_offer, "confirm": cmd_confirm, "catalog": cmd_catalog, "prompt": cmd_prompt, "validate": cmd_validate,
+    return {"scope": cmd_scope, "templates": cmd_templates, "offer": cmd_offer, "confirm": cmd_confirm, "catalog": cmd_catalog, "prompt": cmd_prompt, "validate": cmd_validate,
             "text": cmd_text, "audit": cmd_audit, "view": cmd_view, "components": cmd_components}[a.cmd](a)
 
 

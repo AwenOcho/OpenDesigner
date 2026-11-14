@@ -82,9 +82,13 @@ class ODChat extends HTMLElement {
     await this.call("/api/chat", { session: SID, message });
   }
 
+  /** Every streamed event goes to the page too (a "what runs behind the answer" panel listens for these). */
+  tell(ev) { this.dispatchEvent(new CustomEvent("od-chat-event", { detail: ev, bubbles: true })); }
+
   async call(url, body) {
     this.busy(true);
     let r, early = null;
+    this.tell({ type: "start", url });
     try {
       const res = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...body, stream: true }) });
       if ((res.headers.get("content-type") || "").includes("ndjson") && res.body) {
@@ -98,9 +102,10 @@ class ODChat extends HTMLElement {
           while ((i = buf.indexOf("\n")) >= 0) {
             const ev = JSON.parse(buf.slice(0, i));
             buf = buf.slice(i + 1);
+            this.tell(ev);
             if (ev.type === "done") r = ev;
             else if (ev.type === "error") throw new Error(ev.error);
-            else early = this.early(early, ev);
+            else if (ev.type !== "lane") early = this.early(early, ev);
           }
         }
         if (!r) throw new Error("the answer stopped early");
@@ -115,7 +120,31 @@ class ODChat extends HTMLElement {
       return;
     }
     this.busy(false);
+    if (r.toast) this.toast(r.toast);
+    if (!r.text && !r.answer) { early?.turn.remove(); return r; }  // a fix or an undo: the toast is the answer
     this.show(r, early);
+    return r;
+  }
+
+  /** Feedback after a change, in the system's own colours, with Undo when the app allows it. Polite, never stealing focus. */
+  toast(t) {
+    if (!this.toasts) {
+      this.toasts = el("div", "od-toasts");
+      this.toasts.setAttribute("role", "status");
+      this.toasts.setAttribute("aria-live", "polite");
+      document.body.append(this.toasts);
+    }
+    const box = el("div", "od-toast");
+    box.dataset.tone = t.tone || "success";
+    box.append(el("span", "", t.text));
+    if (t.undo && t.undo.name) {
+      const b = el("button", "od-toast-undo", "Undo");
+      b.type = "button";
+      b.addEventListener("click", () => { box.remove(); this.call("/api/press", { session: SID, action: t.undo }); });
+      box.append(b);
+    }
+    this.toasts.append(box);
+    setTimeout(() => box.remove(), t.undo ? 8000 : 5000);
   }
 
   /** While the answer is on its way: the chosen part's skeleton, then the words. Hidden from screen readers until the
@@ -126,18 +155,23 @@ class ODChat extends HTMLElement {
       turn.setAttribute("aria-hidden", "true");
       this.wait?.remove();
       this.log.append(turn);
-      state = { turn, text: null, surface: null };
+      state = { turn, text: null, surface: null, chip: null };
       this.reveal(turn, true);
     }
+    if (ev.type === "call") {  // the tool call that picked the part: visible, so the person sees what is being built
+      state.chip = el("p", "od-chat-call", ev.part ? `show_ui · ${ev.part}` : "answer in text");
+      state.turn.prepend(state.chip);
+      return state;
+    }
+    if (ev.type === "shell") ev = { ...ev, type: "skeleton" };
     if (ev.type === "text") {
       if (!state.text) { state.text = el("p", "od-chat-bot"); state.turn.prepend(state.text); }
       state.text.textContent = datesInText(ev.text, document.documentElement.lang);
-    } else if (ev.type === "part") {  // built by the app from its data: the real part, before the words arrive
-      state.surface?.remove();
+    } else if (ev.type === "part") {  // filled from the data as it lands: replaces the outline, then grows
       const s = document.createElement("od-surface");
       s.catalog = this.catalog;
       s.source = ev.data;
-      state.turn.append(s);
+      if (state.surface) state.surface.replaceWith(s); else state.turn.append(s);
       if (!s.process(ev.answer).ok) s.remove(); else state.surface = s;
     } else if (ev.type === "skeleton" && !state.surface) {
       const s = document.createElement("od-surface");
@@ -151,6 +185,7 @@ class ODChat extends HTMLElement {
 
   show(r, early) {
     const turn = el("div", "od-chat-turn");
+    if (early?.chip) { early.chip.classList.add("is-done"); turn.append(early.chip); }
     if (r.text) turn.append(el("p", "od-chat-bot", datesInText(r.text, document.documentElement.lang)));
     if (r.answer) {
       const s = document.createElement("od-surface");
@@ -163,7 +198,7 @@ class ODChat extends HTMLElement {
         const a = e.detail.action;
         const btn = s.querySelector(`[data-od-event="${CSS.escape(a.name)}"]`);
         if (btn) s.setActionState(btn, "pending", "Sending");
-        this.call("/api/press", { session: SID, action: a }).then(() => { if (btn) s.setActionState(btn, "done", "Done"); });
+        this.call("/api/press", { session: SID, action: a }).then((res) => { if (btn) s.setActionState(btn, res && res.toast && res.toast.tone !== "danger" ? "done" : "idle", res && res.toast ? "Done" : undefined); });
       });
     }
     const log = r.log || {};

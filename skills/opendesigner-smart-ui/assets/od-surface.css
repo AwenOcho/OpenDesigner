@@ -40,3 +40,18 @@
 @media (prefers-reduced-motion: reduce) {
   .od-surface [data-od-pending] { animation: none; }
 }
+
+/* od-chat: the tool call that picked the part, and the toast after a change. Tokens only. */
+.od-chat-call { margin: 0; color: var(--ds-color-text-secondary); font: var(--ds-text-label-sm, var(--ds-text-label-md)); font-family: var(--ds-font-family-mono, monospace); }
+.od-chat-call::before { content: ""; display: inline-block; inline-size: 0.5em; block-size: 0.5em; margin-inline-end: var(--ds-space-inline-xs);
+  border-radius: 50%; background: var(--ds-color-bg-action-primary); vertical-align: middle; }
+.od-chat-call.is-done::before { background: var(--ds-color-text-tertiary, var(--ds-color-text-secondary)); }
+.od-toasts { position: fixed; inset-block-end: var(--ds-space-inset-lg); inset-inline: var(--ds-space-inset-md); z-index: 50; display: grid; justify-items: center; gap: var(--ds-space-stack-sm); pointer-events: none; }
+.od-toast { display: flex; align-items: center; gap: var(--ds-space-inline-md); max-inline-size: 32rem; padding: var(--ds-space-inset-sm) var(--ds-space-inset-md);
+  border-radius: var(--ds-radius-control); background: var(--ds-color-surface-inverse, var(--ds-color-text-primary)); color: var(--ds-color-text-inverse, var(--ds-color-surface-raised));
+  box-shadow: var(--ds-elevation-overlay, var(--ds-elevation-raised)); font: var(--ds-text-body-sm, var(--ds-text-body-md)); pointer-events: auto; }
+.od-toast[data-tone="danger"] { background: var(--ds-color-bg-danger-strong, var(--ds-color-text-danger, var(--ds-color-text-primary))); }
+.od-toast-undo { min-block-size: var(--ds-size-target-min); padding-inline: var(--ds-space-inset-sm); border: 0; border-radius: var(--ds-radius-control-sm, var(--ds-radius-control));
+  background: transparent; color: inherit; font: inherit; font-weight: var(--ds-font-weight-label); text-decoration: underline; cursor: pointer; }
+.od-toast-undo:focus-visible { outline: var(--ds-focus-ring-width) solid var(--ds-color-border-focus); outline-offset: var(--ds-focus-ring-offset); }
+

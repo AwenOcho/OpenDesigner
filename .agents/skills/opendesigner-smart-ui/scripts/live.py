@@ -23,6 +23,8 @@ Standard library only.
 import argparse
 import importlib.util
 import inspect
+import queue
+import threading
 import json
 import os
 import pathlib
@@ -306,6 +308,8 @@ class Conversation:
         self.log = []          # per turn: calls, first errors, repaired, ui
         self.offered = []      # the changes an answer offered as buttons: (name, context); a press must match one (R3)
         self.case_fixed, self.first_case_errors, self.routed_by_model, self.last_calls = 0, [], False, []
+        tp = pathlib.Path(app.CATALOG).parent / "templates.json"  # parts made ahead of time for the app's read actions
+        self.templates = (json.loads(tp.read_text()).get("templates", []) if tp.is_file() else [])
 
     # -- routing: which read actions to run
     def fast_route(self, message):
@@ -423,11 +427,45 @@ class Conversation:
         t0 = time.perf_counter()
         ms = {}
         emit = on_event or (lambda e: None)
+        clock = lambda: round((time.perf_counter() - t0) * 1000)
+        lane = lambda name, step, status: emit({"type": "lane", "lane": name, "step": step, "status": status, "ms": clock()})
         self.routed_by_model = False
-        calls = self.route(message)
-        fresh = self.run(calls)
-        data = {**self.data, **fresh}
         surface = f"s{self.surfaces + 1}"
+        lane("data", "Find the data", "run")
+        calls = self.route(message)  # by its words, in a few milliseconds; a model only when it is unclear
+        lane("data", "Find the data", "done")
+        # The UI lane: the part made ahead of time for this question (templates.json), announced and drawn at once
+        planned = None if self.names_a_change(message) else self._planned(calls)
+        if planned:  # R1 first: a short fact ("when does my permit run out?") stays a sentence, template or not
+            early = {}
+            for name, _ in calls:
+                for i, part in enumerate(self.route_parts.get(name, [])):
+                    early[part] = early.get(part, 0) + (3 if i == 0 else 2)
+            if not smartui.select(message, self.catalog, 3, self.scope, None, early)["ui"]:
+                planned = None
+        if planned:
+            t, act = planned
+            comp = t["part"].get("component")
+            emit({"type": "call", "name": "show_ui", "intent": t.get("intent") or act, "part": comp})
+            lane("ui", f"Pick part: {comp}", "done")
+            emit({"type": "shell", "part": comp})
+            ms["shell"] = clock()
+            lane("ui", "Draw the outline", "done")
+        # The data lane runs beside it; each chunk of data that lands fills the part further
+        fresh, view = {}, None
+        for name, value, final in self.stream(calls, lane):
+            fresh[name] = value
+            if planned and name == planned[1]:
+                hit = smartui.pick_template([planned[0]], name, value)
+                if hit:
+                    msgs = smartui.wrap(hit[1], surface)
+                    if smartui.validate(msgs, self.catalog, {"source": {**self.data, **fresh}, "copy": True})["ok"]:
+                        view = msgs
+                        ms.setdefault("first_data", clock())
+                        emit({"type": "part", "answer": msgs, "data": {**self.data, **fresh}, "final": final})
+        data = {**self.data, **fresh}
+        if planned and view:
+            lane("ui", "Fill from the data and check it", "done")
         history = "\n".join(f"{'Person' if t['role'] == 'user' else 'You'}: {t['text'][:400]}" for t in self.turns[-6:])
         boost = {}
         for name, _ in calls or self.last_calls:  # the parts this repo's scope tied to the actions run (a follow-up: last turn's)
@@ -446,14 +484,20 @@ class Conversation:
         if not self.names_a_change(message):  # a question never gets an approval prompt (R3): the record answers it
             sel["candidates"] = [c for c in sel["candidates"] if c != "ApprovalPrompt"]
             sel["ui"] = sel["ui"] and bool(sel["candidates"])
-        view = None if self.names_a_change(message) else self._view(calls, fresh, source, surface)
-        if view:  # the app builds this part from its data: shown now, checked; the model writes only the sentence
-            ms["skeleton"] = (time.perf_counter() - t0) * 1000
-            emit({"type": "part", "answer": view, "data": data})
-            sel = {"ui": False, "candidates": [], "scores": {}, "why": "the app's own view of the data"}
+        if not view and not self.names_a_change(message):
+            view = self._view(calls, fresh, source, surface)  # an app's code view (@shows), when it has one
+            if view:
+                ms.setdefault("first_data", clock())
+                emit({"type": "part", "answer": view, "data": data, "final": True})
+        if view:  # the part is the app's, filled from its data and checked; the model writes only the sentence
+            ms.setdefault("skeleton", ms.get("shell", ms["first_data"]))
+            sel = {"ui": False, "candidates": [], "scores": {}, "why": "a part made ahead of time, filled from the data"}
         elif sel["ui"] and sel["candidates"]:
-            ms["skeleton"] = (time.perf_counter() - t0) * 1000
+            ms["skeleton"] = clock()
+            emit({"type": "call", "name": "show_ui", "intent": "chosen by the model", "part": sel["candidates"][0]})
             emit({"type": "skeleton", "part": sel["candidates"][0]})
+            lane("ui", "Model writes the part", "run")
+        lane("text", "Write the sentence", "run")
         system, sel = smartui.build_prompt(message, self.catalog, 3, self.scope, data, boost, always, structured=True, sel=sel)
         if view:
             system += ("\n\nThe person already sees this part, built by the app from the data:\n"
@@ -521,16 +565,54 @@ class Conversation:
         if result["answer"]:
             self.surfaces += 1
             self._remember_offers(result["answer"])
+        lane("text", "Write the sentence", "done")
         ms["full"] = (time.perf_counter() - t0) * 1000
         ms.setdefault("skeleton", ms["full"])
         ms.setdefault("first_text", ms["full"])
+        ms.setdefault("first_data", ms["full"] if result["answer"] else ms["first_text"])
         entry = {"message": message, "calls": calls, "routed_by_model": self.routed_by_model, "ms": {k: round(v) for k, v in ms.items()},
-                 "view": bool(view),
+                 "view": bool(view), "template": bool(planned and view),
                  "case_fixed": case_fixed, "selector": sel["candidates"], "ui": bool(result["answer"]),
                  "part": result["part"], "first_errors": [f"{e['rule']} {e['path']}" for e in first_errors], "repaired": repaired,
                  "final_errors": [f"{e['rule']} {e['path']}" for e in result["errors"]]}
         self.log.append(entry)
         return {"text": text, "answer": result["answer"], "data": data, "log": entry}
+
+    def _planned(self, calls):
+        """The first template made ahead of time (templates.json) for an action this turn runs: (template, action)."""
+        for name, _ in calls:
+            t = next((t for t in self.templates if t.get("action") == name), None)
+            if t:
+                return t, name
+        return None
+
+    def stream(self, calls, lane=lambda *a: None):
+        """The data lane: run the read actions on a worker thread, yielding (action, value, final) as data lands. An
+        action that is a generator yields its result as it grows (one check, one row at a time)."""
+        q = queue.Queue()
+
+        def work():
+            for name, args in calls:
+                lane("data", f"Run {name}", "run")
+                try:
+                    out = self.app.ACTIONS[name]["fn"](**args)
+                    if inspect.isgenerator(out):
+                        last = None
+                        for last in out:
+                            q.put((name, last, False))
+                        out = last
+                except Exception as e:  # an action's own failure is data too: the answer can show it (ErrorRetry)
+                    out = {"error": {"message": str(e)[:200]}}
+                self.data[name] = out
+                q.put((name, out, True))
+                lane("data", f"Run {name}", "done")
+            q.put(None)
+        threading.Thread(target=work, daemon=True).start()
+        while True:
+            item = q.get()
+            if item is None:
+                return
+            yield item
 
     def _view(self, calls, fresh, source, surface):
         """The part an action's own view builds from its data (the app's @shows), when it passes every check; else None."""
@@ -621,6 +703,12 @@ class Conversation:
         if a and a.get("changes"):
             approved = ctx.pop("approved", None) is True
             offer = (name, json.dumps(ctx, sort_keys=True))
+            if a.get("reversible") and offer in self.offered:
+                # a change that can be undone, on a button the person was shown ("Fix", "Undo"): it runs on the press,
+                # and the person gets a toast with Undo instead of a question first (R3: they pressed it; it can be taken back)
+                self.offered.remove(offer)
+                result = self._run_change(a, name, ctx)
+                return {"text": "", "answer": None, "data": {name: result}, "toast": self._toast(name, result), "log": {"ran": name}}
             if not approved:
                 # a "Pay this fine" button on a record: a request for the change, answered with its approval prompt
                 said = ", ".join(f"{k.replace('_', ' ')} {v}" for k, v in ctx.items())
@@ -628,16 +716,36 @@ class Conversation:
             if not approved or offer not in self.offered:  # only a change this conversation showed, after the prompt said yes
                 return {"text": "That needs your confirmation first.", "answer": None, "log": {"refused": name}}
             self.offered.remove(offer)
-            args = {k: v for k, v in ctx.items() if k in a.get("params", {})}
-            try:
-                result = a["fn"](**args)
-            except Exception as e:
-                result = {"error": {"message": str(e)[:200]}}
-            self.data[name] = result
-            return self.answer(f"(I confirmed {name.replace('_', ' ')}. The app returned the result; tell me what happened.)", on_event=on_event)
+            result = self._run_change(a, name, ctx)
+            r = self.answer(f"(I confirmed {name.replace('_', ' ')}. The app returned the result; tell me what happened.)", on_event=on_event)
+            if self._toast(name, result):
+                r["toast"] = self._toast(name, result)
+            return r
         # not a change: what the person picked becomes their next message
         said = ", ".join(f"{k.replace('_', ' ')} {v}" for k, v in ctx.items())
         return self.answer(f"I picked {name.replace('_', ' ')}" + (f": {said}" if said else "") + ".", on_event=on_event)
+
+    def _run_change(self, a, name, ctx):
+        args = {k: v for k, v in ctx.items() if k in a.get("params", {})}
+        try:
+            result = a["fn"](**args)
+        except Exception as e:
+            result = {"error": {"message": str(e)[:200]}}
+        self.data[name] = result
+        return result
+
+    def _toast(self, name, result):
+        """Feedback for a change, in the app's words (result["toast"]), with Undo when the app returns one."""
+        if not isinstance(result, dict):
+            return None
+        if "error" in result:
+            return {"text": (result["error"] or {}).get("message") or "That didn't work. Nothing was changed.", "tone": "danger"}
+        if not result.get("toast"):
+            return None
+        undo = result.get("undo")
+        if isinstance(undo, dict) and undo.get("name") in self.app.ACTIONS:
+            self.offered.append((undo["name"], json.dumps(undo.get("context") or {}, sort_keys=True)))  # Undo may run once
+        return {"text": result["toast"], "tone": "success", "undo": undo if isinstance(undo, dict) else None}
 
     def _recorded(self, message):
         rec = getattr(self.app, "RECORDED", None)
