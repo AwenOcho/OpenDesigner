@@ -4,7 +4,7 @@ seo_title: OpenDesigner FAQ: AI design systems, tokens, teams, privacy
 description: Plain answers about OpenDesigner: what it is, which AI tools it works with, privacy, accessibility, how it compares, team governance, and how early it is.
 section: Reference
 order: 5
-updated: 2026-11-13
+updated: 2026-11-14
 ---
 
 ### What is OpenDesigner?
@@ -92,7 +92,19 @@ It finds them and proposes the fix; it does not edit your code by itself. `engin
 
 ### Can my chatbot answer with my own components instead of text?
 
-Yes, with Smart UI, which comes with OpenDesigner and stays off until you ask for it. Your assistant answers with a part of your system, like a table of invoices or a booking step, and every answer is checked before it shows: no colours, sizes or links of the model's choosing, and nothing that pays or books until the person presses the button. It reads your repo to propose which answers need a part. [How it works](/docs/smart-ui/).
+Yes, with Smart UI, which comes with OpenDesigner and stays off until you ask for it. Your assistant answers with a part of your system, like a fine with a Pay button or an application's progress. Every answer is checked before it shows: no colours, sizes or links of the model's choosing, and nothing that pays or books until the person presses the button. It reads your repo to work out which answers need a part. [See it build an answer](/smart-ui/).
+
+### What is generative UI, and how do I make it match my design system?
+
+Generative UI means an AI assistant answers with interface, like a table, a chart or a booking step, instead of only text. To match your design system, the interface has to come from your own components and tokens, not from code the model writes on the fly. Smart UI prepares those parts ahead of time from your library, fills them from your data by code, and checks each one before it renders. [How Smart UI works](/docs/smart-ui/).
+
+### How do I add generative UI to a chatbot I already have?
+
+Ask your AI: "Add Smart UI to our assistant." It reads your repo, proposes the answers that need a part, and you confirm them. Your page draws answers with `<od-surface>`, a plain HTML element that works in React, Vue, Svelte or plain HTML. You keep your own model and agents. [Add Smart UI to your assistant](/docs/smart-ui-quickstart/).
+
+### Does the model write the interface code for every answer?
+
+No. The parts are made ahead of time, bound to your app's data. For each question a fast matcher picks one, code fills it as the data arrives, and the model writes only the sentence. When no prepared part fits, the model writes one in a checked format, and anything off-system is refused. [How an answer becomes interface](/docs/smart-ui/#how-an-answer-becomes-interface).
 
 ### Does it send my code or data anywhere?
 
