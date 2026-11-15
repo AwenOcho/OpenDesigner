@@ -345,3 +345,9 @@ Kunal's verdict after five iterations: the skills "betrayed" him. Evidence: the 
 | # | Feedback | What it means for the project | Status |
 |---|---|---|---|
 | 1 | From watching a senior designer: audit with an entirely new agent, task or session that has no context, for a fresh perspective. Then cross-match its findings with the parent's decision traces before deciding. | `_coordination/PROTOCOL.md` section 7 makes it part of "done" at audit points (a PR's checklist, a demo, a merge), skipping one-file fixes. `opendesigner-review` already starts a fresh verifier (`references/report.md`); it now also reconciles each finding against `decisions.md`, the audit ledger and its waivers, RULES.md and DESIGN.md, sorting each into a real gap, decided on purpose (with its id) or a decision to revisit with the person. | addressed |
+
+## 2026-11-16: "why is the first iteration always the ugliest?" (Claude Code, Opus 5.5)
+
+| # | Feedback | What it means for the project | Status |
+|---|---|---|---|
+| 1 | The Smart UI page: "absolutely ugly", far too big a container, visible text that should be in alt text, previews squeezed and broken, too much clutter, demo frames rounder than the rest of the page, and a container that grows out of view when clicked. "Why do I have to keep telling you about each and everything again and again?" | Root causes and the fix are in `_coordination/DESIGN-BAR.md`. His rules were in one session's memory, not in briefs; checks measured correctness, not taste; makers graded their own work; there was no approved picture before building; more was added than cut. Now: one rules file linked in every brief, picture first, a fresh-eyes visual audit, the coordinator looks, then Kunal sees it locally before any push. | addressed |
