@@ -41,6 +41,7 @@ All notable changes to OpenDesigner are recorded here. The format follows [Keep 
 
 ### Changed
 
+- **The review checks a fresh reviewer's findings against your decisions** (2026-11-16). When `opendesigner-review` hands the work to a new agent with no context, each finding is then checked against decisions.md, the audit ledger and its waivers, RULES.md and DESIGN.md. A choice you made on purpose is shown with its decision id instead of being reported as a mistake or quietly dropped.
 - **Calmer spacing on the booking page** (2026-11-16). The note under "Book a free 20-minute call" now sits 16px below the button in small print, and the privacy note sits 24px below the cards.
 - **The library's JSON has a new shape** (2026-11-13). `/library/index.json` was a list of parts; it is now the whole catalog, `{format, components}`, and each part's name is `id` instead of `slug`. The prompts on the website now point to `/library/<id>.html`; the old `/library/r/<id>.html` addresses still work.
 - **The approval panel keeps its amounts in view** (2026-11-14). With text at 200% on a phone, the balance amounts ran out of the panel. Each line now wraps, so an amount drops under its label, and "USD" can move to a new line.
