@@ -87,6 +87,9 @@ jobs:
       - name: Review catches what a second model got past it (S4 drift)
         run: python3 tools/test_review_drift.py
 
+      - name: Status colours and feedback as rules
+        run: python3 tools/test_status_feedback.py
+
       - name: Audit page, adapt page, exempt folders and the audit ledger
         run: python3 tools/test_audit_page.py
 

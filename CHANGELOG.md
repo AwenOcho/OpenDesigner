@@ -8,6 +8,8 @@ All notable changes to OpenDesigner are recorded here. The format follows [Keep 
 
 ### Added
 
+- **Status colours and feedback are rules** (2026-11-14). DESIGN.md gets a Status and Feedback section: what success, warning, danger, info and discovery mean, their tokens, never colour alone, and how an action is confirmed (Q-form-04, Q-form-05). `build/status.json` holds the same map for tools. `review` lists status colours off their meaning, colour-only status and forms with no feedback for a person to judge.
+
 - **Review catches what another model got past it** (2026-11-14). `engine.py review` now flags `var(--ds-...)` names that do not exist (with the nearest real one), typed font stacks and weights the system does not have. An `od-ignore` line counts as open until the owner approves its reason with `engine.py keep`, so an existing project's `od-ignore` lines fail `review --strict` until then; review lists each reason to ask about.
 - **Research, hand-off and commit check need real evidence** (2026-11-14). `research add` refuses findings with no tool that read them, placeholder addresses or no day opened. `handoff yes` and `guard install` take the owner's words (`--quote`). The session-start hook names the full build loop, and DESIGN.md gives each Tailwind class its plain CSS name.
 - **A shorter review and audit page** (2026-11-14). `engine.py review` now leads with the 10 biggest groups of findings (same value, same fix); `--all` lists every line. The audit page opens on the five biggest decisions and folds the rest, labels use the text font, and the header names the project. The same raw value now always gets the same token suggestion, and the note about an older system shows once a day.
