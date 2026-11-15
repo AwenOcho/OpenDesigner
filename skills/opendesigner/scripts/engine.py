@@ -11067,8 +11067,10 @@ STATUS_ROLES = {"text": "color.text.{s}", "bg": "color.bg.{s}.subtle", "bgBold":
 FEEDBACK_WORDS = {"inline-banner": "In place, next to what changed, or in a banner over the section; no toasts",
                   "no-toasts": "In place or in a banner; never a toast",
                   "toasts-widely": "A toast for quick confirmations, in place for errors on a field"}
-UNDO_WORDS = {"undo-first": "an Undo button for a few seconds, no confirm step", "confirm": "an \"Are you sure?\" step before it happens",
-              "both": "a confirm step for what cannot be undone, Undo for the rest"}
+UNDO_WORDS = {"undo-first": "an Undo button that stays until the person uses it or closes it, and no confirm step",
+              "confirm": "an \"Are you sure?\" step before it happens (house standard STD-visual-details-40 keeps that step for actions "
+                         "that cannot be undone; ask before using it for the rest)",
+              "both": "a confirm step for what cannot be undone, and an Undo that stays until used or closed for the rest"}
 
 
 def status_map(files, meta, state, prefix):
@@ -11093,7 +11095,9 @@ def status_map(files, meta, state, prefix):
     undo = undo[0] if isinstance(undo, list) and undo else undo
     t_ms = duration_ms((base.get("component.toast.duration") or {}).get("resolved")) or 4000  # STD-components-toasts-drawers-15
     out["feedback"] = {"confirm": fb, "confirmSetBy": "answer" if (state.get("answers") or {}).get("Q-form-04") else "default",
-                       "toastMs": {"success": int(t_ms), "info": int(t_ms)}, "errorsStay": True, "actionToastStays": True,
+                       "usesToasts": fb == "toasts-widely",
+                       "toastMs": {"success": int(t_ms), "info": int(t_ms), "warning": int(t_ms), "danger": None}, "errorsStay": True,
+                       "actionToastStays": True,
                        "undo": undo, "undoStays": "until the person acts or dismisses it",
                        "sources": ["STD-components-toasts-drawers-15", "STD-visual-details-40"]}
     return out
@@ -11102,7 +11106,7 @@ def status_map(files, meta, state, prefix):
 def status_lines(state, files, meta, prefix):
     """DESIGN.md's Status and Feedback section, from the same map build/status.json holds."""
     sm = status_map(files, meta, state, prefix)
-    rows = ["| Status | Means | Use it | Tokens (text, background, border) | Say it with |", "|---|---|---|---|---|"]
+    rows = ["| Status | Means | Use it | Tokens (text and icon, background, border) | Say it with |", "|---|---|---|---|---|"]
     for st, x in sm["statuses"].items():
         t = x["css"]
         rows.append(f"| {st.title()} | {x['meaning']} | {x['when']} | `{t.get('text', '')}`, `{t.get('bg', '')}`, `{t.get('border', '')}` | "
@@ -16373,10 +16377,12 @@ TW_WEIGHTS = {"thin": 100, "extralight": 200, "light": 300, "normal": 400, "medi
               "extrabold": 800, "black": 900}
 
 
-RX_STATUS_TOKEN = re.compile(r"(?:var\(\s*--[a-z0-9]+-color-(?:bg|text|border)-|(?<![\w-])(?:bg|text|border)-)(success|warning|danger)(?:[-\w]*)")
+RX_STATUS_TOKEN = re.compile(r"(?:var\(\s*--[a-z0-9-]+?-color-(?:(?:bg|text|border|icon)-)?|(?<![\w-])(?:bg|text|border|fill|stroke|ring|outline|decoration)-)"
+                             r"(success|warning|danger|info)(?=[-\s\"')}:;]|$)(?:[-\w]*)")
 STATUS_SAYS = {"success": r"success|valid|done|complete|saved|paid|ok\b|confirm|verified|positive|good",
                "warning": r"warn|caution|expir|limit|pending|attention|risk",
-               "danger": r"error|danger|invalid|fail|destructive|delete|remove|critical|alert|negative|declin|denied"}
+               "danger": r"error|danger|invalid|fail|destructive|delete|remove|critical|alert|negative|declin|denied",
+               "info": r"info|note|tip|help|notice|update|hint|about"}
 RX_STATUS_CUE = re.compile(r"<svg|<i\b|icon|aria-label|role=[\"'](?:status|alert)|sr-only|visually-hidden", re.I)
 
 
@@ -16393,7 +16399,10 @@ def status_misuse(line, ctx, rel, i, ext, prefix):
                                 f"nothing here says {st}: is it a {st} status? If it is decoration or a brand accent, use the action or "
                                 "accent tokens instead")})
             break
-    if ext in (".html", ".jsx", ".tsx", ".vue", ".svelte") and RX_STATUS_TOKEN.search(line) and "<" in line:
+    # colour alone: an element whose text closes on this line (or that holds nothing at all) and says no status and has no icon;
+    # an element whose text runs on to the next lines is left alone, since one line cannot see it
+    m_el = re.search(r"<(\w+)\b[^>]*>([^<]*)</\1>|<(\w+)\b[^>]*/>|<(\w+)\b[^>]*>\s*</\4>", line)
+    if ext in (".html", ".jsx", ".tsx", ".vue", ".svelte") and m_el and RX_STATUS_TOKEN.search(m_el.group(0)):
         text = re.sub(r"<[^>]+>|\{[^}]*\}", " ", line)
         if not RX_STATUS_CUE.search(line) and not any(re.search(rx, text, re.I) for rx in STATUS_SAYS.values()):
             out.append({"kind": "status-colour-only", "file": rel, "line": i, "what": "a status shown by colour alone",
@@ -16401,15 +16410,16 @@ def status_misuse(line, ctx, rel, i, ext, prefix):
     return out
 
 
-RX_ACTION = re.compile(r"<form\b|onSubmit|method=[\"']post|\bfetch\(|axios\.(?:post|put|patch|delete)|\.submit\(", re.I)
-RX_FEEDBACK = re.compile(r"role=[\"'](?:status|alert)|aria-live|toast|snackbar|notif|banner|\balert\(|flash|setMessage|setError|"
-                         r"setStatus|\bsaved\b|\berror\b", re.I)
+RX_ACTION = re.compile(r"<form\b|onSubmit|method=[\"']post|\bfetch\([^;]{0,300}?method\s*:\s*[\"'](?:post|put|patch|delete)|"
+                       r"axios\.(?:post|put|patch|delete)|\.submit\(", re.I | re.S)
+RX_FEEDBACK = re.compile(r"role=[\"'](?:status|alert)[\"']|aria-live|toast|snackbar|notif(?:y|ication)|<(?:Banner|Alert|Callout)\b|"
+                         r"\balert\(|flash\(|set(?:Message|Error|Status|Notice|Saved)\b|>\s*(?:saved|sent|done)\b", re.I)
 
 
 def feedback_gap(lines, rel, ext):
     """A judgment note: a file that sends something (a form, a POST, a fetch) and shows nothing back (no status or alert role, no
     live region, no toast or banner, no message state). Only files with markup or UI code; servers and tests are not read here."""
-    if ext not in (".html", ".jsx", ".tsx", ".vue", ".svelte", ".js", ".ts"):
+    if ext not in (".html", ".jsx", ".tsx", ".vue", ".svelte"):  # markup only: plain .js and .ts are often API helpers and servers
         return []
     text = "".join(lines)
     m = RX_ACTION.search(text)
@@ -16982,7 +16992,9 @@ def cmd_review(d, project=None, strict=False, as_json=False, limit=40, collect=N
             ctx = (css_selector_context(lines, i) if ext in (".css", ".scss", ".sass", ".less") else
                    (lines[i - 2] if i > 1 else "")) + " " + line  # the selector or the line above names the element's role
             sel_ = css_selector_context(lines, i) if ext in (".css", ".scss", ".sass", ".less", ".html", ".vue", ".svelte") else ""
-            status_notes.extend(status_misuse(raw_line[:REVIEW_LINE_CAP], sel_ + " " + RX_STATUS_TOKEN.sub(" ", raw_line[:REVIEW_LINE_CAP]),
+            near_ = "".join(lines[i:i + 2]) if ext in (".html", ".jsx", ".tsx", ".vue", ".svelte") and not sel_.strip() else ""  # markup text below
+            status_notes.extend(status_misuse(raw_line[:REVIEW_LINE_CAP],
+                                              sel_ + " " + RX_STATUS_TOKEN.sub(" ", raw_line[:REVIEW_LINE_CAP] + " " + near_[:400]),
                                               rel, i, ext, prefix))
             custom_prop = bool(re.match(r"\s*--", line))  # a custom property definition is a token source, not a bypass
             tw_ctx = bool(RX_TW_CONTEXT.search(line)) or (ext in (".css", ".scss") and "@apply" in line)

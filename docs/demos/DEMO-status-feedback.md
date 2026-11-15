@@ -18,7 +18,7 @@ export E="$PWD/skills/opendesigner/scripts/engine.py" && mkdir "$DEMO/app" && cp
 python3 "$E" build >/dev/null && python3 -m json.tool opendesigner/build/status.json | head -30
 ```
 
-Each status (success, warning, danger, info, discovery) with what it means, when to use it, words and an icon, the token for text, background, border and icon, the CSS name of each, and the values in each mode. Then the rule "never colour alone" and how actions are confirmed.
+Each status (success, warning, danger, info, discovery) with what it means, when to use it, words and an icon, the token for text, background and border (icons take the text colour), the CSS name of each, and the values in each mode. Then the rule "never colour alone" and how actions are confirmed.
 
 ## 2. The rules in DESIGN.md
 
@@ -44,9 +44,10 @@ printf '<style>\n.btn-primary{background:var(--ds-color-bg-success-bold)}\n</sty
 python3 "$E" review --project . | grep -A4 "For a person to judge"
 ```
 
-You should see three notes, apart from the counted findings:
+You should see four notes, apart from the counted findings:
 - a success colour on a primary button;
-- a status shown by colour alone;
+- a danger colour on "Payment", which says no status;
+- the same span showing its status by colour alone;
 - a form with nothing shown back.
 
 None of them changes review's verdict, because code alone cannot be sure.

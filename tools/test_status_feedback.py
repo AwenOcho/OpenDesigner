@@ -47,6 +47,13 @@ class StatusAndFeedback(unittest.TestCase):
         (self.root / "page.html").write_text(PAGE)
         (self.root / "form.html").write_text('<form method="post" action="/save"><button>Save</button></form>\n')
         (self.root / "ok.html").write_text('<form method="post"><button>Save</button><p role="status"></p></form>\n')
+        src = self.root / "src"
+        src.mkdir()
+        (src / "Save.jsx").write_text('export const Save = () => {\n  const go = () => fetch("/api", {method: "POST"}).catch((error) => console.log(error));\n'
+                                      '  return <header role="banner"><button onClick={go}>Save</button></header>;\n};\n')
+        (src / "api.ts").write_text('export const users = () => fetch("/api/users").then((r) => r.json());\n')
+        (src / "Multi.jsx").write_text('export const M = () => (\n  <div>\n    <p className="text-danger">\n      Payment failed\n    </p>\n  </div>\n);\n')
+        (src / "cta.css").write_text(".cta { background: var(--ds-color-danger-dark-9); }\n")
 
     def tearDown(self):
         shutil.rmtree(self.root, ignore_errors=True)
@@ -103,6 +110,10 @@ class StatusAndFeedback(unittest.TestCase):
         self.assertFalse([n for n in notes if n[1] == 7], "an icon and a word beside the colour")
         self.assertFalse([n for n in notes if n[0] == "ok.html"], "a form with a status region")
         self.assertFalse([x for x in rv["reasons"] if "status" in x.lower() and "out of date" not in x], "judgment is never counted")
+        self.assertIn((os.path.join("src", "Save.jsx"), 2, "no-feedback"), notes, "a POST with only a console.log is no feedback")
+        self.assertFalse([n for n in notes if n[0].endswith("api.ts")], "a GET helper in .ts is not an action")
+        self.assertFalse([n for n in notes if n[0].endswith("Multi.jsx")], "text on the next lines: one line cannot judge it")
+        self.assertIn((os.path.join("src", "cta.css"), 1, "status-meaning"), notes, "a danger primitive on a call to action")
         text = run("review", "--project", ".", cwd=self.root, ok=False).stdout
         self.assertIn("For a person to judge (status and feedback; not counted", text)
 

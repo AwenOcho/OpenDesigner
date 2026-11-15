@@ -461,7 +461,7 @@ Decisions: none recorded yet; values are defaults from references/levers.json.
 
 **Each status colour has one meaning, always with an icon or a word, and every action shows what happened.**
 
-| Status | Means | Use it | Tokens (text, background, border) | Say it with |
+| Status | Means | Use it | Tokens (text and icon, background, border) | Say it with |
 |---|---|---|---|---|
 | Success | an action finished as asked | after an action that worked, and for a state that is good (paid, verified) | `--ds-color-text-success`, `--ds-color-bg-success-subtle`, `--ds-color-border-success` | the circle-check icon and a word such as "Saved" |
 | Warning | something needs attention soon, but nothing is lost yet | for a risk the person can still avoid: a limit near, a date close, a change that is hard to undo | `--ds-color-text-warning`, `--ds-color-bg-warning-subtle`, `--ds-color-border-warning` | the triangle-alert icon and a word such as "Check" |
@@ -472,7 +472,7 @@ Decisions: none recorded yet; values are defaults from references/levers.json.
 - **One meaning per colour.** Success, warning and danger colours appear only for that status, never for a brand accent, a primary button or decoration. Delete buttons take danger; everything else takes the action colour.
 - **After every action, the person sees what happened.** In place, next to what changed, or in a banner over the section; no toasts (default until Q-form-04 is answered).
 - **Banners:** a success banner may close on its own after a few seconds; an error stays until the person dismisses it or fixes the cause, and never closes on its own.
-- **Undo:** a confirm step for what cannot be undone, Undo for the rest (default, from house standard STD-visual-details-40).
+- **Undo:** a confirm step for what cannot be undone, and an Undo that stays until used or closed for the rest (default, from house standard STD-visual-details-40).
 - The same map, for tools and agents: `build/status.json`.
 
 ## Do's and Don'ts
