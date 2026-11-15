@@ -36,7 +36,7 @@
     if ("IntersectionObserver" in window) {
       var io = new IntersectionObserver(function (es) {
         if (es.some(function (e) { return e.isIntersecting; })) { io.disconnect(); self.ask(self.product.scenarios[0]); }
-      }, { threshold: 0.35 });
+      }, { threshold: 0.2 });
       io.observe(root);
     } else {
       this.ask(this.product.scenarios[0]);
@@ -136,6 +136,7 @@
     try {
       await this.wait(this.mini ? 260 : 160, id);
       turn.append(call);
+      t0 = performance.now();  // timed from the moment the question is sent, as the evals time it
       // the data agent starts with the tool call and runs beside the UI agent; the fill waits for it
       var data = this.lane(L.data || [], id);
       data.catch(function () {});
@@ -152,6 +153,9 @@
         turn.append(say);
       }
       await data;
+      // no prepared part covers a change: the model writes the part first, then it fills and is checked like any other
+      var w = (L.text || [])[0];
+      if (s.fallback && w) { w.row.classList.add("run"); await this.wait(700, id); }
       if (s.view) {
         if (ui[2]) ui[2].row.classList.add("run");
         await part.fill(this, id);
@@ -159,7 +163,6 @@
         if (ui[3]) await this.step(ui[3], id);
       }
       // the writer: one or two sentences, after the facts are in
-      var w = (L.text || [])[0];
       if (w) w.row.classList.add("run");
       await this.stream(say, s.say, id);
       if (w) { w.row.classList.remove("run"); w.row.classList.add("done"); w.row.lastChild.textContent = w.ms + " ms"; }

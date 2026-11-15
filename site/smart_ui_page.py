@@ -85,6 +85,11 @@ def day(iso, year=True):
     return f"{d:%A} {d.day} {d:%B}" + (f" {d.year}" if year else "")
 
 
+def short(iso):
+    d = datetime.date.fromisoformat(iso)
+    return f"{d.day} {d:%b} {d.year}"
+
+
 def warns(fn):
     """The consequence the Fernhollow server states for one change (@warns above its def), so the demo says what the app says."""
     src = (FERN / "server.py").read_text()
@@ -93,8 +98,9 @@ def warns(fn):
     return m.group(1)
 
 
-def lanes(data, ui, words, fill=0):
-    return {"data": data, "ui": ui, "text": [["Write the sentence", words * 26]]}
+def lanes(data, ui, words, fallback=False):
+    """The three lanes. fallback: no prepared part covers it, so the model writes the part (then it is checked like any other)."""
+    return {"data": data, "ui": ui, "text": [["Write the part and the sentence" if fallback else "Write the sentence", words * 26 + (700 if fallback else 0)]]}
 
 
 def fernhollow():
@@ -106,7 +112,7 @@ def fernhollow():
     say_fine = (f"You have one unpaid fine, {f['reference']}. If you pay by {day(f['discount_until'], False)}, it costs "
                 f"{f['discounted_amount']} instead of {f['amount']}.")
     fine = {"q": "Do I have any fines?", "part": "KeyFacts", "prepared": True, "say": say_fine,
-            "lanes": lanes([["list_fines", 420]], [["Match a prepared part", 1], ["Draw the outline", 2], ["Fill from the data", 480], ["Check the part", 4]], len(say_fine.split())),
+            "lanes": lanes([["list_fines", 420]], [["Match a prepared part", 1], ["Draw the outline", 2], ["Fill as the data lands", 4], ["Check the part", 4]], len(say_fine.split())),
             "view": {"kind": "facts", "title": "Unpaid parking fine", "sub": f"Vehicle {f['vehicle']}", "facts": [
                 {"label": "Reference", "value": f["reference"], "w": "40%"},
                 {"label": "Date", "value": f"{day(f['date'])}, {f['time']}"},
@@ -125,14 +131,14 @@ def fernhollow():
     a = rec["Where is my application?"]
     ps = a["answer"][0]["createSurface"]["components"][0]
     app = {"q": "Where is my application?", "part": "ProgressStatus", "prepared": True, "say": a["text"],
-           "lanes": lanes([["application_status", 380]], [["Match a prepared part", 1], ["Draw the outline", 2], ["Fill from the data", 300], ["Check the part", 3]], len(a["text"].split())),
+           "lanes": lanes([["application_status", 380]], [["Match a prepared part", 1], ["Draw the outline", 2], ["Fill as the data lands", 3], ["Check the part", 3]], len(a["text"].split())),
            "view": {"kind": "progress", "title": ps["title"], "status": ps["status"], "tone": TONE[ps["tone"]],
                     "steps": [{"label": s["label"], "state": s["state"], "time": s.get("time", "")} for s in ps["steps"]]}}
     r = rec["Renew my parking permit"]
     ap = r["answer"][0]["createSurface"]["components"][0]
     opt = d["renewal"]["options"][0]
     renew = {"q": "Renew my parking permit", "part": "ApprovalPrompt", "prepared": False, "say": r["text"],
-             "lanes": lanes([["get_permit", 260], ["renewal_quote", 300]], [["No prepared part for a change: the model writes it", 3], ["Draw the outline", 2], ["Fill from the data", 360], ["Check: it names the consequence", 5]], len(r["text"].split())),
+             "lanes": lanes([["get_permit", 260], ["renewal_quote", 300]], [["Pick a part for the change (no model)", 1], ["Draw the outline", 2], ["Fill from the model's answer", 3], ["Check: it names the consequence", 5]], len(r["text"].split()), fallback=True), "fallback": True,
              "view": {"kind": "approval", "title": ap["title"], "summary": ap.get("summary", ""),
                       "details": [{"label": x["label"], "value": x["value"]} for x in ap["details"]], "warn": warns("renew_permit"),
                       "cancel": ap["cancel"]["label"], "approve": ap["approve"]["label"], "pending": "Paying", "done": "Renewed",
@@ -146,14 +152,14 @@ def fernhollow():
 
 def design_review():
     """The sketch's design-review assistant (an invented product with invented numbers), on the brand system."""
-    def sc(q, part, say, data, ui, view=None, prepared=True):
-        return {"q": q, "part": part, "prepared": prepared, "say": say, "lanes": lanes(data, ui, len(say.split())), **({"view": view} if view else {})}
+    def sc(q, part, say, data, ui, view=None, prepared=True, fallback=False):
+        return {"q": q, "part": part, "prepared": prepared, "fallback": fallback, "say": say, "lanes": lanes(data, ui, len(say.split()), fallback), **({"view": view} if view else {})}
     std = lambda fill: [["Match a prepared part", 1], ["Draw the outline", 2], ["Fill from the data", fill], ["Check the part", 4]]
     return {"id": "review", "label": "Design review assistant", "tab": "Design review",
             "sub": "Recorded demo. An invented app and its invented numbers.", "scenarios": [
         sc("Review my pricing page", "AuditFindings",
            "Your pricing page follows the system in most places. Two things break it, and one is worth a look.",
-           [["Read 14 files", 260], ["Measure colours and spacing", 420], ["Compare with the tokens", 380]], std(360),
+           [["Read 14 files", 260], ["Measure colours and spacing", 420], ["Compare with the tokens", 380]], std(3),
            {"kind": "findings", "title": "Pricing page, checked against your system", "summary": "5 checks: 3 pass, 1 to look at, 1 broken", "rows": [
                {"tone": "ok", "label": "Pass", "text": "Colours all come from tokens"},
                {"tone": "ok", "label": "Pass", "text": "Body text contrast is 7.2 to 1"},
@@ -162,14 +168,14 @@ def design_review():
                {"tone": "bad", "label": "Broken", "text": "The “Most popular” label is cut off at 320px wide", "fix": "Let it wrap"}]}),
         sc("How much of my code uses the tokens?", "KpiStrip + BarChart",
            "About two thirds of your values come from tokens. Shadows are the weak spot.",
-           [["Scan 54 files", 340], ["Count token uses", 300], ["Group by kind", 200]], std(420),
+           [["Scan 54 files", 340], ["Count token uses", 300], ["Group by kind", 200]], std(4),
            {"kind": "metrics", "title": "Token use in your code", "kpis": [
                {"label": "Values checked", "value": "1,900"}, {"label": "From tokens", "value": "1,254"}, {"label": "Typed by hand", "value": "646"}],
             "bars": [{"label": "Colours", "pct": 82}, {"label": "Spacing", "pct": 71}, {"label": "Type sizes", "pct": 64},
                      {"label": "Corners", "pct": 58}, {"label": "Shadows", "pct": 19, "tone": "bad"}]}),
         sc("Which parts fit a settings page?", "Recommendations",
            "Three library parts fit a settings page. All three already use your tokens.",
-           [["Search the library", 300], ["Rank by fit", 260]], std(180),
+           [["Search the library", 300], ["Rank by fit", 260]], std(2),
            {"kind": "cards", "title": "Parts for a settings page", "cards": [
                {"name": "Settings switches", "text": "On and off settings, each with a plain explanation."},
                {"name": "Member list", "text": "People, roles and pending invites."},
@@ -177,11 +183,11 @@ def design_review():
         sc("Make the corners rounder", "ApprovalPrompt",
            "I can raise the corner radius one step. This changes your system, so it needs your yes.",
            [["Read the radius tokens", 160], ["Find what would change", 320]],
-           [["No prepared part for a change: the model writes it", 3], ["Draw the outline", 2], ["Fill from the data", 180], ["Check: it names the consequence", 4]],
+           [["Pick a part for the change (no model)", 1], ["Draw the outline", 2], ["Fill from the model's answer", 2], ["Check: it names the consequence", 4]],
            {"kind": "approval", "title": "Change the corner radius", "details": [
                {"label": "Controls", "value": "12px to 16px"}, {"label": "Containers", "value": "16px to 20px"}, {"label": "Affects", "value": "38 parts on 9 screens"}],
             "warn": "This changes every screen that uses these tokens.", "cancel": "Cancel", "approve": "Change corners",
-            "pending": "Changing", "done": "Changed", "toast": "Corners changed in your system", "undo": "Change undone"}, prepared=False),
+            "pending": "Changing", "done": "Changed", "toast": "Corners changed in your system", "undo": "Change undone"}, prepared=False, fallback=True),
         sc("What is a design token?", None,
            "A design token is a named design value, such as “primary text colour” or “small gap”. Your code uses the name, so changing the value in one place changes it everywhere.",
            [["Look up the glossary", 180]], [["No part: a sentence answers it", 1]], prepared=False)]}
@@ -280,7 +286,7 @@ def screens(f):
         ("data", "Data", "Where something stands, numbers and trends. The data picks the colour.",
          f'<div class="sl-part"><div class="sl-ph"><p class="sl-pt">{esc(ps["title"])}</p><span class="sl-tag {TONE[ps["tone"]]}">{esc(ps["status"])}</span></div><ol class="sl-steps">{steps}</ol></div>', f["by_group"]["data"]),
         ("choose", "Choose", "Two or three options side by side, so the person can pick.",
-         '<div class="uc-cmp">' + "".join(f'<div class="sl-card"><strong>{esc(o["length"])}</strong><span class="uc-price num">{esc(o["price"])}</span><span>{esc(day(o["from"], False))} to {esc(day(o["to"]))}</span></div>' for o in opts) + "</div>", f["by_group"]["choose"]),
+         '<div class="uc-cmp">' + "".join(f'<div class="sl-card"><strong>{esc(o["length"])}</strong><span class="uc-price">{esc(o["price"])}</span><span>{esc(short(o["from"]))} to {esc(short(o["to"]))}</span></div>' for o in opts) + "</div>", f["by_group"]["choose"]),
         ("act", "Act", "A change the person makes. It says what will happen and waits for their press.",
          f'<div class="sl-part"><p class="sl-pt">Pay notice {esc(fine["reference"])}</p><p class="sl-warn">{esc(warns("pay_fine"))}</p><div class="sl-acts"><span class="sl-btn">Not now</span><span class="sl-btn primary">Pay {esc(fine["discounted_amount"])}</span></div></div>', f["by_group"]["act"]),
         ("confirm", "Confirm", "What happened, with Undo when the change can be undone.",
@@ -291,7 +297,7 @@ def screens(f):
              f'<li><span class="uc-file" aria-hidden="true"></span><span><strong>{esc(x["document"])}</strong><small>{esc(x["file"] or "Still needed")}</small></span>'
              f'<span class="sl-tag {"ok" if x["file"] else "warn"}">{"Uploaded" if x["file"] else "Needed"}</span></li>' for x in docs) + "</ul></div>", f["by_group"]["media"]),
         ("states", "Every state", "Loading, empty, an error with a retry, data that may be old. Every part handles each one.",
-         '<div class="uc-states"><div class="sl-part"><span class="sl-sk" style="width:60%"></span><span class="sl-sk" style="width:90%"></span><span class="sl-sk" style="width:40%"></span></div>'
+         '<div class="uc-stategrid"><div class="sl-part"><span class="sl-sk" style="width:60%"></span><span class="sl-sk" style="width:90%"></span><span class="sl-sk" style="width:40%"></span></div>'
          '<div class="sl-part uc-empty"><p>Nothing to show yet.</p></div>'
          '<div class="sl-part"><p class="uc-err">We couldn’t load your fines.</p><span class="sl-btn">Try again</span></div>'
          '<div class="sl-part"><p class="uc-stale">Updated 10:42. It may have changed since.</p></div></div>', []),
@@ -318,12 +324,12 @@ def uses_section(b, f):
 
 def built_section(b, f):
     t = f["templates"]
-    pick = [x for x in t if x["action"] in ("list_fines", "application_status", "renewal_quote", "office_details")]
+    pick = [x for x in t if x["action"] in ("list_fines", "application_status", "renewal_quote")]
     seen, rows = set(), []
     for x in pick:
         if x["action"] not in seen:
             seen.add(x["action"])
-            rows.append(f'<li><code>{esc(x["action"])}</code><span aria-hidden="true">→</span><b>{esc(x["part"]["component"])}</b></li>')
+            rows.append(f'<li><span>{esc(x["action"])}</span><b>{esc(x["part"]["component"])}</b></li>')
     vis = [
         f'<div class="sb-file"><p class="sb-fname num">templates.json</p><ul>{"".join(rows)}</ul><p class="sb-more">{len(t)} parts for Fernhollow</p></div>',
         '<div class="sb-match"><p class="sl-me">Do I have any fines?</p><p class="sl-call done num"><span class="sl-dot"></span><span>list_fines → KeyFacts</span></p><p class="sb-note">Under 0.2 ms, no model</p></div>',
@@ -332,8 +338,14 @@ def built_section(b, f):
         '<div class="sb-draw"><p class="num">&lt;od-surface&gt;</p><div class="sl-part"><p class="sl-pt">Unpaid parking fine</p><span class="sl-btn primary">Pay £35.00</span></div><p class="num">+ your tokens.css</p></div>',
     ]
     who = ["Once, with you", "Smart UI", "Code, as data lands", "Smart UI", "Your page"]
-    cols = "".join(f'<li class="sb-step"><span class="sb-n num">0{i + 1}</span><h3>{esc(title)}</h3><p class="sb-who num">{who[i]}</p><div class="sb-vis" aria-hidden="true">{vis[i]}</div><p>{b.inline(desc)}</p></li>'
-                   for i, (title, desc) in enumerate(f["steps"]))
+    # one line each here; the full step is on /docs/smart-ui/ (the titles come from there, so the two keep the same steps)
+    lines = ["Works out which answers your product needs and binds a part to each data source. You check them.",
+             "Finds the prepared part for the question in under 0.2 ms, with no model.",
+             "Code fills the part as your agent's data lands. The data picks the colours.",
+             "Every part is validated before it renders, including one the model wrote.",
+             "`<od-surface>` draws it with your tokens, in any framework."]
+    cols = "".join(f'<li class="sb-step"><span class="sb-n num">0{i + 1}</span><h3>{esc(title)}</h3><p class="sb-who num">{who[i]}</p><div class="sb-vis" aria-hidden="true">{vis[i]}</div><p>{b.inline(lines[i])}</p></li>'
+                   for i, (title, _desc) in enumerate(f["steps"]))
     events = ["call", "shell", "part", "text", "lane", "done"]
     return f"""
 <section class="h-sec" id="built">
