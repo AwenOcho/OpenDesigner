@@ -8,6 +8,8 @@ All notable changes to OpenDesigner are recorded here. The format follows [Keep 
 
 ### Added
 
+- **The Smart UI page shows an answer being built** (2026-11-16). opendesigner.dev/smart-ui/ plays recorded answers from the Fernhollow council example: the tool call, the outline, values as the data lands, then the sentence, with the three lanes beside it. It also has a screen for each kind of answer, the five build steps, and the answer types found for three products.
+- **The home page and README say the Smart UI demo is recorded** (2026-11-16). The home section plays one recorded Fernhollow answer and links to "Watch the recorded demo". The README's Smart UI section has three pictures made from the page, and llms.txt now answers three questions people ask about generative UI.
 - **Smart UI prepares its answers ahead of time** (2026-11-16). `smartui.py usecases` works out which answers a product needs from its own data, description, research and screens. `templates` then prepares a part for each, bound to the app's data. A question is matched to a prepared part without a model, the part fills as data lands, and the model writes only the sentence.
 - **Smart UI colours and feedback follow the data** (2026-11-16). A value that says "Unpaid" or "Failed" can't be shown as good: the check refuses it. An approval states what a change will do before its button. A change that can be undone gives a toast with Undo, using the system's own toast part.
 - **Plug your own agents into Smart UI** (2026-11-16). `references/your-agents.md` shows how a data agent or a document search sits beside the UI step, and how `show_ui` fills a prepared part over MCP. Smart UI ships no orchestrator.

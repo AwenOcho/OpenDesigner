@@ -32,9 +32,10 @@ esc = html.escape
 PATH = "/smart-ui/"
 DEMO = PATH + "demo/"
 TITLE = "Smart UI"
-SEO_TITLE = "Smart UI: generative UI made from your own design system"
-DESCRIPTION = ("Generative UI with your own components. Watch an assistant build its answer: the part's outline first, "
-               "then values as the data lands, checked before it shows.")
+H1 = "Generative UI for your chatbot, in your own design system"
+SEO_TITLE = H1
+DESCRIPTION = ("Add generative UI to your chatbot with your own design system. Watch a recorded answer build: the outline first, "
+               "then values as the data lands.")
 # the questions on /docs/faq/ this page repeats (word for word, so the two never disagree)
 FAQ = ["What is generative UI, and how do I make it match my design system?", "How do I add generative UI to a chatbot I already have?",
        "Does the model write the interface code for every answer?", "Can my chatbot answer with my own components instead of text?"]
@@ -245,10 +246,10 @@ def hero(b, f):
     return f"""
 <section class="h-sec h-first su-hero">
 <nav class="crumb" aria-label="Breadcrumb"><a href="/">{b.NAME}</a><span aria-hidden="true">/</span><span aria-current="page">Smart UI</span></nav>
-<p class="kicker su-eyebrow">Generative UI, from your own design system</p>
-<h1 class="su-title">Answers that show your interface</h1>
+<p class="kicker su-eyebrow">Smart UI · comes with OpenDesigner</p>
+<h1 class="su-title">{esc(H1)}</h1>
 <p class="h-lede su-lede">Your assistant answers with your own components: a fine with a Pay button, an application's progress, a table you can sort. The parts are made ahead of time from your library, filled from your data and checked before they show.</p>
-<p class="su-note">It comes with OpenDesigner and stays off until you ask for it. You keep your own model and agents.</p>
+<p class="su-note">Smart UI comes with OpenDesigner and stays off until you ask for it. You keep your own model and agents.</p>
 <p class="su-act"><a class="btn primary" href="/docs/smart-ui-quickstart/">Add it to your assistant</a><a class="h-link" href="#built">How it's built {b.ARROW}</a></p>
 <figure class="su-demo">
 {st}
@@ -461,7 +462,7 @@ def markdown(b, f, faq):
             f"- **{p['name']}** ({p['kind'].replace('-', ' ')}): " + "; ".join(f"{a['type']} ({a['part'] if not a.get('missing') else 'no part yet'})" for a in p["answer_types"])
             for p in u.get("products", []))
     qa = "\n\n".join(f"### {q}\n\n{a}" for q, a in faq)
-    return f"""# Smart UI: generative UI made from your own design system
+    return f"""# {H1}
 
 {DESCRIPTION}
 
@@ -557,9 +558,13 @@ def add(b, files, mds, paths):
                           "description": "Generative UI for an assistant, made from the product's own design system: parts prepared ahead of time, filled from the app's data and checked before they render."},
            "hasPart": [{"@type": "TechArticle", "name": t, "url": b.SITE_URL + u} for t, u in
                        (("Smart UI: answers that show your interface", "/docs/smart-ui/"), ("Add Smart UI to your assistant", "/docs/smart-ui-quickstart/"),
-                        ("Where Smart UI runs", "/docs/smart-ui-adapters/"))]}]
+                        ("Where Smart UI runs", "/docs/smart-ui-adapters/"))]},
+          {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
+              {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": b.plain(a)}} for q, a in faq]}]
     body = f'<link rel="stylesheet" href="/smart-ui.css?v={VER}">\n' + assets_html() + body
-    files["smart-ui/index.html"] = b.shell(PATH, SEO_TITLE, DESCRIPTION, body, b.load_docs(), ld, home=True)
+    og = "/og/smart-ui.jpg" if (b.CACHE / "og" / "smart-ui.jpg").exists() else "/og/home.jpg"
+    files["smart-ui/index.html"] = b.shell(PATH, SEO_TITLE, DESCRIPTION, body, b.load_docs(), ld, og=og, home=True,
+                                          og_alt=f"Smart UI: {H1}")
     mds["smart-ui/index.md"] = markdown(b, f, faq)
     paths.append(PATH)
     (b.DIST / "smart-ui.css").write_text(css)

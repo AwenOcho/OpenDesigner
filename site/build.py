@@ -1542,6 +1542,10 @@ def doc_page(p, pages):
     if p["slug"] == "faq":
         ld.append({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
             {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": plain(a)}} for q, a in faq_items(p["body"])]})
+    if p["slug"] == "smart-ui-quickstart":
+        steps = re.findall(r"^## \d+\. (.+)$", p["body"], re.M)
+        ld.append({"@context": "https://schema.org", "@type": "HowTo", "name": p["title"], "description": p["description"],
+                   "step": [{"@type": "HowToStep", "position": i + 1, "name": s, "url": f'{SITE_URL}{p["path"]}#{slugify(f"{i + 1}. {s}")}'} for i, s in enumerate(steps)]})
     if p["slug"] == "install":
         ld.append({"@context": "https://schema.org", "@type": "HowTo", "name": "Install OpenDesigner in Claude Code", "step": [
             {"@type": "HowToStep", "text": "/plugin marketplace add ckryptickunal/OpenDesigner"},
@@ -2031,6 +2035,7 @@ def og_images(pages):
     for p in pages:
         kicker = "Docs" if p["slug"] == "index" else f'Docs · {p["section"]}'
         jobs[f'docs/{p["slug"]}.jpg'] = ("file", card.replace("{{KICKER}}", esc(kicker)).replace("{{TITLE}}", esc(p["title"])))
+    jobs["smart-ui.jpg"] = ("file", card.replace("{{KICKER}}", "Smart UI").replace("{{TITLE}}", esc(smart_ui_page.H1)))
     jobs["showcase.png"] = ("post", K.statement("cobalt", 'B2B screens, styles and more. <span class="od-strong">One process.</span>',
                                                 "Built by AI agents through OpenDesigner. Every brand is invented.", "Showcase", 1200, 630, "social-subhead"))
     digest = lambda h: hashlib.sha256(h.encode()).hexdigest()

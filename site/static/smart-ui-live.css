@@ -66,7 +66,7 @@
 .sl-pt { margin: 0; font-size: 17px; line-height: 24px; font-weight: 500; letter-spacing: -0.02em; }
 .sl-psub { margin: 0; flex-basis: 100%; font-size: 14px; line-height: 20px; color: var(--ink-muted); }
 .sl-ph .sl-tag, .sl-ph .sl-sk { flex: none; }
-.sl-sk { display: inline-block; height: 12px; border-radius: 4px; background: var(--surface-sunken); vertical-align: middle; }
+.sl-sk { display: inline-block; height: 12px; border-radius: 4px; background: color-mix(in srgb, var(--line) 60%, var(--surface-sunken)); vertical-align: middle; }
 .sl-facts { display: grid; margin: 0; }
 .sl-fact { display: grid; grid-template-columns: minmax(96px, 2fr) minmax(0, 3fr); gap: 4px 16px; align-items: baseline; padding: 9px 0; border-top: 1px solid var(--line); }
 .sl-fact dt { font-size: 14px; line-height: 20px; color: var(--ink-muted); }
