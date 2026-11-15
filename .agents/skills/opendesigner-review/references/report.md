@@ -50,6 +50,14 @@ So, when the host can start an agent, start one with this prompt and nothing fro
 
 Merge its findings into the report: its probe files go through `review.py check` (measured), and what it did or saw goes in with `review.py finding` (basis `operated` or `seen`). Keep its "not confirmed" notes next to the errors they concern.
 
+### Then reconcile with the decision traces
+The verifier saw none of the project's history, which is why it is useful. It also means some of what it flags was decided on purpose. Before anything is fixed or dropped, check each finding against the project's records: `opendesigner/decisions.md` (ids like `D-0012`), the audit ledger and its waivers (`engine.py ledger show`, and the Waivers line in DESIGN.md; this is the engine's ledger, not this skill's `review/ledger.json`), the owner's notes in `opendesigner/RULES.md`, and DESIGN.md. Then put each finding in one of three groups:
+- **Real gap:** no record covers it. It stays in the report and gets fixed.
+- **Decided on purpose:** a record covers it. Keep the finding, and add `review.py finding "Kept on purpose: <what> (<id>)" --severity info --basis seen` next to it. The verdict stays as the tool sets it. A locked accessibility floor is never "on purpose".
+- **A decision to revisit:** a record covers it, but the finding shows the decision now hurts, for example an accessibility floor or a broken state. Ask the person; don't change their decision yourself.
+
+Never dismiss a finding without naming the record that covers it. If the host can't start a new agent, say so in the report: the review then had no fresh check.
+
 A verifier is worth its cost when the work is bigger than one careful pass can hold. For a one-component change, the measured checks plus a deliberate look at the cases list are enough.
 
 ## Pixel comparison
