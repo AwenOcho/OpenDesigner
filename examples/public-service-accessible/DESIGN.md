@@ -435,6 +435,24 @@ Decisions: D-0034 (answers.Q-state-03), D-0036 (answers.Q-form-01).
 - **Not found (404) and offline**: a page that says what happened in one line and offers a way on (home, search or retry), in the page's own layout, never a dead end.
 - **Every screen that shows data** has its loading, empty and error state before it ships; skeletons take the final layout's shape, so nothing jumps when the content arrives. Reduced motion stops the skeleton shimmer.
 
+## Status and Feedback
+
+**Each status colour has one meaning, always with an icon or a word, and every action shows what happened.**
+
+| Status | Means | Use it | Tokens (text and icon, background, border) | Say it with |
+|---|---|---|---|---|
+| Success | an action finished as asked | after an action that worked, and for a state that is good (paid, verified) | `--ds-color-text-success`, `--ds-color-bg-success-subtle`, `--ds-color-border-success` | the circle-check icon and a word such as "Saved" |
+| Warning | something needs attention soon, but nothing is lost yet | for a risk the person can still avoid: a limit near, a date close, a change that is hard to undo | `--ds-color-text-warning`, `--ds-color-bg-warning-subtle`, `--ds-color-border-warning` | the triangle-alert icon and a word such as "Check" |
+| Danger | something failed or would destroy data | for errors, failures, and actions that delete or cannot be undone | `--ds-color-text-danger`, `--ds-color-bg-danger-subtle`, `--ds-color-border-danger` | the circle-x icon and a word such as "Error" |
+| Info | neutral news the person may want | for neutral facts and tips; never for errors or success | `--ds-color-text-info`, `--ds-color-bg-info-subtle`, `--ds-color-border-info` | the info icon and a word such as "Note" |
+
+- **Never colour alone.** Every status carries an icon or a word as well as its colour (WCAG 2.2 SC 1.4.1).
+- **One meaning per colour.** Success, warning and danger colours appear only for that status, never for a brand accent, a primary button or decoration. Delete buttons take danger; everything else takes the action colour.
+- **After every action, the person sees what happened.** In place, next to what changed, or in a banner over the section; no toasts (default until Q-form-04 is answered).
+- **Banners:** a success banner may close on its own after a few seconds; an error stays until the person dismisses it or fixes the cause, and never closes on its own.
+- **Undo:** a confirm step for what cannot be undone, and an Undo that stays until used or closed for the rest (default, from house standard STD-visual-details-40).
+- The same map, for tools and agents: `build/status.json`.
+
 ## Do's and Don'ts
 
 **These rules keep screens clear and easy to read.** The engine checks the ones it can.
@@ -709,6 +727,7 @@ Your own decisions first (the newest value per path), then your changes to stand
 4. To change the system: `engine.py set <path> <value> --why "..."`, then `engine.py generate`, `engine.py validate`, `engine.py design-md`.
 5. To extend: add a decision (never hand-edit tokens or this file). Keep semantic names the same across modes. Deprecate instead of deleting.
 6. Every build: open a round (`engine.py ledger start "<what>" --items ...`), build from the tokens, run `engine.py review`, check the rendered page with opendesigner-review and show screenshots at phone and desktop width, mark each ledger item done or waived (with the owner's words), then re-read this file.
+7. Status colours (success, warning, danger, info) carry one meaning each and never alone: follow Status and Feedback above (`build/status.json` holds the same map). After every action, show what happened as it says.
 
 **Tailwind v4 classes** (one import: `@import "tailwindcss"; @import "<path>/opendesigner/build/tailwind/theme.css";`; Tailwind's default colors, text sizes, radii and shadows are switched off, so only these exist). They need a Tailwind build that imports that file. In plain HTML with no build step, use the CSS name beside each class from `build/css/tokens.css`; never load Tailwind from a CDN script. Each row is one token under its two names:
 

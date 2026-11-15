@@ -54,6 +54,7 @@ Everything above is plain files, so no tool is required:
 - If you invent a new mechanism, document it in this file in the same commit, so the next session can use it.
 
 ## 7. Done means
+- **A fresh-eyes audit, reconciled, at audit points:** a PR's checklist, before a demo, and before a merge of work bigger than one careful pass can hold. A one-file fix doesn't need one. Start a brand-new agent with no context. Give it only the brief or spec and the work itself, never your reasoning. Then check each of its findings against your records (`_coordination/DECISIONS.md`, your lane file, `traces/`, `_coordination/OWNER-FEEDBACK.md`, and the plan the work came from) and sort it: a real gap (fix it), decided on purpose (name the record), or a decision to revisit (ask the owner). Never dismiss a finding without the record that covers it. If the host can't start a new agent, say so (owner, 2026-11-16).
 - Lane file ends with `## Open questions / gaps` and `## Confidence`.
 - Trace file lists every source; `python3 tools/jev_nav.py check` reports no dangling references.
 - Board row says `done`, your heartbeat says what you finished, and the work is synced.
