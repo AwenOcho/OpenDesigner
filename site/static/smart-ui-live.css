@@ -22,7 +22,7 @@
 /* chat beside the lanes */
 .sl-chat { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
 .sl-logwrap { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; }
-.sl-log { position: relative; flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 24px; scrollbar-width: thin; }
+.sl-log { position: relative; flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 24px 24px 80px; scrollbar-width: thin; }
 .sl-turn + .sl-turn { margin-top: 28px; padding-top: 28px; border-top: 1px solid var(--line); }
 .sl-turn { display: flex; flex-direction: column; gap: 14px; }
 .sl-me { align-self: flex-end; max-width: 85%; margin: 0; padding: 8px 14px; border-radius: var(--r-control); background: var(--accent-soft); color: var(--accent-text); font-size: 15px; line-height: 22px; }
@@ -143,7 +143,7 @@
   .sl-top, .sl-behind { padding: 16px; }
   .sl-chips { padding: 12px 16px; }
   .sl-grid { gap: 16px; }
-  .sl-log { padding: 16px; }
+  .sl-log { padding: 16px 16px 72px; }
   .sl-app { height: min(560px, 70vh); }
   .sl-lanes { grid-template-columns: minmax(0, 1fr); }
   .sl-part { padding: 16px; }
@@ -164,7 +164,7 @@
 
 /* one corner scale with the page: the cards' radius, continuous where the browser draws it */
 @supports (corner-shape: superellipse(1.35)) { .sl-app, .sl-behind, .sl-part, .sl-card, .sl-kpi { corner-shape: superellipse(1.35); --corner-k: 1.22; } }
-@media (max-width: 640px) { .sl-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; } .sl-chip { flex: none; } }
+@media (max-width: 640px) { .sl-chips { gap: 6px; } .sl-chip { min-height: 36px; padding: 0 12px; font-size: 13px; } }
 .sl-log:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: -2px; }
 /* the newest answer can always scroll to the top of the chat, even while it is still short */
 .sl-turn:last-child { min-height: 100%; }

@@ -419,27 +419,22 @@ def parts_css(f):
 
 def built_section(b, f, n):
     t = f["templates"]
-    pick = [x for x in t if x["action"] in ("list_fines", "application_status", "renewal_quote")]
-    seen, rows = set(), []
-    for x in pick:
-        if x["action"] not in seen:
-            seen.add(x["action"])
-            rows.append(f'<li><span>{esc(x["action"])}</span><b>{esc(x["part"]["component"])}</b></li>')
+    # plain words for each prepared part (the action and component names stay in templates.json and the docs)
+    rows = "".join(f'<li><span>{a}</span><b>{c}</b></li>' for a, c in (("Your fines", "Fine card"), ("Your application", "Progress card"), ("Renewal prices", "Table")))
     vis = [
-        f'<div class="sb-file"><p class="sb-fname num">templates.json</p><ul>{"".join(rows)}</ul><p class="sb-more">{len(t)} parts for Fernhollow</p></div>',
-        '<div class="sb-match"><div class="sl-me">Do I have any fines?</div><p class="sl-call done num"><span class="sl-dot"></span><span>list_fines → KeyFacts</span></p><p class="sb-note">Under 0.2 ms, no model</p></div>',
+        f'<div class="sb-file"><ul>{rows}</ul><p class="sb-more">{len(t)} ready-made cards for the council example</p></div>',
+        '<div class="sb-match"><div class="sl-me">Do I have any fines?</div><p class="sl-call done"><span class="sl-dot"></span><span>Fine card, ready-made</span></p></div>',
         '<div class="sl-part sb-fill"><div class="sl-fact"><dt>Full amount</dt><dd>£70.00</dd></div><div class="sl-fact"><dt>Status</dt><dd><span class="sl-tag warn">Unpaid</span></dd></div><div class="sl-fact"><dt>Challenge by</dt><dd><span class="sl-sk" style="width:70%"></span></dd></div></div>',
-        '<ul class="sb-checks"><li>Every value is in the data</li><li>Every colour is a token</li><li>The colour agrees with the data</li><li>A change asks first</li></ul>',
-        '<div class="sb-draw"><p class="num">&lt;od-surface&gt;</p><div class="sl-part"><p class="sl-pt">Unpaid parking fine</p><span class="sl-btn primary">Pay £35.00</span></div><p class="num">+ your tokens.css</p></div>',
+        '<ul class="sb-checks"><li>Every value is in the data</li><li>Every colour is yours</li><li>The colour agrees with the data</li><li>A change asks first</li></ul>',
+        '<div class="sb-draw"><div class="sl-part"><p class="sl-pt">Unpaid parking fine</p><span class="sl-btn primary">Pay £35.00</span></div><p>In your page, in your colours</p></div>',
     ]
-    who = ["Once, with you", "Smart UI", "Code, as data lands", "Smart UI", "Your page"]
-    # one line each here; the full step is on /docs/smart-ui/ (the titles come from there, so the two keep the same steps)
-    lines = ["Works out which answers your product needs and binds a part to each data source. You check them.",
-             "Finds the prepared part for the question in under 0.2 ms, with no model.",
-             "Code fills the part as your agent's data lands. The data picks the colours.",
-             "Every part is validated before it renders, including one the model wrote.",
-             "`<od-surface>` draws it with your tokens, in any framework."]
-    cols = "".join(f'<li class="sb-step"><span class="sb-n num">0{i + 1}</span><h3>{esc(title)}</h3><p class="sb-who num">{who[i]}</p><div class="sb-vis" aria-hidden="true">{vis[i]}</div><p>{b.inline(lines[i])}</p></li>'
+    who = ["Once, with you", "Smart UI", "As the data lands", "Smart UI", "Your page"]
+    lines = ["Finds the answers your product needs and makes a card for each. You check them.",
+             "Finds the ready-made card for the question at once, with no model.",
+             "Fills the card as your agent's data arrives. The data picks the colours.",
+             "Checks every card before it shows, including one the model wrote.",
+             "Draws it with your components and colours, in any framework."]
+    cols = "".join(f'<li class="sb-step"><span class="sb-n num">0{i + 1}</span><h3>{esc(title)}</h3><p class="sb-who">{who[i]}</p><div class="sb-vis" aria-hidden="true">{vis[i]}</div><p>{b.inline(lines[i])}</p></li>'
                    for i, (title, _desc) in enumerate(f["steps"]))
     return f"""
 <section class="h-sec" id="built">

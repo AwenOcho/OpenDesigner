@@ -454,9 +454,10 @@
   // it does full size (nothing wraps or stacks because the tile is narrower). The scale follows the tile's width.
   function fit() {
     document.querySelectorAll("[data-fit]").forEach(function (box) {
-      var inner = box.firstElementChild, w = parseFloat(box.getAttribute("data-fit"));
-      var room = box.clientWidth - parseFloat(getComputedStyle(box).paddingLeft) * 2;
-      inner.style.transform = "scale(" + Math.min(1, room / w).toFixed(4) + ")";
+      var inner = box.firstElementChild, w = parseFloat(box.getAttribute("data-fit")), cs = getComputedStyle(box);
+      var roomW = box.clientWidth - parseFloat(cs.paddingLeft) * 2, roomH = box.clientHeight - parseFloat(cs.paddingTop) * 2;
+      var s = Math.min(1, roomW / w, roomH / Math.max(1, inner.offsetHeight));  // the whole part shows: never cropped
+      inner.style.transform = "translate(" + ((roomW - w * s) / 2).toFixed(1) + "px, " + ((roomH - inner.offsetHeight * s) / 2).toFixed(1) + "px) scale(" + s.toFixed(4) + ")";
     });
   }
 
