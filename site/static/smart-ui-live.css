@@ -150,6 +150,7 @@
 }
 
 /* the home page's compact demo: the chat alone, played once in view, with a replay */
+.sl[data-mini] .sl-body { grid-template-columns: minmax(0, 1fr); }
 .sl[data-mini] .sl-log { min-height: 380px; }
 .sl-replay { align-self: flex-start; margin-top: 16px; }
 .sl[data-mini][data-state="busy"] .sl-replay { visibility: hidden; }

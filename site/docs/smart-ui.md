@@ -1,7 +1,7 @@
 ---
 title: Smart UI: answers that show your interface
 seo_title: "Generative UI from your own design system components"
-description: Generative UI with your own design system. Your assistant answers with parts made ahead of time from your components, filled from your data and checked before they show.
+description: Generative UI with your own design system. Your assistant answers with parts made from your components, filled from your data and checked before they show.
 section: Concepts
 order: 8
 updated: 2026-11-14

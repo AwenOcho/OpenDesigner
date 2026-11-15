@@ -126,7 +126,7 @@
     this.root.setAttribute("data-state", "busy");
     var L = this.lanes(s);
     var turn = el("div", "sl-turn", null);
-    turn.append(el("p", "sl-me", s.q));
+    turn.append(el("div", "sl-me", s.q));
     this.log.replaceChildren(turn);
     var say = el("p", "sl-say", null);
     var call = el("p", "sl-call num", null);

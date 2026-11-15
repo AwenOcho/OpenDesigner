@@ -280,7 +280,7 @@ def screens(f):
     hl = d["offices"][0]
     return [
         ("text", "Text, when text is enough", "A short fact or a “when” question. Most questions end here, with no part.",
-         f'<div class="uc-chat"><p class="sl-me">When is the Hollow Lane office open?</p><p class="sl-say">{esc(office)}</p></div>', []),
+         f'<div class="uc-chat"><div class="sl-me">When is the Hollow Lane office open?</div><p class="sl-say">{esc(office)}</p></div>', []),
         ("answer", "Answer", "A record with its facts: one fine, one booking, one office.",
          mini_facts("Hollow Lane office", [("Today", hl["open_today"], "ok"), ("Closure", "Friday 27 November", "warn"), ("Phone", hl["phone"], "")]), f["by_group"]["answer"]),
         ("data", "Data", "Where something stands, numbers and trends. The data picks the colour.",
@@ -295,7 +295,7 @@ def screens(f):
         ("media", "Media", "A file, a place, a picture or code, from hosts you allow.",
          '<div class="sl-part"><p class="sl-pt">Your documents</p><ul class="uc-files">' + "".join(
              f'<li><span class="uc-file" aria-hidden="true"></span><span><strong>{esc(x["document"])}</strong><small>{esc(x["file"] or "Still needed")}</small></span>'
-             f'<span class="sl-tag {"ok" if x["file"] else "warn"}">{"Uploaded" if x["file"] else "Needed"}</span></li>' for x in docs) + "</ul></div>", f["by_group"]["media"]),
+             f'<span class="sl-tag {"ok" if x["file"] else "warn"}">{"Uploaded" if x["file"] else "Needed"}</span></li>' for x in docs[:2]) + "</ul></div>", f["by_group"]["media"]),
         ("states", "Every state", "Loading, empty, an error with a retry, data that may be old. Every part handles each one.",
          '<div class="uc-stategrid"><div class="sl-part"><span class="sl-sk" style="width:60%"></span><span class="sl-sk" style="width:90%"></span><span class="sl-sk" style="width:40%"></span></div>'
          '<div class="sl-part uc-empty"><p>Nothing to show yet.</p></div>'
@@ -332,7 +332,7 @@ def built_section(b, f):
             rows.append(f'<li><span>{esc(x["action"])}</span><b>{esc(x["part"]["component"])}</b></li>')
     vis = [
         f'<div class="sb-file"><p class="sb-fname num">templates.json</p><ul>{"".join(rows)}</ul><p class="sb-more">{len(t)} parts for Fernhollow</p></div>',
-        '<div class="sb-match"><p class="sl-me">Do I have any fines?</p><p class="sl-call done num"><span class="sl-dot"></span><span>list_fines → KeyFacts</span></p><p class="sb-note">Under 0.2 ms, no model</p></div>',
+        '<div class="sb-match"><div class="sl-me">Do I have any fines?</div><p class="sl-call done num"><span class="sl-dot"></span><span>list_fines → KeyFacts</span></p><p class="sb-note">Under 0.2 ms, no model</p></div>',
         '<div class="sl-part sb-fill"><div class="sl-fact"><dt>Full amount</dt><dd>£70.00</dd></div><div class="sl-fact"><dt>Status</dt><dd><span class="sl-tag warn">Unpaid</span></dd></div><div class="sl-fact"><dt>Challenge by</dt><dd><span class="sl-sk" style="width:70%"></span></dd></div></div>',
         '<ul class="sb-checks"><li>Every value is in the data</li><li>Every colour is a token</li><li>The colour agrees with the data</li><li>A change asks first</li></ul>',
         '<div class="sb-draw"><p class="num">&lt;od-surface&gt;</p><div class="sl-part"><p class="sl-pt">Unpaid parking fine</p><span class="sl-btn primary">Pay £35.00</span></div><p class="num">+ your tokens.css</p></div>',

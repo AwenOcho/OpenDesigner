@@ -69,8 +69,8 @@
 
 /* 01 every kind of answer: a small screen per job, drawn with the demo's part styles */
 .ucs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
-.uc { display: flex; flex-direction: column; min-width: 0; padding: 12px 12px 20px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-panel); }
-.uc-screen { height: 232px; overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: 8px; padding: 14px; border-radius: max(2px, calc(var(--r-panel) - 12px)); background: var(--surface-sunken); pointer-events: none; }
+.uc { --uc-r: var(--r-panel); display: flex; flex-direction: column; min-width: 0; padding: 12px 12px 20px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-panel); }
+.uc-screen { height: 248px; overflow: hidden; display: flex; flex-direction: column; justify-content: safe center; gap: 8px; padding: 18px; border-radius: max(2px, calc(var(--uc-r) - 12px)); background: var(--surface-sunken); pointer-events: none; }
 .uc-screen .sl-part { gap: 8px; padding: 12px; border-radius: 10px; }
 .uc-screen .sl-pt { font-size: 14px; line-height: 20px; }
 .uc-screen .sl-fact { grid-template-columns: minmax(0, 1fr) auto; padding: 6px 0; }
@@ -91,8 +91,8 @@
 .uc-toast .sl-undo { display: inline-flex; align-items: center; min-height: 26px; font-size: 13px; }
 .uc-files { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
 .uc-files li { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; gap: 8px; align-items: center; font-size: 13px; line-height: 18px; }
-.uc-files small { display: block; color: var(--ink-muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.uc-files strong { display: block; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.uc-files small { display: block; color: var(--ink-muted); font-size: 12px; overflow-wrap: anywhere; }
+.uc-files strong { display: block; font-weight: 500; }
 .uc-file { width: 14px; height: 18px; border-radius: 3px; border: 1.5px solid var(--line-strong); }
 .uc-stategrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .uc-stategrid .sl-part { min-height: 92px; justify-content: center; }
@@ -116,11 +116,11 @@
 .sb-ahead { background: var(--surface-sunken); color: var(--ink-muted); }
 .sb-now { background: var(--accent-soft); color: var(--accent-text); }
 .sb-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
-.sb-step { display: flex; flex-direction: column; min-width: 0; padding: 20px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-panel); }
+.sb-step { --sb-r: var(--r-panel); display: flex; flex-direction: column; min-width: 0; padding: 20px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-panel); }
 .sb-n { font: 500 12px/16px "Source Code Pro", ui-monospace, monospace; color: var(--accent-text); }
 .sb-step h3 { margin: 10px 0 0; font-size: 20px; line-height: 26px; font-weight: 500; letter-spacing: -0.023em; }
 .sb-who { margin: 2px 0 0; font-size: 12px; line-height: 16px; color: var(--ink-muted); }
-.sb-vis { display: flex; flex-direction: column; justify-content: center; gap: 8px; height: 172px; margin: 14px 0; padding: 12px; border-radius: max(2px, calc(var(--r-panel) - 20px)); background: var(--surface-sunken); overflow: hidden; }
+.sb-vis { display: flex; flex-direction: column; justify-content: safe center; gap: 8px; height: 204px; margin: 14px 0; padding: 12px; border-radius: max(2px, calc(var(--sb-r) - 20px)); background: var(--surface-sunken); overflow: hidden; }
 .sb-step > p:last-child { margin: 0; font-size: 14px; line-height: 21px; color: var(--ink-muted); letter-spacing: -0.012em; text-wrap: pretty; }
 .sb-step code { font-size: 12px; }
 .sb-vis .sl-part { gap: 6px; padding: 10px; border-radius: 10px; }
@@ -154,6 +154,7 @@
 @media (max-width: 1100px) {
   .sb-bands { display: none; }
   .sb-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sb-step:last-child { grid-column: 1 / -1; }
   .sb-agents { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 600px) { .sb-steps { grid-template-columns: minmax(0, 1fr); } .sb-agents { padding: 20px; } }
