@@ -10,11 +10,25 @@ Kunal's rules for every page, figure, demo, video and image in this project, in 
 5. **More was added than cut.** Every finished piece of work went onto the page, so pages grew cluttered.
 
 ## The process
-1. **Picture first.** Before building a page or a section, make one rough screen of the target (static HTML is fine) and get Kunal's yes, or match one he already approved.
+1. **Picture first, in two or three variants.** Before building a page or a section, make one rough screen of the target (static HTML is fine) and get Kunal's yes, or match one he already approved.
 2. **Build against this file,** and cut before adding. Every section has to earn its place.
 3. **Fresh-eyes visual audit.** Start a new agent with no context. Give it this file, the brief and screenshots at 1440 and 375 px in WebKit (Kunal uses Safari) and Chromium, and nothing else. Sort its findings as `_coordination/PROTOCOL.md` section 7 says.
 4. **The coordinator looks** at the screenshots before Kunal does.
 5. **Kunal sees it locally** before anything is pushed.
+
+## How quality is judged (adapted from Contra Labs' Human Creativity Benchmark)
+Source: [contralabs.com/research/human-creativity-benchmark](https://contralabs.com/research/human-creativity-benchmark), April 2026. Across 5,940 pairwise judgments by working designers, they found:
+- Judges agree on failures: unreadable text, broken hierarchy, visual artifacts.
+- Once those are cleared, disagreement is taste. Usability acted as a gate: outputs scored lowest on it reached the top two only 10% of the time.
+- On desktop apps and landing pages, models fell short on the details: typography, spacing, component design, interaction patterns, icons and accessibility.
+
+What we take from it:
+1. **A gate, then taste.** The checks and the fresh-eyes audit are the gate: nothing broken, cut off, misaligned or unreadable. Passing the gate makes work showable, not good. Taste is judged next, by Kunal.
+2. **Show two, not one.** For a new page, section or visual, show Kunal two or three real variants side by side (`skills/opendesigner/assets/picker.js`), not one first draft. People judge a pair more reliably than a single piece.
+3. **Score three things apart:** prompt adherence (it does what the brief asked), usability (people can read it and use it), and visual appeal (taste). The fresh-eyes audit reports all three, each with its reasons.
+4. **Polish where models fail.** Before showing anything, spend a refinement pass on exactly those details: type, spacing, component finish, interaction states, icons and accessibility.
+5. **Use agreement as the signal.** When two fresh reviewers agree on a problem, it's a gate failure, so fix it. When they disagree, it's taste, so ask Kunal.
+6. **Record why he picked.** When Kunal picks a variant, record his reason in `OWNER-FEEDBACK.md`, tagged by theme (layout, hierarchy, usability, colour, type, motion). Themes that recur become rules in this file.
 
 ## The rules
 
