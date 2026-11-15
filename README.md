@@ -132,7 +132,7 @@ New to the repo? You only need `skills/` or a zip from above. Everything else he
 
 Optional. Your assistant answers with a part of your own system, like a fine with a Pay button or an application's progress, instead of three paragraphs. The parts are prepared ahead of time from your library and bound to your app's data. A matcher picks one in under 0.2 ms with no model, its outline shows at once, and values fill in as your data lands. The model writes only the sentence.
 
-<img src="brand/kit/readme/smart-ui-live.png" width="1012" alt="A council assistant answering 'Do I have any fines?'. The unpaid-fine card is half filled: four values are in, four are still loading blocks. Beside it, three lanes: the data agent's list_fines call is done, Smart UI has matched a prepared part and drawn the outline in a few milliseconds, and the model has not started its sentence.">
+<img src="brand/kit/readme/smart-ui-live.png" width="1012" alt="A council assistant answering 'Do I have any fines?'. The unpaid-fine card is half filled: some values are in, the rest are still loading blocks. Beside it, two lanes: your agent is fetching the fines, and Smart UI has matched a ready-made card, drawn its outline and is filling it in.">
 
 Colours come from the data through your status tokens, anything that books or pays asks first and says what will happen, and every part is checked before it shows. You keep your own model and agents. Plain HTML, so it works in any framework, and it speaks A2UI and MCP Apps.
 
@@ -140,7 +140,7 @@ Colours come from the data through your status tokens, anything that books or pa
 
 Each product gets its own list of answers, from its own data and actions:
 
-<img src="brand/kit/readme/smart-ui-products.png" width="1012" alt="The answer types the scope step found for three example products. Fernhollow council: table, record details, ask before a change, form, progress, pick a time, place, what happened and compare options. Tallyhaus billing: ask before a change, table, record details, chart over time, headline numbers, file, compare options and what happened. Orvell travel: ask before a change, table, record details, compare options, results to pick from, pictures, place, pick a time and what happened.">
+<img src="brand/kit/readme/smart-ui-products.png" width="1012" alt="The first answer types the scope step found for three example products. Fernhollow council: table, record details, ask before a change, form, progress; Tallyhaus billing: ask before a change, table, record details, chart over time, headline numbers; Orvell travel: ask before a change, table, record details, compare options, results to pick from.">
 
 [Watch the recorded demo](https://opendesigner.dev/smart-ui/) · [Add it to your assistant](https://opendesigner.dev/docs/smart-ui-quickstart/)
 
