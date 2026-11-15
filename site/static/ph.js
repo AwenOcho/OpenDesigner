@@ -91,7 +91,7 @@
     };
     // a page that opens on a live demo (/smart-ui/) shows the card only once the demo has left the screen, so it never covers it
     var later = function () {
-      var demo = document.querySelector(".su-hero [data-sl]");
+      var demo = document.querySelector(".su-hero .sl-app");
       if (!demo || !("IntersectionObserver" in window)) { setTimeout(show, 1500); return; }
       var io = new IntersectionObserver(function (es) { if (!es[0].isIntersecting) { io.disconnect(); setTimeout(show, 300); } });
       io.observe(demo);

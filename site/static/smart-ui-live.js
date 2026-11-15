@@ -37,7 +37,7 @@
       var io = new IntersectionObserver(function (es) {
         if (es.some(function (e) { return e.isIntersecting; })) { io.disconnect(); self.ask(self.product.scenarios[0]); }
       }, { threshold: 0.2 });
-      io.observe(root);
+      io.observe(root.querySelector(".sl-app") || root);  // the chat window: the root may lay out as display: contents
     } else {
       this.ask(this.product.scenarios[0]);
     }
@@ -149,15 +149,14 @@
       var ui = L.ui || [];
       // the UI agent: match a prepared part (or decide on text) and draw its outline at once
       if (ui[0]) await this.step(ui[0], id);
+      // the sentence goes under the part: it arrives last, so nothing above it moves when it does
       if (s.view) {
-        turn.append(say);
         part = this.build(s.view, true);
         if (ui[1]) await this.step(ui[1], id);
         turn.append(part.node);
         this.time("outline", t0);
-      } else {
-        turn.append(say);
       }
+      turn.append(say);
       await data;
       // no prepared part covers a change: the model writes the part first, then it fills and is checked like any other
       var w = (L.text || [])[0];
