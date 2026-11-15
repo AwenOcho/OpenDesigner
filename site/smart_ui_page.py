@@ -220,7 +220,7 @@ def demo_html(products, mini=False):
 {switch}<div class="sl-grid">
 <div class="sl-app" aria-describedby="{did}">
 <div class="sl-top"><div class="sl-who"><span class="sl-avatar" aria-hidden="true"></span><div><h2 data-who></h2><p data-sub></p></div></div></div>
-<section class="sl-chat" aria-label="Conversation"><div class="sl-log" data-log></div>{chat_extra}</section>
+<section class="sl-chat" aria-label="Conversation"><div class="sl-log" data-log tabindex="0" aria-label="Answers"></div>{chat_extra}</section>
 <p class="vh" data-live aria-live="polite"></p>
 <div class="sl-toasts" data-toasts></div>
 </div>{behind}
@@ -337,7 +337,8 @@ def parts_section(b, f, n):
         c = comps.get(slug)
         if not c:
             continue
-        tiles.append(f'<li class="th"><div class="th-view lib-fit" inert aria-hidden="true"><div class="th-zoom odl-sys-nordic th-{c["width"]}">{quiet(c["markup"])}</div></div>'
+        w = library_page.FRAME_W[c["width"]]
+        tiles.append(f'<li class="th"><div class="th-view lib-fit" data-fit="{w}" inert aria-hidden="true"><div class="th-zoom odl-sys-nordic" style="width:{w}px">{quiet(c["markup"])}</div></div>'
                      f'<a class="th-name" href="/library/{slug}/">{esc(c["name"])}</a><p class="th-line">{esc(library_page.short(c))}</p></li>')
     return f"""
 <section class="h-sec" id="parts">
@@ -452,6 +453,7 @@ def built_section(b, f, n):
 <div class="sb-agents"><h3 class="h-h3">Your agents, your model</h3>
 <ol class="flow3"><li><b>Your data agent</b><span>Your API, documents or database</span></li><li><b>Smart UI</b><span>Matches, fills and checks the part</span></li><li><b>The screen</b><span>Your components, your tokens</span></li></ol>
 <a class="h-link" href="/docs/smart-ui-quickstart/#use-your-own-agents">Use your own agents {b.ARROW}</a></div>
+<p class="su-more"><a href="/docs/smart-ui/">How it works</a><a href="/docs/smart-ui-quickstart/">Add it to your assistant</a><a href="/docs/smart-ui-adapters/">Where it runs</a><a href="/smart-ui/demo/">The renderer demo</a></p>
 </section>
 """
 
@@ -466,14 +468,12 @@ def products_section(b, n):
         return ""
     cols = []
     for p in ps:
-        lis = "".join(f'<li class="{"pr-missing" if a.get("missing") else ""}" title="{esc(a["reason"])}"><span class="pr-type">{esc(a["type"])}</span>'
-                      f'<span class="pr-part num">{esc(a["part"]) if a.get("part") and not a.get("missing") else "no part yet"}</span>'
-                      '</li>' for a in p["answer_types"])
-        cols.append(f'<div class="pr"><h3>{esc(p["name"])}</h3><p class="pr-kind num">{esc(p["kind"].replace("-", " "))}</p><ol>{lis}</ol></div>')
+        # at most five, in plain words: the part names and the evidence stay in the Markdown copy and use-cases.json
+        kinds = [a["type"][:1].upper() + a["type"][1:] for a in p["answer_types"] if not a.get("missing")][:5]
+        cols.append(f'<div class="pr"><h3>{esc(p["name"])}</h3><ul class="pr-chips">{"".join(f"<li>{esc(k)}</li>" for k in kinds)}</ul></div>')
     return f"""
 <section class="h-sec" id="products">
-<div class="h-head">{b.idx(n, "Different products")}<h2 class="h-h2">Different products, different answers.</h2>
-<p class="h-lede">Each list comes from the product's own data and actions.</p></div>
+<div class="h-head">{b.idx(n, "Different products")}<h2 class="h-h2">Different products, different answers.</h2></div>
 <div class="prs">{"".join(cols)}</div>
 </section>
 """
@@ -630,9 +630,9 @@ def add(b, files, mds, paths):
     faq = faq_items(b)
     css = b.minify_css(b.corners_match_levers(b.apple_tracking((STATIC / "smart-ui.css").read_text())))
     VER = hashlib.sha256(css.encode()).hexdigest()[:10]
-    secs = [lambda n: parts_section(b, f, n), lambda n: real_section(b, n), lambda n: build_seq_section(b, n), lambda n: compare_section(b, n),
-            lambda n: systems_section(b, n), lambda n: states_section(b, n), lambda n: products_section(b, n), lambda n: built_section(b, f, n),
-            lambda n: rules_section(b, f, n), lambda n: tested_section(b, f, n), lambda n: faq_section(b, faq, n), lambda n: end_section(b, n)]
+    # six sections (Kunal, 2026-11-16: "about 5 or 6"); the rules, where it runs and the questions live on the docs pages
+    secs = [lambda n: parts_section(b, f, n), lambda n: real_section(b, n), lambda n: compare_section(b, n),
+            lambda n: systems_section(b, n), lambda n: products_section(b, n), lambda n: built_section(b, f, n)]
     body, i = hero(b, f), 1
     for s in secs:
         h = s(f"{i:02d}")
@@ -651,9 +651,7 @@ def add(b, files, mds, paths):
                           "description": "Generative UI for an assistant, made from the product's own design system: parts prepared ahead of time, filled from the app's data and checked before they render."},
            "hasPart": [{"@type": "TechArticle", "name": t, "url": b.SITE_URL + u} for t, u in
                        (("Smart UI: answers that show your interface", "/docs/smart-ui/"), ("Add Smart UI to your assistant", "/docs/smart-ui-quickstart/"),
-                        ("Where Smart UI runs", "/docs/smart-ui-adapters/"))]},
-          {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
-              {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": b.plain(a)}} for q, a in faq]}]
+                        ("Where Smart UI runs", "/docs/smart-ui-adapters/"))]}]
     pv = hashlib.sha256(parts_css(f).encode()).hexdigest()[:10]
     pv = hashlib.sha256((parts_css(f) + parts_js(f)).encode()).hexdigest()[:10]
     body = (f'<link rel="stylesheet" href="/smart-ui-parts.css?v={pv}">\n<link rel="stylesheet" href="/smart-ui.css?v={VER}">\n'

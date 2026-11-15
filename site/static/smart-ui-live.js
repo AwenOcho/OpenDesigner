@@ -60,6 +60,7 @@
         self.chips.append(b);
       });
     }
+    if (this.log) this.log.replaceChildren();
     if (play) this.ask(this.product.scenarios[0]);
   };
 
@@ -121,6 +122,7 @@
   // ---------------------------------------------------------------- one answer
   Demo.prototype.ask = async function (s) {
     var id = ++this.run;
+    var wasBusy = this.root.getAttribute("data-state") === "busy";
     var self = this;
     var t0 = performance.now();
     if (this.chips) this.product.scenarios.forEach(function (x) { if (x._chip) x._chip.setAttribute("aria-pressed", String(x === s)); });
@@ -128,7 +130,11 @@
     var L = this.lanes(s);
     var turn = el("div", "sl-turn", null);
     turn.append(el("div", "sl-me", s.q));
-    this.log.replaceChildren(turn);
+    // the chat keeps its height and scrolls inside: an unfinished answer is dropped, the new one is scrolled to the top
+    if (this.turn && wasBusy) this.turn.remove();
+    this.turn = turn;
+    this.log.append(turn);
+    this.reveal(turn);
     var say = el("p", "sl-say", null);
     var call = el("p", "sl-call num", null);
     call.append(el("span", "sl-dot", null), el("span", null, s.chip));
@@ -174,6 +180,14 @@
     } catch (e) {
       if (!(e instanceof Cancel)) throw e;
     }
+  };
+
+  // Scroll the conversation itself, never the page around it.
+  Demo.prototype.reveal = function (node) {
+    var log = this.log;
+    requestAnimationFrame(function () {
+      log.scrollTo({ top: Math.max(0, node.offsetTop - 12), behavior: reduce.matches ? "auto" : "smooth" });
+    });
   };
 
   Demo.prototype.stream = async function (node, text, id) {
@@ -426,6 +440,7 @@
     trigger.disabled = true;
     var p = KINDS.approval.call(this, ap);
     after.after(p.node);
+    this.reveal(p.node);
     var self = this;
     p.fill(this, this.run).then(function () {
       var yes = p.node.querySelector(".sl-btn.primary"), no = p.node.querySelector(".sl-btn:not(.primary)");
@@ -436,6 +451,22 @@
     }).catch(function () {});
   };
 
-  function boot() { document.querySelectorAll("[data-sl]").forEach(function (r) { new Demo(r); }); }
+  // Gallery previews: each part is laid out at its natural width and scaled down with a transform, so it looks exactly as
+  // it does full size (nothing wraps or stacks because the tile is narrower). The scale follows the tile's width.
+  function fit() {
+    document.querySelectorAll("[data-fit]").forEach(function (box) {
+      var inner = box.firstElementChild, w = parseFloat(box.getAttribute("data-fit"));
+      var room = box.clientWidth - parseFloat(getComputedStyle(box).paddingLeft) * 2;
+      inner.style.transform = "scale(" + Math.min(1, room / w).toFixed(4) + ")";
+    });
+  }
+
+  var ro = window.ResizeObserver ? new ResizeObserver(fit) : null;
+  function boot() {
+    document.querySelectorAll("[data-sl]:not([data-sl-on])").forEach(function (r) { r.setAttribute("data-sl-on", ""); new Demo(r); });
+    fit();
+    if (ro) document.querySelectorAll("[data-fit]").forEach(function (b) { ro.observe(b); });
+  }
+  document.addEventListener("od:variant", boot, true);  // (capture: the event does not bubble) a review copy's variant picker mounts new markup
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
 })();
