@@ -518,7 +518,7 @@ def select(msg, catalog, k=3, scope=None, data=None, boost=None):
                   and not cue and best_words < 3
                   and not re.search(r"\band (when|what|how|who|where|which)\b", norm(msg)))  # two questions in one are not a short fact
     # "when is the next invoice due?" asks for one date: a sentence, whatever cue word it has
-    when_fact = bool(re.match(r"^\s*when\b", norm(msg))) and not re.search(r"\b(each|every|all|list|show|times|slots)\b", norm(msg))
+    when_fact = bool(re.match(r"^\s*when\b", norm(msg))) and not re.search(r"\b(each|every|all|list|show|times|slots|can|could)\b", norm(msg))
     ui = bool(top) and reason and not short_fact and not when_fact
     return {"ui": ui, "candidates": top if ui else [], "scores": {n: round(s, 2) for s, n in ranked[:k + 2]},
             "short_fact": bool(short_fact or when_fact),
@@ -593,6 +593,7 @@ def build_prompt(msg, catalog, k=3, scope=None, data=None, boost=None, always=()
 # ".field" is the current item. {"tone": "path", "map": {"Unpaid": "warning", "*": "success"}} sets a semantic tone from
 # the data (green for good, red for bad come from the system's tokens, never from a model). {"when": "...", "then": X}
 # keeps X only when the condition holds. A string that is one placeholder keeps the value's type (a number stays one).
+# A tone map key ending in * matches by its start ("Paid*" for "Paid £35.00 on 25 August"); an unlisted value is neutral.
 
 _PH = re.compile(r"\{([^{}]+)\}")
 
@@ -678,7 +679,11 @@ def bind(node, root, cur=None):
             return [v for v in (bind(node["item"], root, it) for it in items[: node.get("max", 50)]) if v is not None]
         if "tone" in node and "map" in node:
             v = _get(node["tone"], root, cur)
-            return node["map"].get(str(v), node["map"].get("*"))
+            m, sv = node["map"], str(v)
+            if sv in m:
+                return m[sv]
+            pre = next((t for k, t in m.items() if k.endswith("*") and len(k) > 1 and sv.lower().startswith(k[:-1].lower())), None)
+            return pre if pre is not None else m.get("*", "neutral")  # unknown values are neutral, never green by default
         if "when" in node and "then" in node:
             return bind(node["then"], root, cur) if _holds(node["when"], root, cur) else None
         out = {}
@@ -750,7 +755,7 @@ class Matcher:
         return out[:k], round((time.perf_counter() - t0) * 1000, 3)
 
 
-def pick_template(templates, action, data, message=""):
+def pick_template(templates, action, data):
     """The first template for this action whose condition holds for the data, filled; or None."""
     for t in templates:
         if t.get("action") != action:
@@ -1008,7 +1013,7 @@ def duplicate_rows(v, path, errs, sid):
 
 
 TONE_GOOD = re.compile(r"^(?:paid|done|complete|completed|approved|passed|pass|ok|active|on time|delivered|available|eligible|yes|confirmed|sent|saved|fixed|resolved|in stock)\b", re.I)
-TONE_BAD = re.compile(r"^(?:unpaid|overdue|failed|fail|broken|error|declined|refused|cancelled|canceled|rejected|missing|not eligible|no|expired|out of stock|blocked|still needed)\b", re.I)
+TONE_BAD = re.compile(r"^(?:unpaid|overdue|failed|fail|broken|error|declined|refused|cancelled|canceled|rejected|missing|not eligible|expired|out of stock|blocked|still needed|delayed)\b(?!\s+(?:issues?|problems?|errors?)\b)", re.I)
 
 
 def tones_from_data(comp, path, errs, sid):
@@ -1668,8 +1673,7 @@ def propose_intents(product, actions):
     return out
 
 
-GOOD = re.compile(r"^(paid|done|ok|active|open now|available|approved|passed?|complete|completed|on time|eligible|yes|in stock|delivered)\b", re.I)
-BAD = re.compile(r"^(unpaid|overdue|failed|error|broken|declined|refused|closed|cancelled|no|not|out of stock|delayed|missing|still needed)\b", re.I)
+GOOD, BAD = TONE_GOOD, TONE_BAD  # one list for drafting tones and for checking them (R6-tone)
 WAIT = re.compile(r"^(pending|waiting|look|review|in progress|processing|due|warning)\b", re.I)
 
 
@@ -1708,7 +1712,7 @@ def draft_template(action, result, catalog):
             states = {"done": "done", "complete": "done", "current": "now", "now": "now", "next": "next"}
             now = next((x["state"] for x in v if str(x.get("state")).lower() in ("current", "now")), "current")
             return {"action": action, "intent": _label(action), "part": {"component": "ProgressStatus", "title": _label(k.split(".")[0]),
-                    "tone": "info", "status": "{%s[state=%s][0].label|or:In progress}" % (k, now), "steps": {
+                    "tone": "info", "status": "{%s[state=%s][0].label|or:–}" % (k, now), "steps": {
                 "each": k, "item": {"label": "{.label}", "state": {"tone": ".state", "map": {**states, "*": "next"}}}}}}
     if lists and "DataTable" in comps:
         k, v = max(lists, key=lambda kv: len(kv[1]))
@@ -1843,8 +1847,7 @@ def use_cases(root, app=None, catalog=None):
     hits = {k: sum(w in p for w in v.get("match", [])) for k, v in PRODUCT_INTENTS.items()}
     if hits and max(hits.values()):
         kind = max(hits, key=lambda k: hits[k])
-    for t in INDUSTRY_TYPES.get(kind, []):
-        add(t, 2, f"common in {kind.replace('-', ' ')} assistants", "product: " + (product[:80] or "PRODUCT.md"))
+    industry = INDUSTRY_TYPES.get(kind, [])  # a hint only: it adds weight to a type this product's own evidence shows
     gaps = []
     if app is not None:
         for name, act in app.ACTIONS.items():
@@ -1873,6 +1876,9 @@ def use_cases(root, app=None, catalog=None):
                 continue
             for t, reason in evidence_from_data(name, res):
                 add(t, 3, reason, f"data from {name}")
+    for t in industry:
+        if t in score:
+            add(t, 1, f"common in {kind.replace('-', ' ')} assistants", "product: " + (product[:80] or "PRODUCT.md"))
     research = root / "opendesigner" / "research"
     texts = [(f, f.read_text(errors="ignore").lower()) for f in sorted(research.glob("*")) if f.suffix in (".md", ".json")] if research.is_dir() else []
     words = {"table": "table", "chart over time": "chart|trend|graph", "pictures": "photo|picture|image|gallery", "place": "map|address|location",
@@ -1888,7 +1894,7 @@ def use_cases(root, app=None, catalog=None):
                     "`engine.py research plan --brief \"what answers do assistants for <this product> show, and which do people use\"`")
     for f in sorted(list(root.glob("web/*.html")) + list(root.glob("*.html")) + list(root.glob("src/**/*.tsx")))[:30]:
         t = f.read_text(errors="ignore").lower()
-        for typ, pat in (("table", r"<table"), ("pictures", r"<img"), ("chart over time", r"chart|<svg[^>]*class=\"[^\"]*chart"), ("place", r"map")):
+        for typ, pat in (("table", r"<table"), ("pictures", r"<img"), ("chart over time", r"chart|<svg[^>]*class=\"[^\"]*chart"), ("place", r"\bmaps?\b(?!\.)")):
             if re.search(pat, t):
                 add(typ, 1, f"the app's own screens already show this ({f.name})", f"screen: {f.name}")
     lib = {c["as"] for c in json.loads(SET.read_text())["components"]}
@@ -1939,6 +1945,12 @@ def cmd_usecases(a):
         for g in doc["gaps"]:
             print("gap: " + g)
     if a.write:
+        old = _load_json(dest) or {}
+        if old.get("confirmed"):  # the person's confirmation survives a refresh; a type no longer found is reported
+            gone = [t for t in old["confirmed"] if t not in {x["type"] for x in doc["answer_types"]}]
+            doc["confirmed"], doc["confirmed_on"] = old["confirmed"], old.get("confirmed_on")
+            if gone:
+                print("confirmed before but not found now: " + ", ".join(gone))
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_text(json.dumps(doc, indent=1, ensure_ascii=False) + "\n")
         print(f"wrote {dest}. Show the list; then: smartui.py usecases --confirm \"table,record details,...\"")

@@ -18,7 +18,7 @@ Nothing waits for the data before the outline shows. The model never writes the 
 
 1. `smartui.py usecases --app <your app module> --write` lists the answer types this product needs, from its own data and actions, PRODUCT.md, the project's research (`opendesigner/research/`) and its screens, each with its reason and the library part it maps to. A type the library has no part for (an embed, for example) is listed as missing, never forced into the wrong part. With no research on what assistants in your industry show, it says so and gives the `research.py` command to run first.
 2. The person confirms the list: `smartui.py usecases --confirm "table,record details,..."`.
-3. `smartui.py templates --app <your app module> --write` drafts a prepared part for each read action, bound to the shape of its real data (`opendesigner/smart-ui/templates.json`). Edit titles, labels and conditions. The syntax is above `bind()` in `scripts/smartui.py`: `{path}`, lists with `each`, `when` conditions, and tones set by the data (`{"tone": path, "map": {"Unpaid": "warning", "*": "success"}}`).
+3. `smartui.py templates --app <your app module> --write` drafts a prepared part for each read action, bound to the shape of its real data (`opendesigner/smart-ui/templates.json`). Edit titles, labels and conditions. The syntax is above `bind()` in `scripts/smartui.py`: `{path}`, lists with `each`, `when` conditions, and tones set by the data (`{"tone": path, "map": {"Unpaid": "warning", "Paid*": "success"}}`; a key ending in `*` matches by its start, and an unlisted value is neutral).
 
 ## Plug in your data agent
 
@@ -59,4 +59,4 @@ def search_docs(query):
 
 ## Over MCP
 
-In a host that renders MCP Apps, the host's model runs your agents. When it has the data, it calls `show_ui({"template": "<action>", "data": <your agent's result>})`: the prepared part is filled and checked by code, and the model writes only its sentence. `show_ui({"answer": [...]})` is the fallback, checked the same way. `show_ui` never changes data: a pressed button comes back as `OD:action <name> <context>` for the host to confirm.
+In a host that renders MCP Apps, the host's model runs your agents. When it has the data, it calls `show_ui({"template": "<action>", "data": <your agent's result>})`: the prepared part is filled by code from the data you pass, and its shape, tokens and buttons are checked (not the data itself: that is your agent's result). The model writes only its sentence. `show_ui({"answer": [...]})` is the fallback, checked the same way. `show_ui` never changes data: a pressed button comes back as `OD:action <name> <context>` for the host to confirm.

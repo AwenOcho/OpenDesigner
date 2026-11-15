@@ -221,6 +221,33 @@ class McpTemplate(unittest.TestCase):
             tool.show_ui({"template": "no_such_action", "data": {}}, Refused)
 
 
+class AuditFixes(unittest.TestCase):
+    def test_tone_maps_match_starts_and_default_to_neutral(self):
+        m = {"tone": "s", "map": {"Unpaid": "warning", "Paid*": "success"}}
+        self.assertEqual(smartui.bind(m, {"s": "Paid £35.00 on 25 August"}), "success")
+        self.assertEqual(smartui.bind(m, {"s": "Under review"}), "neutral")
+
+    def test_tone_rule_reads_the_whole_value(self):
+        for value in ("No", "No issues found"):
+            errs = []
+            smartui.tones_from_data({"facts": [{"label": "Overdue", "value": value, "tone": "success"}]}, "/c", errs, "s1")
+            self.assertEqual(errs, [], value)
+
+    def test_questions_that_want_a_part(self):
+        self.assertFalse(smartui.select("when can I book an appointment?", {"components": {}}, 3, None, None, {"TimeSlots": 3})["short_fact"])
+        self.assertTrue(smartui.select("When is the next invoice due?", {"components": {}}, 3, None, None, {"DataTable": 3})["short_fact"])
+
+    def test_a_refresh_keeps_the_confirmed_use_cases(self):
+        with tempfile.TemporaryDirectory() as t:
+            root = pathlib.Path(t)
+            (root / "opendesigner" / "smart-ui").mkdir(parents=True)
+            dest = root / "opendesigner" / "smart-ui" / "use-cases.json"
+            dest.write_text(json.dumps({"answer_types": [], "confirmed": ["table"], "confirmed_on": "2026-11-16"}))
+            import argparse
+            smartui.cmd_usecases(argparse.Namespace(project=str(root), app=None, write=True, json=False, confirm=None))
+            self.assertEqual(json.loads(dest.read_text())["confirmed"], ["table"])
+
+
 class CopyRules(unittest.TestCase):
     def test_duplicate_rows_are_text_facts_only(self):
         errs = []
@@ -389,11 +416,15 @@ class Live(unittest.TestCase):
         unfix = lambda id: (done.append("undo " + id), {"toast": "Change undone"})[1]
         self.app.ACTIONS["fix"] = {"description": "Fix a check.", "changes": True, "reversible": True, "fn": fix, "params": {"id": "check"}}
         self.app.ACTIONS["unfix"] = {"description": "Undo a fix.", "changes": True, "reversible": True, "fn": unfix, "params": {"id": "check"}}
-        self.script(["Do you want me to fix it?"] * 3)
+        self.script(["Do you want me to fix it?"] * 8)
         conv = self.live.Conversation(self.app, "scripted")
         r = conv.press({"name": "fix", "context": {"id": "c3"}})  # never shown: asks, runs nothing
         self.assertEqual(done, [])
-        conv._remember_offers([{"createSurface": {"components": [{"x": {"label": "Fix", "event": {"name": "fix", "context": {"id": "c3"}}}}]}}])
+        shown = [{"createSurface": {"components": [{"x": {"label": "Fix", "event": {"name": "fix", "context": {"id": "c3"}}}}]}}]
+        conv._remember_offers(shown)  # a part the model wrote: not enough to run a change on a press
+        conv.press({"name": "fix", "context": {"id": "c3"}})
+        self.assertEqual(done, [])
+        conv._remember_offers(shown, prepared=True)  # a prepared part showed it
         r = conv.press({"name": "fix", "context": {"id": "c3"}})
         self.assertEqual(done, ["c3"])
         self.assertEqual(r["toast"]["text"], "Fixed c3")
