@@ -1081,7 +1081,13 @@ TONE_GOOD = re.compile(r"^(?:paid|done|complete|completed|approved|passed|pass|o
 TONE_BAD = re.compile(r"^(?:unpaid|overdue|failed|fail|broken|error|declined|refused|cancelled|canceled|rejected|missing|not eligible|expired|out of stock|blocked|still needed|delayed)\b(?!\s+(?:issues?|problems?|errors?)\b)", re.I)
 
 
-def tones_from_data(comp, path, errs, sid):
+def status_words(status):
+    """The system's own words for good and bad, from opendesigner/build/status.json (engine.py build), when it has one."""
+    st = (status or {}).get("statuses", {})
+    return ([w.lower() for w in st.get("success", {}).get("words", [])], [w.lower() for w in st.get("danger", {}).get("words", [])])
+
+
+def tones_from_data(comp, path, errs, sid, words=((), ())):
     """Colours follow meaning: a value that says good ("Paid", "Passed") is never danger, one that says bad ("Unpaid",
     "Overdue", "Failed") is never success. The data decides the tone, not the model's taste."""
     def walk(v, p):
@@ -1089,7 +1095,9 @@ def tones_from_data(comp, path, errs, sid):
             tone = v.get("tone")
             if tone in ("success", "danger"):
                 said = next((v[k] for k in ("value", "status", "text", "label") if isinstance(v.get(k), str)), "")
-                good, bad = TONE_GOOD.search(said.strip()), TONE_BAD.search(said.strip())
+                low = said.strip().lower()
+                good = TONE_GOOD.search(said.strip()) or any(low == w or low.startswith(w + " ") for w in words[0])
+                bad = TONE_BAD.search(said.strip()) or any(low == w or low.startswith(w + " ") for w in words[1])
                 if (tone == "success" and bad and not good) or (tone == "danger" and good and not bad):
                     _err(errs, "R6-tone", f"{p}/tone", f"'{said}' is shown as {tone}", sid,
                          "let the data set the tone: danger for a bad value, success for a good one, neutral when unsure")
@@ -1373,7 +1381,7 @@ def validate(answer, cat, opts=None):
             ctx = {"data": surfaces[sid]["data"], "numbers": numbers, "warnings": warns, "names": names}
             checked = check_value(c, schema, cpath, errs, sid, cat, opts, ctx)
             consequences(c, schema, cpath, errs, sid, opts.get("consequences") or {})
-            tones_from_data(c, cpath, errs, sid)
+            tones_from_data(c, cpath, errs, sid, status_words(opts.get("status")))
             if opts.get("source") is not None:
                 steps_from_data(c, cpath, errs, sid, opts["source"])
             acc = c.get("@accessibility") or {}

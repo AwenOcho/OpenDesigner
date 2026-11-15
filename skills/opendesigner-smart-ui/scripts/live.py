@@ -310,6 +310,8 @@ class Conversation:
         self.log = []          # per turn: calls, first errors, repaired, ui
         self.offered = []      # the changes an answer offered as buttons: (name, context); a press must match one (R3)
         self.case_fixed, self.first_case_errors, self.routed_by_model, self.last_calls = 0, [], False, []
+        sj = pathlib.Path(app.CATALOG).resolve().parents[1] / "build" / "status.json"  # the system's status words (engine.py build)
+        self.status = json.loads(sj.read_text()) if sj.is_file() else None
         self.prepared_offers = set()  # buttons a prepared part or a toast showed: the only ones a reversible change may run from
         tp = pathlib.Path(app.CATALOG).parent / "templates.json"  # parts made ahead of time for the app's read actions
         self.templates = (json.loads(tp.read_text()).get("templates", []) if tp.is_file() and self.USE_TEMPLATES else [])
@@ -626,7 +628,7 @@ class Conversation:
                 new, edited = smartui.apply_edit(part0, ed, self.catalog, alts)
                 if edited:
                     msgs = smartui.wrap({**new, "id": "root"}, surface)
-                    if smartui.validate(msgs, self.catalog, {"source": source, "copy": True})["ok"]:
+                    if smartui.validate(msgs, self.catalog, {"source": source, "copy": True, "status": self.status})["ok"]:
                         view = msgs
                         emit({"type": "part", "answer": view, "data": data, "final": True})
                     else:
@@ -756,7 +758,7 @@ class Conversation:
             for k in ("createSurface", "updateComponents", "updateDataModel", "deleteSurface"):
                 if isinstance(m, dict) and isinstance(m.get(k), dict):
                     m[k]["surfaceId"] = surface
-        opts = {"source": data, "limits": {"leaves": max_parts}, "copy": True,
+        opts = {"source": data, "limits": {"leaves": max_parts}, "copy": True, "status": self.status,
                 "consequences": {n: a["consequences"] for n, a in self.app.ACTIONS.items() if a.get("changes") and a.get("consequences")}}
         r = smartui.validate(msgs, self.catalog, opts)
         self.case_fixed = 0

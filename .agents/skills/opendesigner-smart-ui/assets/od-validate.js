@@ -38,13 +38,17 @@ function duplicateRows(v, path, errs, sid) {
 const TONE_GOOD = /^(?:paid|done|complete|completed|approved|passed|pass|ok|active|on time|delivered|available|eligible|yes|confirmed|sent|saved|fixed|resolved|in stock)\b/i, TONE_BAD = /^(?:unpaid|overdue|failed|fail|broken|error|declined|refused|cancelled|canceled|rejected|missing|not eligible|no|expired|out of stock|blocked|still needed)\b/i;
 
 /** Colours follow meaning: a good value is never danger, a bad one never success. The data decides the tone. */
-function tonesFromData(comp, path, errs, sid) {
+function tonesFromData(comp, path, errs, sid, status) {
+  const st = (status && status.statuses) || {};
+  const words = [(st.success && st.success.words) || [], (st.danger && st.danger.words) || []].map((ws) => ws.map((w) => String(w).toLowerCase()));
+  const has = (low, ws) => ws.some((w) => low === w || low.startsWith(w + " "));
   const walk = (v, p) => {
     if (Array.isArray(v)) v.forEach((x, i) => walk(x, `${p}/${i}`));
     else if (isObj(v)) {
       if (v.tone === "success" || v.tone === "danger") {
         const k = ["value", "status", "text", "label"].find((k) => typeof v[k] === "string");
-        const said = k ? v[k].trim() : "", good = TONE_GOOD.test(said), bad = TONE_BAD.test(said);
+        const said = k ? v[k].trim() : "", low = said.toLowerCase();
+        const good = TONE_GOOD.test(said) || has(low, words[0]), bad = TONE_BAD.test(said) || has(low, words[1]);
         if ((v.tone === "success" && bad && !good) || (v.tone === "danger" && good && !bad))
           err(errs, "R6-tone", `${p}/tone`, `'${said}' is shown as ${v.tone}`, sid, "let the data set the tone: danger for a bad value, success for a good one, neutral when unsure");
       }
@@ -349,7 +353,7 @@ export function validate(answer, cat, opts = {}) {
       const ctx = { data: surfaces[sid].data, numbers, warnings: warns, names };
       const checked = checkValue(c, schema, cpath, errs, sid, cat, opts, ctx);
       consequences(c, schema, cpath, errs, sid, opts.consequences || {});
-      tonesFromData(c, cpath, errs, sid);
+      tonesFromData(c, cpath, errs, sid, opts.status);
       if (opts.source !== undefined && opts.source !== null) stepsFromData(c, cpath, errs, sid, opts.source);
       if (typeof c.id === "string") surfaces[sid].components[c.id] = { c: isObj(checked) ? checked : c, path: cpath, schema };
     });

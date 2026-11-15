@@ -31,7 +31,7 @@ def keys(errors):
 
 
 def py_opts(o):
-    return {"partial": o.get("partial"), "source": o.get("source"), "limits": o.get("limits"), "allow_empty": o.get("allowEmpty"), "copy": o.get("copy"), "consequences": o.get("consequences")}
+    return {"partial": o.get("partial"), "source": o.get("source"), "limits": o.get("limits"), "allow_empty": o.get("allowEmpty"), "copy": o.get("copy"), "consequences": o.get("consequences"), "status": o.get("status")}
 
 
 class Validator(unittest.TestCase):
