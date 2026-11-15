@@ -523,6 +523,8 @@ class Conversation:
                         emit({"type": "part", "answer": msgs, "data": {**self.data, **fresh}, "final": final})
         self.data.update(fresh)  # written here, on the turn's own thread, not by the data worker
         data = {**self.data, **fresh}
+        if calls and isinstance(fresh.get(calls[0][0]), dict) and "error" in fresh[calls[0][0]]:
+            view = None  # the main lookup failed: the answer says so (ErrorRetry), not another action's table
         if planned and view:
             lane("ui", "Fill from the data and check it", "done")
         history = "\n".join(f"{'Person' if t['role'] == 'user' else 'You'}: {t['text'][:400]}" for t in self.turns[-6:])
@@ -677,7 +679,12 @@ class Conversation:
         matcher's score for the question comes first; then rank (the selector's parts, best first)."""
         score = {id(t): sc for sc, t in self.matched[0]}
         found = [(t, name) for name, _ in calls for t in self.templates if t.get("action") == name]
-        found.sort(key=lambda tn: (-score.get(id(tn[0]), 0),
+        top = list(rank)[:1]
+        # the part the question wants most comes first ("what do the different permits cost?": the price table), then
+        # the first action's own template, then the matcher's score
+        found.sort(key=lambda tn: (0 if tn[0]["part"].get("component") in top else 1,
+                                   0 if set(top) & set(self.route_parts.get(tn[1], [])) else 1,  # the action that answers it
+                                   0 if calls and tn[1] == calls[0][0] else 1, -score.get(id(tn[0]), 0),
                                    list(rank).index(tn[0]["part"].get("component")) if tn[0]["part"].get("component") in rank else 99))
         return found[0] if found else None
 

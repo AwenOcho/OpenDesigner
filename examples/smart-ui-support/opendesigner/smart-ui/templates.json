@@ -50,31 +50,43 @@
   },
   {
    "action": "get_invoice",
-   "intent": "Get invoice",
+   "intent": "one invoice",
+   "when": "invoice",
    "part": {
-    "component": "DataTable",
-    "title": "Lines",
-    "columns": [
+    "component": "KeyFacts",
+    "title": "Invoice {invoice.number}",
+    "facts": [
      {
-      "label": "Label"
+      "label": "Date",
+      "value": "{invoice.date}"
      },
      {
-      "label": "Amount"
-     }
-    ],
-    "rows": {
-     "each": "invoice.lines",
-     "item": {
-      "cells": [
-       {
-        "text": "{.label|or:–}"
-       },
-       {
-        "text": "{.amount|or:–}"
+      "label": "Amount",
+      "value": "{invoice.amount}"
+     },
+     {
+      "label": "Status",
+      "value": "{invoice.status}",
+      "tone": {
+       "tone": "invoice.status",
+       "map": {
+        "paid": "success",
+        "open": "warning",
+        "overdue": "danger",
+        "refunded": "neutral"
        }
-      ]
+      }
+     },
+     {
+      "label": "Due",
+      "value": "{invoice.due}"
+     },
+     {
+      "label": "File",
+      "value": "{invoice.file|or:–}",
+      "note": "{invoice.size|or:}"
      }
-    }
+    ]
    }
   },
   {
