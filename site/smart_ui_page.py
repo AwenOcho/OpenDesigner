@@ -220,9 +220,8 @@ def demo_html(products, mini=False):
 {switch}<div class="sl-grid">
 <div class="sl-app" aria-describedby="{did}">
 <div class="sl-top"><div class="sl-who"><span class="sl-avatar" aria-hidden="true"></span><div><h2 data-who></h2><p data-sub></p></div></div></div>
-<section class="sl-chat" aria-label="Conversation"><div class="sl-log" data-log tabindex="0" aria-label="Answers"></div>{chat_extra}</section>
+<section class="sl-chat" aria-label="Conversation"><div class="sl-logwrap"><div class="sl-log" data-log tabindex="0" aria-label="Answers"></div><div class="sl-toasts" data-toasts></div></div>{chat_extra}</section>
 <p class="vh" data-live aria-live="polite"></p>
-<div class="sl-toasts" data-toasts></div>
 </div>{behind}
 </div>
 </div>"""

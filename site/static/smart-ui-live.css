@@ -21,6 +21,7 @@
 
 /* chat beside the lanes */
 .sl-chat { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.sl-logwrap { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .sl-log { position: relative; flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 24px; scrollbar-width: thin; }
 .sl-turn + .sl-turn { margin-top: 28px; padding-top: 28px; border-top: 1px solid var(--line); }
 .sl-turn { display: flex; flex-direction: column; gap: 14px; }
@@ -55,7 +56,7 @@
 .sl-fineprint { margin: 10px 0 0; font-size: 12px; line-height: 17px; color: var(--ink-muted); }
 
 /* toasts sit inside the demo, never over the page */
-.sl-toasts { position: absolute; left: 50%; bottom: 16px; z-index: 3; display: grid; gap: 8px; width: min(92%, 420px); transform: translateX(-50%); pointer-events: none; }
+.sl-toasts { position: absolute; left: 50%; bottom: 12px; z-index: 3; display: grid; gap: 8px; width: min(92%, 420px); transform: translateX(-50%); pointer-events: none; }
 .sl-toast { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; padding: 8px 8px 8px 16px; border-radius: var(--r-control); background: var(--ink); color: var(--surface-raised); font-size: 14px; line-height: 20px; pointer-events: auto; animation: sl-in 240ms var(--ease-out) both; transition: opacity 160ms ease, transform 160ms ease; }
 .sl-toast.out { opacity: 0; transform: translateY(6px); }
 .sl-undo { min-height: 32px; padding: 0 12px; border: 0; border-radius: var(--r-pill); background: rgb(255 255 255 / .14); color: inherit; font: inherit; font-weight: 500; cursor: pointer; }
@@ -143,7 +144,7 @@
   .sl-chips { padding: 12px 16px; }
   .sl-grid { gap: 16px; }
   .sl-log { padding: 16px; }
-  .sl-app { height: min(560px, 78svh); }
+  .sl-app { height: min(560px, 70vh); }
   .sl-lanes { grid-template-columns: minmax(0, 1fr); }
   .sl-part { padding: 16px; }
   .sl-fact { grid-template-columns: minmax(0, 1fr); }
@@ -165,3 +166,7 @@
 @supports (corner-shape: superellipse(1.35)) { .sl-app, .sl-behind, .sl-part, .sl-card, .sl-kpi { corner-shape: superellipse(1.35); --corner-k: 1.22; } }
 @media (max-width: 640px) { .sl-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; } .sl-chip { flex: none; } }
 .sl-log:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: -2px; }
+/* the newest answer can always scroll to the top of the chat, even while it is still short */
+.sl-turn:last-child { min-height: 100%; }
+@media (min-width: 1101px) { .sl:not([data-mini]) .sl-behind { box-sizing: border-box; height: 560px; } }
+@media (max-width: 1100px) { .sl:not([data-mini]) .sl-behind { min-height: 400px; } }
