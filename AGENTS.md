@@ -154,6 +154,7 @@ Follow `_coordination/PROTOCOL.md`. In short:
 8. Open a pull request for the owner to review and merge (owner, 2026-11-07). Push straight to `main` (`python3 tools/od.py sync -m "<lane>: what changed"`) only when the owner says so.
 
 Processes that held up in use (details in each file):
+- **The design bar:** `_coordination/DESIGN-BAR.md`. Read it before building anything people will see, link it in every brief, and check against it before showing Kunal: picture first, a fresh-eyes visual audit, then a local look.
 - **Website:** `site/README.md` "Before every deploy": local build, `site/check.py`, `site/check_layout.py` with 0 errors at 13 widths, a real-header check, then deploy and IndexNow.
 - **Showcase:** `brand/showcase/BRIEF.md` and `ROUND3-BRIEF.md`: the owner's verdict outranks AI scores; a fresh-eyes audit; `brand/tools/check_dates.py` and `check_names.py`; `.example` domains.
 - **Changelog on every push** (owner, 2026-11-01): every push to main that changes what people get adds one `CHANGELOG.md` entry per change, so the website's changelog says what changed in its own words, not just a commit title or a link to the README. Write `- **Short title** (YYYY-MM-DD). One to three plain sentences.`, dated the day it lands, under 400 characters; the full story goes in the commit or PR. `python3 tools/changelog_check.py` checks the format.
