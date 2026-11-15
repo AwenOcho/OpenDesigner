@@ -7,7 +7,10 @@ const HANDLER = /^on[A-Z_]|^on(click|dblclick|load|error|abort|mouse\w*|key\w*|f
 const BANNED_KEYS = new Set(["style", "class", "classname", "css", "theme", "html", "innerhtml", "outerhtml", "dangerouslysetinnerhtml", "srcdoc"]);
 const HTML = /<\s*\/?\s*[a-zA-Z!][^>]*>|<\s*[a-zA-Z]/;
 const WHOLE_STYLE = /^\s*(#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})|-?\d*\.?\d+(px|rem|em|vh|vw|pt)|(rgba?|hsla?|oklch|oklab|lab|lch|color-mix|var|calc|url|expression)\(.*)\s*$/i;
-const NUM = /(?<![\w.])-?\d[\d,]*(?:\.\d+)?/g;
+// Numbers in text, not inside a word or after a dot. No lookbehind: Safari before 16.4 can't parse one, and a parse error
+// would stop the whole renderer, not just this check.
+const NUM_IN = /(^|[^\w.])(-?\d[\d,]*(?:\.\d+)?)/g;
+const numbersInText = (t) => [...t.matchAll(NUM_IN)].map((m) => m[2]);
 // copy rules (docs/COPY.md), checked when opts.copy; the same as smartui.py
 const BANNED_WORDS = /\b(successful(ly)?|seamless(ly)?|effortless(ly)?|leverag(e|es|ing)|utili[sz](e|es|ing)|robust|delve|unlock(s|ing)?|empower(s|ing)?|elevate(s|d)?|streamline(s|d)?|cutting-edge|hassle-free|please note)\b/i;
 const WORD = /[A-Za-z][A-Za-z'’-]*/g;
@@ -198,7 +201,7 @@ function checkValue(v, schema, path, errs, sid, cat, opts, ctx) {
     }
     if (opts.copy && !schema["x-od-code"] && !schema.enum && !schema.pattern && schema.format !== "uri") copyCheck(v, path, errs, sid, ctx.names || new Set());
     if (ctx.numbers && !schema["x-od-code"]) {
-      for (const n of v.match(NUM) || []) if (!ctx.numbers.has(num(n))) ctx.warnings.push({ rule: "R6-text", path, message: `${n} in the text is not in the data you were given` });
+      for (const n of numbersInText(v)) if (!ctx.numbers.has(num(n))) ctx.warnings.push({ rule: "R6-text", path, message: `${n} in the text is not in the data you were given` });
     }
   }
   if (typeof v === "number") {
@@ -234,7 +237,7 @@ function checkValue(v, schema, path, errs, sid, cat, opts, ctx) {
 export function numbersIn(obj, out = new Set()) {
   if (typeof obj === "boolean" || obj === null || obj === undefined) return out;
   if (typeof obj === "number") out.add(obj);
-  else if (typeof obj === "string") for (const n of obj.match(NUM) || []) { const x = num(n); if (x !== null) out.add(x); }
+  else if (typeof obj === "string") for (const n of numbersInText(obj)) { const x = num(n); if (x !== null) out.add(x); }
   else if (Array.isArray(obj)) obj.forEach((x) => numbersIn(x, out));
   else if (isObj(obj)) Object.values(obj).forEach((x) => numbersIn(x, out));
   return out;
