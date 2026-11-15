@@ -8,13 +8,21 @@ Kunal's rules for every page, figure, demo, video and image in this project, in 
 3. **The maker graded its own work.** It saw what it meant to build, not what was on screen.
 4. **No picture before the build.** Pages were built from a written spec. The one page Kunal liked on the first try (the Smart UI vision sketch) started as a small, approved picture of the target.
 5. **More was added than cut.** Every finished piece of work went onto the page, so pages grew cluttered.
+6. **We judged the code, not the experience.** Work was checked the way it was built, file by file, never the way a visitor meets it: arriving, scrolling, clicking, waiting. The demo that grew and pushed the page away on every click passed every check (Kunal, 2026-11-16).
 
 ## The process
 1. **Picture first, in two or three variants.** Before building a page or a section, make one rough screen of the target (static HTML is fine) and get Kunal's yes, or match one he already approved.
 2. **Build against this file,** and cut before adding. Every section has to earn its place.
-3. **Fresh-eyes visual audit.** Start a new agent with no context. Give it this file, the brief and screenshots at 1440 and 375 px in WebKit (Kunal uses Safari) and Chromium, and nothing else. Sort its findings as `_coordination/PROTOCOL.md` section 7 says.
-4. **The coordinator looks** at the screenshots before Kunal does.
-5. **Kunal sees it locally** before anything is pushed.
+3. **Walk it as a viewer, frame by frame.** Open the built page as someone seeing it for the first time, at 1440 and 375 px, in WebKit. Capture a frame on load, then every 250 ms for 2 s after each scroll and each click on everything clickable. Then look at the frames in order and answer:
+   - What do I see first? Where does my eye go?
+   - Does anything jump, grow, shift or leave the view? (Note `scrollY` and the bounding boxes of the main blocks before and after each click; they shouldn't change unless the click means to.)
+   - Can I read each screen at a glance, without stopping on any text?
+   - Does every click answer within a moment, and is it clear what happened?
+   - Is anything covered (a banner, a toast, a sticky header)?
+   Put the contact sheet of frames in your report. A step that only reads the code doesn't count.
+4. **Fresh-eyes visual audit.** Start a new agent with no context. Give it this file, the brief and the walkthrough's frames (never the code), and have it judge them as a first-time visitor. Sort its findings as `_coordination/PROTOCOL.md` section 7 says.
+5. **The coordinator walks it too**, frame by frame, before Kunal does.
+6. **Kunal sees it locally** before anything is pushed.
 
 ## How quality is judged (adapted from Contra Labs' Human Creativity Benchmark)
 Source: [contralabs.com/research/human-creativity-benchmark](https://contralabs.com/research/human-creativity-benchmark), April 2026. Across 5,940 pairwise judgments by working designers, they found:
@@ -66,5 +74,5 @@ What we take from it:
 - Interactive demos keep their place on click.
 - No paragraph explains a visual.
 - 1440 and 375 px, in WebKit and Chromium: no sideways scroll, nothing cut off.
-- The fresh-eyes audit is done and sorted.
+- The viewer walkthrough is done (contact sheet attached), and the fresh-eyes audit is done and sorted.
 - `site/check_layout.py`, `site/post_change_audit.py` and `opendesigner-review` pass.
