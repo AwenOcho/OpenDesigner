@@ -1,0 +1,621 @@
+{
+ "model": "gemini-3.1-pro-preview",
+ "provider": "gemini",
+ "date": "2026-11-14",
+ "runs_per_case": 1,
+ "summary": {
+  "runs": 26,
+  "selector_recall_pct": 85.7,
+  "picked_right_pct": 90.5,
+  "valid_first_pct": 42.1,
+  "valid_after_repair_pct": 100.0,
+  "held_back_pct": 100.0,
+  "over_trigger_pct": 0.0,
+  "changes_run_by_model": 0,
+  "approval_shown_pct": 100.0,
+  "rendered": 0,
+  "floor_findings": 0,
+  "errors": 0,
+  "copy_problems_first": 20,
+  "copy_problems_left": 0,
+  "speed": {
+   "turns": 31,
+   "skeleton_ms_p50": 21019,
+   "skeleton_ms_p95": 28959,
+   "full_ms_p50": 21019,
+   "full_ms_p95": 28959,
+   "calls_per_turn": 2.45,
+   "tokens_per_turn": 4514
+  },
+  "tokens": {
+   "calls": 76,
+   "input": 70767,
+   "output": 69176
+  }
+ },
+ "rows": [
+  {
+   "id": "invoices-open",
+   "run": 1,
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [
+    "DataTable",
+    "KeyFacts",
+    "FileCard"
+   ],
+   "first_errors": [
+    "copy-case /0/createSurface/components/0/title",
+    "copy-case /0/createSurface/components/0/columns/0/label",
+    "copy-case /0/createSurface/components/0/columns/2/label"
+   ],
+   "repaired": true,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": false
+  },
+  {
+   "id": "invoices-all",
+   "run": 1,
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [
+    "FileCard",
+    "DataTable",
+    "KeyFacts"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true
+  },
+  {
+   "id": "invoices-unpaid",
+   "run": 1,
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [
+    "DataTable",
+    "FileCard",
+    "KeyFacts"
+   ],
+   "first_errors": [
+    "copy-case /0/createSurface/components/0/title",
+    "copy-case /0/createSurface/components/0/columns/2/label"
+   ],
+   "repaired": true,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": false,
+   "headers_ok": true
+  },
+  {
+   "id": "invoice-one",
+   "run": 1,
+   "expect": [
+    "FileCard",
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "FileCard"
+   ],
+   "selector": [
+    "FileCard",
+    "KeyFacts"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true
+  },
+  {
+   "id": "invoice-file-followup",
+   "run": 1,
+   "expect": [
+    "FileCard"
+   ],
+   "ui": true,
+   "parts": [
+    "FileCard"
+   ],
+   "selector": [
+    "FileCard",
+    "ApprovalPrompt",
+    "DataTable"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true
+  },
+  {
+   "id": "usage-trend",
+   "run": 1,
+   "expect": [
+    "LineChart",
+    "BarChart"
+   ],
+   "ui": true,
+   "parts": [
+    "LineChart"
+   ],
+   "selector": [
+    "LineChart",
+    "BarChart"
+   ],
+   "first_errors": [
+    "copy-case /0/createSurface/components/0/title"
+   ],
+   "repaired": true,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": false
+  },
+  {
+   "id": "usage-months",
+   "run": 1,
+   "expect": [
+    "LineChart",
+    "BarChart",
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "LineChart"
+   ],
+   "selector": [
+    "BarChart",
+    "LineChart"
+   ],
+   "first_errors": [
+    "copy-case /0/createSurface/components/0/title",
+    "copy-case /0/createSurface/components/0/series"
+   ],
+   "repaired": true,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": false
+  },
+  {
+   "id": "usage-kpi",
+   "run": 1,
+   "expect": [
+    "KpiStrip",
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KpiStrip"
+   ],
+   "selector": [
+    "KpiStrip",
+    "BarChart",
+    "LineChart"
+   ],
+   "first_errors": [
+    "copy-case /0/createSurface/components/0/label",
+    "R6-number /0/createSurface/components/0/stats/0/share"
+   ],
+   "repaired": true,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": false
+  },
+  {
+   "id": "plans-compare",
+   "run": 1,
+   "expect": [
+    "Comparison"
+   ],
+   "ui": true,
+   "parts": [
+    "Comparison"
+   ],
+   "selector": [
+    "Comparison"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true
+  },
+  {
+   "id": "plans-followup",
+   "run": 1,
+   "expect": [
+    "Comparison"
+   ],
+   "ui": true,
+   "parts": [
+    "Comparison"
+   ],
+   "selector": [
+    "Comparison"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true
+  },
+  {
+   "id": "subscription",
+   "run": 1,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": false,
+   "parts": [],
+   "selector": [
+    "KeyFacts",
+    "Comparison"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": false,
+   "valid": null
+  },
+  {
+   "id": "refund",
+   "run": 1,
+   "expect": [
+    "ProgressStatus"
+   ],
+   "ui": true,
+   "parts": [
+    "ProgressStatus"
+   ],
+   "selector": [
+    "ProgressStatus",
+    "FileCard",
+    "KeyFacts"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true
+  },
+  {
+   "id": "refund-followup",
+   "run": 1,
+   "expect": [
+    "ProgressStatus",
+    "KeyFacts"
+   ],
+   "ui": false,
+   "parts": [],
+   "selector": [
+    "ProgressStatus"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": false,
+   "valid": null
+  },
+  {
+   "id": "pay-approve",
+   "run": 1,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "ApprovalPrompt"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true
+  },
+  {
+   "id": "pay-direct",
+   "run": 1,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "FileCard",
+    "KeyFacts",
+    "ApprovalPrompt"
+   ],
+   "first_errors": [
+    "copy-case /0/createSurface/components/0/title",
+    "copy-case /0/createSurface/components/0/details/0/label",
+    "copy-case /0/createSurface/components/0/details/2/label",
+    "copy-case /0/createSurface/components/0/approve/label"
+   ],
+   "repaired": true,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": false
+  },
+  {
+   "id": "upgrade-approve",
+   "run": 1,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [],
+   "first_errors": [
+    "copy-case /0/createSurface/components/0/title",
+    "unknown-property /0/createSurface/components/0/message",
+    "unknown-property /0/createSurface/components/0/reject",
+    "required /0/createSurface/components/0/cancel"
+   ],
+   "repaired": true,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": false
+  },
+  {
+   "id": "upgrade-after-compare",
+   "run": 1,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [],
+   "first_errors": [
+    "copy-case /0/createSurface/components/0/title",
+    "unknown-property /0/createSurface/components/0/message"
+   ],
+   "repaired": true,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": false
+  },
+  {
+   "id": "seats-approve",
+   "run": 1,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [],
+   "first_errors": [
+    "copy-case /0/createSurface/components/0/title",
+    "unknown-property /0/createSurface/components/0/message",
+    "copy-case /0/createSurface/components/0/approve/label"
+   ],
+   "repaired": true,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": false
+  },
+  {
+   "id": "missing-invoice",
+   "run": 1,
+   "expect": [
+    "ErrorRetry",
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "ErrorRetry"
+   ],
+   "selector": [
+    "FileCard",
+    "KeyFacts",
+    "ErrorRetry"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true
+  },
+  {
+   "id": "usage-and-table",
+   "run": 1,
+   "expect": [
+    "DataTable",
+    "BarChart"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [
+    "BarChart",
+    "LineChart",
+    "DataTable"
+   ],
+   "first_errors": [
+    "copy-case /0/createSurface/components/0/title",
+    "copy-case /0/createSurface/components/0/columns/1/label"
+   ],
+   "repaired": true,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": false
+  },
+  {
+   "id": "seats-history",
+   "run": 1,
+   "expect": [
+    "LineChart",
+    "BarChart",
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "LineChart"
+   ],
+   "selector": [
+    "BarChart",
+    "LineChart"
+   ],
+   "first_errors": [
+    "copy-case /0/createSurface/components/0/title"
+   ],
+   "repaired": true,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": false
+  },
+  {
+   "id": "noui-due",
+   "run": 1,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [
+    "KeyFacts",
+    "FileCard",
+    "DataTable"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-card",
+   "run": 1,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [
+    "KeyFacts"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-sso",
+   "run": 1,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-thanks",
+   "run": 1,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-count",
+   "run": 1,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  }
+ ]
+}

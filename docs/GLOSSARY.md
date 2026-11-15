@@ -6174,6 +6174,21 @@ Designers: token build pipeline · Code: `Terrazzo or Style Dictionary v5`
 
 </details>
 
+### Prepared part
+
+A screen part made ahead of time for one kind of question, filled with real data when someone asks.  
+Designers: answer template · Code: `templates.json`
+
+<details><summary>Designer and engineer</summary>
+
+**Designer:** The answer's layout is decided in advance from your system; at run time only the facts change, so it looks right every time.
+
+**Engineer:** A template in opendesigner/smart-ui/templates.json bound to a read action's data ({path}, each, when, tone maps), found by smartui.Matcher and filled by pick_template, then validated.
+
+**Also called:** answer template, bound template
+
+</details>
+
 ### Durable records for later sessions and the team
 
 Files saved in your project, so the next chat or your team knows what you chose and why.  

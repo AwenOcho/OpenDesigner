@@ -65,7 +65,8 @@
    ],
    "ui": true,
    "candidates": [
-    "BarChart"
+    "BarChart",
+    "DonutBreakdown"
    ],
    "hit": true
   },
@@ -78,6 +79,7 @@
    "ui": true,
    "candidates": [
     "LineChart",
+    "BarChart",
     "Comparison"
    ],
    "hit": true
