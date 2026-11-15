@@ -21,6 +21,7 @@ import datetime
 import html as htmllib
 import inspect
 import importlib.util
+import copy
 import json
 import time
 import math
@@ -693,6 +694,70 @@ def bind(node, root, cur=None):
                 out[k] = v
         return out
     return node
+
+
+# ----------------------------------------------------------------------------------------------- small edits
+# When a prepared part is close but the question wants part of it ("only the unpaid ones", "the two biggest", "without the
+# notes"), the model doesn't write a new part: it sends a small, constrained edit that code applies to the filled part,
+# and the validator checks the result like any answer. Writing a whole part is the last fallback.
+
+def _lists(part):
+    """The lists of rows an edit may keep or order: never a table's columns (each row's cells follow them). Longest first."""
+    ks = [k for k, v in part.items() if isinstance(v, list) and v and all(isinstance(x, dict) for x in v) and k not in ("columns", "headers")]
+    return sorted(ks, key=lambda k: -len(part[k]))
+
+
+def edit_schema(part, catalog, variants=()):
+    """The JSON an edit may be: another variant, rows kept in an order, optional details hidden, allowed options set."""
+    comp = catalog["components"].get(part.get("component"), {})
+    props, required = comp.get("properties", {}), set(comp.get("required", []))
+    optional = [k for k in part if k not in required and k not in ("component", "id") and not k.startswith("@") and not isinstance(part[k], list)]
+    enums = {k: v["enum"] for k, v in props.items() if isinstance(v, dict) and v.get("enum") and k not in ("component",)}
+    lists = _lists(part)
+    out = {}
+    if len(variants) > 1:
+        out["variant"] = {"type": "integer", "minimum": 0, "maximum": len(variants) - 1,
+                          "description": "another way to show the same data: " + "; ".join(f"{i} = {v.get('title') or v.get('component')}" for i, v in enumerate(variants))}
+    if lists:
+        out["list"] = {"type": "string", "enum": lists}
+        out["keep"] = {"type": "array", "items": {"type": "integer", "minimum": 0}, "description": "the rows to show, by number, in the order to show them"}
+    if optional:
+        out["hide"] = {"type": "array", "items": {"type": "string", "enum": optional}}
+    if enums:
+        out["set"] = {"type": "object", "additionalProperties": False, "properties": {k: {"type": "string", "enum": v} for k, v in enums.items()}}
+    return {"type": ["object", "null"], "additionalProperties": False, "properties": out} if out else {"type": "null"}
+
+
+def apply_edit(part, edit, catalog, variants=()):
+    """Apply a small edit to a filled part. Returns (part, what changed); an edit that asks for anything else is ignored."""
+    if not isinstance(edit, dict):
+        return part, []
+    done = []
+    out = copy.deepcopy(part)
+    v = edit.get("variant")
+    if isinstance(v, int) and 0 <= v < len(variants) and variants[v] != part:
+        out = copy.deepcopy(variants[v])
+        done.append(f"variant {v}")
+    lists = _lists(out)
+    keep = edit.get("keep")
+    key = edit.get("list") if edit.get("list") in lists else (lists[0] if lists else None)
+    if key and isinstance(keep, list) and keep:
+        idx = [i for i in dict.fromkeys(keep) if isinstance(i, int) and 0 <= i < len(out[key])]
+        if idx and idx != list(range(len(out[key]))):
+            out[key] = [out[key][i] for i in idx]
+            done.append(f"{key}: {len(idx)} kept")
+    comp = catalog["components"].get(out.get("component"), {})
+    required = set(comp.get("required", []))
+    for k in edit.get("hide") or []:
+        if k in out and k not in required and k not in ("component", "id"):
+            out.pop(k)
+            done.append(f"hid {k}")
+    for k, val in (edit.get("set") or {}).items():
+        allowed = (comp.get("properties", {}).get(k) or {}).get("enum")
+        if allowed and val in allowed and out.get(k) != val:
+            out[k] = val
+            done.append(f"{k} = {val}")
+    return out, done
 
 
 class Matcher:

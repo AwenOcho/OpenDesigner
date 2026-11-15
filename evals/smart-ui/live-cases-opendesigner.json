@@ -1,0 +1,60 @@
+{
+ "about": "Live-path Smart UI evals on the OpenDesigner example (examples/smart-ui-opendesigner): OpenDesigner's own engine run on a sample app, on the brand system.",
+ "app": "examples/smart-ui-opendesigner/server.py",
+ "cases": [
+  {
+   "id": "od-review",
+   "turns": [
+    "Review my pricing page"
+   ],
+   "expect": [
+    "KeyFacts"
+   ],
+   "checks": [
+    {
+     "contains": "fix_check"
+    }
+   ]
+  },
+  {
+   "id": "od-parts",
+   "turns": [
+    "Which parts fit a settings page?"
+   ],
+   "expect": [
+    "ResultList"
+   ]
+  },
+  {
+   "id": "od-tokens",
+   "turns": [
+    "How much of my code uses the tokens?"
+   ],
+   "expect": [
+    "KpiStrip",
+    "DataTable"
+   ]
+  },
+  {
+   "id": "noui-od-define",
+   "turns": [
+    "What is a design token?"
+   ],
+   "expect": []
+  },
+  {
+   "id": "od-corners",
+   "turns": [
+    "Make the corners rounder"
+   ],
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "checks": [
+    {
+     "not": "have updated|has been updated|is done"
+    }
+   ]
+  }
+ ]
+}

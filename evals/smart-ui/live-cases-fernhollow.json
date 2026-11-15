@@ -406,6 +406,54 @@
      "not": "approvalprompt"
     }
    ]
+  },
+  {
+   "id": "fh-edit-saturday",
+   "turns": [
+    "Which offices are open on Saturday?"
+   ],
+   "expect": [
+    "DataTable"
+   ],
+   "checks": [
+    {
+     "mode": "edit"
+    },
+    {
+     "rows": 1
+    }
+   ]
+  },
+  {
+   "id": "fh-edit-missing-doc",
+   "turns": [
+    "Which documents am I still missing? Only those"
+   ],
+   "expect": [
+    "DataTable"
+   ],
+   "checks": [
+    {
+     "mode": "edit"
+    },
+    {
+     "rows": 1
+    }
+   ]
+  },
+  {
+   "id": "fh-edit-table",
+   "turns": [
+    "Show all my fines as a table"
+   ],
+   "expect": [
+    "DataTable"
+   ],
+   "checks": [
+    {
+     "mode": "edit"
+    }
+   ]
   }
  ]
 }

@@ -221,6 +221,29 @@ class McpTemplate(unittest.TestCase):
             tool.show_ui({"template": "no_such_action", "data": {}}, Refused)
 
 
+class SmallEdits(unittest.TestCase):
+    CAT = {"components": {"T": {"properties": {"title": {"type": "string"}, "summary": {"type": "string"}, "tone": {"type": "string", "enum": ["neutral", "danger"]},
+                                               "rows": {"type": "array"}}, "required": ["component", "id", "title", "rows"]}}}
+    PART = {"component": "T", "id": "root", "title": "Invoices", "summary": "3 in all", "tone": "neutral",
+            "rows": [{"n": "A", "s": "paid"}, {"n": "B", "s": "unpaid"}, {"n": "C", "s": "unpaid"}]}
+
+    def test_keep_order_hide_and_set(self):
+        out, done = smartui.apply_edit(self.PART, {"keep": [2, 1], "hide": ["summary"], "set": {"tone": "danger"}}, self.CAT)
+        self.assertEqual([r["n"] for r in out["rows"]], ["C", "B"])
+        self.assertNotIn("summary", out)
+        self.assertEqual(out["tone"], "danger")
+        self.assertEqual(len(done), 3)
+
+    def test_anything_else_is_ignored(self):
+        out, done = smartui.apply_edit(self.PART, {"keep": [7], "hide": ["title"], "set": {"tone": "red"}, "rows": []}, self.CAT)
+        self.assertEqual((out, done), (self.PART, []))  # no such row, a required slot, an option the part lacks
+
+    def test_the_schema_lists_only_what_may_change(self):
+        sch = smartui.edit_schema(self.PART, self.CAT)
+        self.assertEqual(sch["properties"]["hide"]["items"]["enum"], ["summary", "tone"])
+        self.assertEqual(sch["properties"]["set"]["properties"]["tone"]["enum"], ["neutral", "danger"])
+
+
 class AuditFixes(unittest.TestCase):
     def test_tone_maps_match_starts_and_default_to_neutral(self):
         m = {"tone": "s", "map": {"Unpaid": "warning", "Paid*": "success"}}
@@ -449,6 +472,36 @@ class Live(unittest.TestCase):
         self.assertEqual(part["action"]["event"], {"name": "pay_fine", "context": {"reference": "FH40018273"}})
         self.assertNotIn("KeyFacts", json.dumps(self.asked[0]))  # the model was asked for text only
         self.assertEqual(r["log"]["first_errors"], [])
+
+    def test_money_deletion_sending_and_booking_never_run_on_one_press(self):
+        conv = self.live.Conversation(self.app, "scripted")
+        risky = {"pay_invoice": "Pay one open invoice now with the card on file.", "delete_file": "Delete a file.",
+                 "send_reminder": "Email a reminder.", "book_slot": "Book an appointment.", "fix": "Fix a check."}
+        for name, doc in risky.items():
+            a = {"description": doc, "changes": True, "reversible": True, "fn": lambda **k: {}, "params": {}}
+            self.assertEqual(conv._one_press(name, a), name == "fix", name)
+        self.assertFalse(conv._one_press("fix", {"description": "Fix a check.", "reversible": True, "consequences": ["It edits your CSS."]}))
+        # and a payment marked reversible, on a prepared part, still asks first: nothing is paid
+        self.app.ACTIONS["pay_invoice"]["reversible"] = True
+        self.addCleanup(self.app.ACTIONS["pay_invoice"].pop, "reversible", None)
+        self.script(["Do you want to pay it?"] * 3)
+        conv = self.live.Conversation(self.app, "scripted")
+        conv._remember_offers([{"createSurface": {"components": [{"x": {"label": "Pay", "event": {"name": "pay_invoice", "context": {"number": "TH-1043"}}}}]}}], prepared=True)
+        r = conv.press({"name": "pay_invoice", "context": {"number": "TH-1043"}})
+        self.assertEqual(self.ran, [])
+        self.assertIsNone(r.get("toast"))
+
+    def test_a_near_miss_is_an_edit_of_the_prepared_part(self):
+        self.live.Conversation.USE_TEMPLATES = True
+        app = self.live.load_app(ROOT / "examples" / "smart-ui-fernhollow" / "server.py")
+        conv = self.live.Conversation(app, "scripted")
+        n = len(app.ACTIONS["list_offices"]["fn"]()["offices"])
+        self.script([json.dumps({"text": "Hollow Lane is the one open on Saturday.", "edit": {"keep": [0]}})])
+        r = conv.answer("Which offices are open on Saturday?")
+        rows = r["answer"][0]["createSurface"]["components"][0]["rows"]
+        self.assertEqual(r["log"]["mode"], "edit")
+        self.assertEqual(len(rows), 1)
+        self.assertGreater(n, 1)
 
     def test_change_needs_the_renderers_approval(self):
         self.script(["It's paid.", "It's paid."])

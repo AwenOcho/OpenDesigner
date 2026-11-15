@@ -556,17 +556,32 @@ class Conversation:
             lane("ui", "Model writes the part", "run")
         lane("text", "Write the sentence", "run")
         system, sel = smartui.build_prompt(message, self.catalog, 3, self.scope, data, boost, always, structured=True, sel=sel)
+        alts = []
         if view:
-            shown = view[0]["createSurface"]["components"][0]
-            system += ("\n\nThe person already sees this part, built by the app from the data:\n" + json.dumps(shown, ensure_ascii=False)
+            part0 = view[0]["createSurface"]["components"][0]
+            # another prepared variant is on offer only when the question asks for another shape ("as a table", "all of them")
+            if planned and planned[1] in fresh and re.search(r"\b(table|list|all|every|each|chart|graph|card|summary|details)\b", message.lower()):
+                for t in variants:
+                    if not t.get("when") or smartui._holds(t["when"], fresh[planned[1]]):
+                        b = smartui.bind(t["part"], fresh[planned[1]])
+                        if isinstance(b, dict) and b.get("component") and b not in alts:
+                            alts.append({**b, "id": "root"})
+            numbered = {k: [{"#": i, **x} for i, x in enumerate(v)] for k, v in part0.items() if k in smartui._lists(part0)}
+            system += ("\n\nThe person already sees this part, built by the app from the data (rows numbered from 0):\n"
+                       + json.dumps({**part0, **numbered}, ensure_ascii=False)
                        + "\nWrite only the text: one or two plain sentences with what matters most (for a fine: the amount to pay "
-                         "now and the day that ends). Don't list every detail and don't add a part."
+                         "now and the day that ends). Don't list every detail and never write a part. If the question asks for only "
+                         "some rows, an order, fewer details or another way to show it, send an edit (keep: the row numbers to show, "
+                         "in order; hide; set; variant); otherwise edit is null."
                        + (" Nothing has happened yet: say what would change and that it waits for their yes. Never say it is done."
-                          if shown.get("component") == "ApprovalPrompt" else ""))
+                          if part0.get("component") == "ApprovalPrompt" else ""))
         names = (list(sel["candidates"]) + [a for a in always if a not in sel["candidates"] and a in self.catalog["components"]]) if sel["ui"] else []
         smaller = [names, names[:2] + [a for a in always if a in names[2:]], names[:1] + [a for a in always if a in names[1:]]]
         schema = [smartui.response_schema(self.catalog, n) for i, n in enumerate(smaller) if n and n not in smaller[:i]] \
             or smartui.response_schema(self.catalog, [])
+        if view:  # a prepared part: the reply is the sentence and, at most, a small edit to that part
+            schema = {"type": "object", "additionalProperties": False, "required": ["text", "edit"], "properties": {
+                "text": {"type": "string"}, "edit": smartui.edit_schema(part0, self.catalog, alts)}}
         shown = [""]
 
         def on_text(raw):
@@ -600,7 +615,23 @@ class Conversation:
                        "its event context, filled from the data (for example {\"name\": \"pay_invoice\", \"context\": {\"number\": \"TH-1047\"}}):\n"
                        + actions_text(self.app.ACTIONS, True))
         turns = self.turns[-4:] + [{"role": "user", "text": message}]
-        reply = self._structured(ask(self.provider, system, turns, schema, on_text))
+        raw = ask(self.provider, system, turns, schema, on_text)
+        edited = []
+        if view:
+            try:
+                ed = (json.loads(raw) or {}).get("edit")
+            except (ValueError, AttributeError):
+                ed = None
+            if ed:
+                new, edited = smartui.apply_edit(part0, ed, self.catalog, alts)
+                if edited:
+                    msgs = smartui.wrap({**new, "id": "root"}, surface)
+                    if smartui.validate(msgs, self.catalog, {"source": source, "copy": True})["ok"]:
+                        view = msgs
+                        emit({"type": "part", "answer": view, "data": data, "final": True})
+                    else:
+                        edited = ["refused: " + ", ".join(edited)]
+        reply = self._structured(raw)
         self.first_case_errors = []
         result = self._check(reply, source, surface, max_parts)
         first_errors = self.first_case_errors + result["errors"]  # what the model's first answer got wrong, fixed here or not
@@ -631,6 +662,8 @@ class Conversation:
         ms.setdefault("first_data", ms["full"] if result["answer"] else ms["first_text"])
         entry = {"message": message, "calls": calls, "routed_by_model": self.routed_by_model, "ms": {k: round(v) for k, v in ms.items()},
                  "view": bool(view), "template": bool(planned and view),
+                 "mode": ("edit" if view and edited and not edited[0].startswith("refused") else "fill" if view else
+                          "generate" if result["answer"] else "text"), "edit": edited,
                  "case_fixed": case_fixed, "selector": sel["candidates"], "ui": bool(result["answer"]),
                  "part": result["part"], "first_errors": [f"{e['rule']} {e['path']}" for e in first_errors], "repaired": repaired,
                  "final_errors": [f"{e['rule']} {e['path']}" for e in result["errors"]]}
@@ -764,7 +797,7 @@ class Conversation:
         if a and a.get("changes"):
             approved = ctx.pop("approved", None) is True
             offer = (name, json.dumps(ctx, sort_keys=True))
-            if a.get("reversible") and not a.get("consequences") and offer in self.offered and offer in self.prepared_offers:
+            if self._one_press(name, a) and offer in self.offered and offer in self.prepared_offers:
                 # a change that can be undone, with nothing the person must read first, on a button a prepared part or a
                 # toast showed ("Fix", "Undo"): it runs on the press, with a toast and Undo instead of a question first
                 # (R3, as the house standard says: confirm only what cannot be undone). A model-written part never counts.
@@ -787,6 +820,17 @@ class Conversation:
         # not a change: what the person picked becomes their next message
         said = ", ".join(f"{k.replace('_', ' ')} {v}" for k, v in ctx.items())
         return self.answer(f"I picked {name.replace('_', ' ')}" + (f": {said}" if said else "") + ".", on_event=on_event)
+
+    NEVER_ONE_PRESS = re.compile(r"\b(pay|paid|payment|charge|refund|purchase|buy|order|checkout|transfer|withdraw|deposit|price|"
+                                 r"delete|remove|erase|destroy|wipe|purge|drop|close account|"
+                                 r"send|email|message|post|publish|share|invite|submit|"
+                                 r"book|booking|reserve|schedule|cancel)\b", re.I)
+
+    def _one_press(self, name, a):
+        """A change may run on one press (toast and Undo, no approval prompt) only when the app marks it reversible, it
+        declares no consequences, and nothing in its name or description touches money, deletion, sending or booking."""
+        said = name.replace("_", " ") + " " + a.get("description", "")
+        return bool(a.get("reversible")) and not a.get("consequences") and not self.NEVER_ONE_PRESS.search(said)
 
     def _run_change(self, a, name, ctx):
         args = {k: v for k, v in ctx.items() if k in a.get("params", {})}
