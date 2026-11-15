@@ -68,6 +68,10 @@ class StatusAndFeedback(unittest.TestCase):
                 self.assertIn(name + ":", css, name)  # every name the map gives exists
         self.assertRegex(d["values"]["light"]["text"], r"^#[0-9a-f]{6}$")
         self.assertTrue(sm["rules"]["neverColourAlone"])
+        for st in sm["statuses"].values():  # agreed with Smart UI: lower-case words, which its tone rule matches against data
+            self.assertTrue(st["words"] and all(w == w.lower() for w in st["words"]))
+        self.assertEqual((sm["aliases"]["good"], sm["aliases"]["bad"], sm["aliases"]["pending"]), ("success", "danger", "warning"))
+        self.assertIn("unpaid", sm["statuses"]["danger"]["words"])
         fb = sm["feedback"]
         self.assertEqual((fb["confirm"], fb["confirmSetBy"], fb["undo"], fb["errorsStay"]), ("inline-banner", "default", "both", True))
         self.assertEqual(fb["toastMs"]["success"], 4000)

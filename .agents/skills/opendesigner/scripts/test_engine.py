@@ -5941,8 +5941,8 @@ class BuildFormats(unittest.TestCase):
     def test_web_gets_css_and_tailwind_and_says_what_it_left_out(self):
         with tempfile.TemporaryDirectory() as t:
             d, out, built = self.build_dir(t, "web")
-            self.assertEqual(built, ["artifact", "brand", "css", "dtcg", "figma", "paper", "tailwind"])
-            self.assertIn("build/ (css, tailwind, figma, paper, dtcg, artifact, brand)", out)
+            self.assertEqual(built, ["artifact", "brand", "css", "dtcg", "figma", "paper", "status.json", "tailwind"])
+            self.assertIn("build/ (css, tailwind, figma, paper, dtcg, artifact, brand, status)", out)
             self.assertIn("Not written: swift and compose, because it runs on web (Q-plat-01). To write one anyway: "
                           "engine.py export --format swift.", out)
             agents = next(ln for ln in design_section(t, "For Agents").splitlines() if ln.startswith("2. "))
@@ -5954,7 +5954,7 @@ class BuildFormats(unittest.TestCase):
     def test_ios_gets_swift_only(self):
         with tempfile.TemporaryDirectory() as t:
             d, out, built = self.build_dir(t, "ios")
-            self.assertEqual(built, ["artifact", "brand", "dtcg", "figma", "paper", "swift"])
+            self.assertEqual(built, ["artifact", "brand", "dtcg", "figma", "paper", "status.json", "swift"])  # status: every platform
             agents = next(ln for ln in design_section(t, "For Agents").splitlines() if ln.startswith("2. "))
             self.assertEqual(agents, "2. Use tokens, never raw values: `DS.*` in Swift.")
 

@@ -6,10 +6,14 @@
       "meaning": "an action finished as asked",
       "when": "after an action that worked, and for a state that is good (paid, verified)",
       "words": [
-        "Saved",
-        "Done",
-        "Sent",
-        "Paid"
+        "saved",
+        "done",
+        "sent",
+        "paid",
+        "approved",
+        "complete",
+        "on time",
+        "verified"
       ],
       "icon": "circle-check",
       "tokens": {
@@ -51,9 +55,12 @@
       "meaning": "something needs attention soon, but nothing is lost yet",
       "when": "for a risk the person can still avoid: a limit near, a date close, a change that is hard to undo",
       "words": [
-        "Check",
-        "Expires soon",
-        "Almost full"
+        "check",
+        "expires soon",
+        "almost full",
+        "due soon",
+        "at risk",
+        "needs review"
       ],
       "icon": "triangle-alert",
       "tokens": {
@@ -95,9 +102,13 @@
       "meaning": "something failed or would destroy data",
       "when": "for errors, failures, and actions that delete or cannot be undone",
       "words": [
-        "Error",
-        "Failed",
-        "Delete"
+        "error",
+        "failed",
+        "delete",
+        "overdue",
+        "declined",
+        "unpaid",
+        "rejected"
       ],
       "icon": "circle-x",
       "tokens": {
@@ -139,9 +150,11 @@
       "meaning": "neutral news the person may want",
       "when": "for neutral facts and tips; never for errors or success",
       "words": [
-        "Note",
-        "New",
-        "Tip"
+        "note",
+        "tip",
+        "update",
+        "draft",
+        "scheduled"
       ],
       "icon": "info",
       "tokens": {
@@ -183,8 +196,9 @@
       "meaning": "something new to try",
       "when": "for new features and invitations",
       "words": [
-        "New",
-        "Beta"
+        "new",
+        "beta",
+        "try it"
       ],
       "icon": "sparkles",
       "tokens": {
@@ -222,6 +236,19 @@
         }
       }
     }
+  },
+  "aliases": {
+    "good": "success",
+    "ok": "success",
+    "positive": "success",
+    "bad": "danger",
+    "error": "danger",
+    "critical": "danger",
+    "negative": "danger",
+    "pending": "warning",
+    "caution": "warning",
+    "neutral": "info",
+    "new": "discovery"
   },
   "rules": {
     "neverColourAlone": true,

@@ -11049,16 +11049,19 @@ def build_formats(state, d=None):
 
 
 STATUS_MEANING = {  # what each status means, the words that say it, and an icon (Lucide names); never colour alone (WCAG 1.4.1)
-    "success": ("an action finished as asked", ["Saved", "Done", "Sent", "Paid"], "circle-check",
+    "success": ("an action finished as asked", ["saved", "done", "sent", "paid", "approved", "complete", "on time", "verified"], "circle-check",
                 "after an action that worked, and for a state that is good (paid, verified)"),
-    "warning": ("something needs attention soon, but nothing is lost yet", ["Check", "Expires soon", "Almost full"], "triangle-alert",
+    "warning": ("something needs attention soon, but nothing is lost yet", ["check", "expires soon", "almost full", "due soon", "at risk",
+                                                                             "needs review"], "triangle-alert",
                 "for a risk the person can still avoid: a limit near, a date close, a change that is hard to undo"),
-    "danger": ("something failed or would destroy data", ["Error", "Failed", "Delete"], "circle-x",
+    "danger": ("something failed or would destroy data", ["error", "failed", "delete", "overdue", "declined", "unpaid", "rejected"], "circle-x",
                "for errors, failures, and actions that delete or cannot be undone"),
-    "info": ("neutral news the person may want", ["Note", "New", "Tip"], "info",
+    "info": ("neutral news the person may want", ["note", "tip", "update", "draft", "scheduled"], "info",
              "for neutral facts and tips; never for errors or success"),
-    "discovery": ("something new to try", ["New", "Beta"], "sparkles", "for new features and invitations"),
+    "discovery": ("something new to try", ["new", "beta", "try it"], "sparkles", "for new features and invitations"),
 }
+STATUS_ALIASES = {"good": "success", "ok": "success", "positive": "success", "bad": "danger", "error": "danger", "critical": "danger",
+                  "negative": "danger", "pending": "warning", "caution": "warning", "neutral": "info", "new": "discovery"}
 STATUS_ROLES = {"text": "color.text.{s}", "bg": "color.bg.{s}.subtle", "bgBold": "color.bg.{s}.bold", "onBold": "color.text.on-{s}",
                 "border": "color.border.{s}", "icon": "color.text.{s}"}
 FEEDBACK_WORDS = {"inline-banner": "In place, next to what changed, or in a banner over the section; no toasts",
@@ -11075,7 +11078,7 @@ def status_map(files, meta, state, prefix):
     modes = meta.get("modes") or ["light"]
     flats = {m: resolve_all(files, {"theme": m} if "theme" in res.get("modifiers", {}) else {}) for m in modes}
     base = flats[modes[0]]
-    out = {"v": 1, "prefix": prefix, "statuses": {},
+    out = {"v": 1, "prefix": prefix, "statuses": {}, "aliases": dict(STATUS_ALIASES),
            "rules": {"neverColourAlone": True, "pairWith": ["icon", "word"], "source": "WCAG 2.2 SC 1.4.1; DC-L01-15"}}
     for st, (meaning, words, icon, when) in STATUS_MEANING.items():
         toks = {k: v.format(s=st) for k, v in STATUS_ROLES.items() if v.format(s=st) in base}
@@ -11103,7 +11106,7 @@ def status_lines(state, files, meta, prefix):
     for st, x in sm["statuses"].items():
         t = x["css"]
         rows.append(f"| {st.title()} | {x['meaning']} | {x['when']} | `{t.get('text', '')}`, `{t.get('bg', '')}`, `{t.get('border', '')}` | "
-                    f"the {x['icon']} icon and a word such as \"{x['words'][0]}\" |")
+                    f"the {x['icon']} icon and a word such as \"{x['words'][0].capitalize()}\" |")
     fb = sm["feedback"]
     rows += ["", "- **Never colour alone.** Every status carries an icon or a word as well as its colour (WCAG 2.2 SC 1.4.1).",
              "- **One meaning per colour.** Success, warning and danger colours appear only for that status, never for a brand accent, "
