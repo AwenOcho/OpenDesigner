@@ -65,6 +65,7 @@
 
   Demo.prototype.wait = function (ms, id) {
     var self = this;
+    if (reduce.matches) ms = 0;  // reduced motion: the finished answer, with no build-up
     return new Promise(function (ok, no) {
       setTimeout(function () { if (id !== self.run) no(new Cancel()); else ok(); }, ms);
     });
@@ -86,20 +87,21 @@
   };
 
   // ---------------------------------------------------------------- lanes
+  // Two lanes: your agent (fetch the data, then write the sentence) and Smart UI (match, outline, fill, check).
+  // Each step is a plain verb with a quiet dot: waiting, working, done. The writer's step sits in your agent's lane.
   Demo.prototype.lanes = function (s) {
-    var out = {};
-    var self = this;
-    this.root.querySelectorAll("[data-lane]").forEach(function (box) {
-      var k = box.getAttribute("data-lane");
-      box.replaceChildren();
+    var out = {}, root = this.root;
+    root.querySelectorAll("[data-lane]").forEach(function (box) { box.replaceChildren(); });
+    ["data", "ui", "text"].forEach(function (k) {
+      var box = root.querySelector("[data-lane='" + (k === "text" ? "data" : k) + "']");
       out[k] = (s.lanes[k] || []).map(function (st) {
         var row = el("li", "sl-step", null);
-        row.append(el("span", "sl-step-t", st[0]), el("span", "sl-step-ms num", "·"));
-        box.append(row);
+        row.append(el("span", "sl-pdot", null), el("span", "sl-step-t", st[0]));
+        if (box) box.append(row);
         return { row: row, ms: st[1] };
       });
     });
-    this.root.querySelectorAll("[data-t]").forEach(function (n) { n.textContent = "–"; });
+    root.querySelectorAll("[data-t]").forEach(function (n) { n.textContent = "–"; });
     return out;
   };
   Demo.prototype.step = async function (st, id) {
@@ -107,14 +109,13 @@
     await this.wait(st.ms, id);
     st.row.classList.remove("run");
     st.row.classList.add("done");
-    st.row.lastChild.textContent = st.ms + " ms";
   };
   Demo.prototype.lane = async function (steps, id) { for (var i = 0; i < steps.length; i++) await this.step(steps[i], id); };
   Demo.prototype.time = function (key, t0) {
     var n = this.root.querySelector("[data-t='" + key + "']");
     if (!n) return;
     var ms = Math.round(performance.now() - t0);
-    n.textContent = ms < 1000 ? ms + " ms" : (ms / 1000).toFixed(1) + " s";
+    n.textContent = reduce.matches ? "–" : ms < 1000 ? ms + " ms" : (ms / 1000).toFixed(1) + " s";
   };
 
   // ---------------------------------------------------------------- one answer
@@ -130,11 +131,10 @@
     this.log.replaceChildren(turn);
     var say = el("p", "sl-say", null);
     var call = el("p", "sl-call num", null);
-    call.append(el("span", "sl-dot", null), el("span", null, s.part ? "show_ui · " + s.part : "answer in text"));
-    if (s.prepared) call.append(el("span", "sl-tag-p", "prepared"));
+    call.append(el("span", "sl-dot", null), el("span", null, s.chip));
     var part = null;
     try {
-      await this.wait(this.mini ? 260 : 160, id);
+      await this.wait(this.mini ? 220 : 120, id);
       turn.append(call);
       t0 = performance.now();  // timed from the moment the question is sent, as the evals time it
       // the data agent starts with the tool call and runs beside the UI agent; the fill waits for it
@@ -159,15 +159,15 @@
       if (s.view) {
         if (ui[2]) ui[2].row.classList.add("run");
         await part.fill(this, id);
-        if (ui[2]) { ui[2].row.classList.remove("run"); ui[2].row.classList.add("done"); ui[2].row.lastChild.textContent = ui[2].ms + " ms"; }
+        if (ui[2]) { ui[2].row.classList.remove("run"); ui[2].row.classList.add("done"); }
         if (ui[3]) await this.step(ui[3], id);
       }
       // the writer: one or two sentences, after the facts are in
       if (w) w.row.classList.add("run");
       await this.stream(say, s.say, id);
-      if (w) { w.row.classList.remove("run"); w.row.classList.add("done"); w.row.lastChild.textContent = w.ms + " ms"; }
+      if (w) { w.row.classList.remove("run"); w.row.classList.add("done"); }
       call.classList.add("done");
-      if (s.view && !this.mini) turn.append(el("p", "sl-checked", "Checked before it showed: every value is from the data, every colour from the tokens."));
+      if (s.view && !this.mini) turn.append(el("p", "sl-checked", "Checked before it showed."));
       this.time("full", t0);
       this.live.textContent = s.say;
       this.root.setAttribute("data-state", "done");
@@ -182,7 +182,7 @@
     node.classList.add("typing");
     for (var i = 0; i < words.length; i++) {
       node.textContent += (i ? " " : "") + words[i];
-      await this.wait(26, id);
+      await this.wait(18, id);
     }
     node.classList.remove("typing");
   };
@@ -205,7 +205,7 @@
 
   // stagger: values land one after another, 60 ms apart (decorative; nothing waits on it for input)
   async function each(demo, items, id, fn) {
-    for (var i = 0; i < items.length; i++) { fn(items[i], i); await demo.wait(60, id); }
+    for (var i = 0; i < items.length; i++) { fn(items[i], i); await demo.wait(45, id); }
   }
 
   var KINDS = {
