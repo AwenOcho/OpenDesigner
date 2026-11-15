@@ -130,17 +130,9 @@ New to the repo? You only need `skills/` or a zip from above. Everything else he
 
 ## Smart UI
 
-Optional. Your assistant answers with a part of your own system, like a fine with a Pay button or an application's progress, instead of three paragraphs. The parts are prepared ahead of time from your library and bound to your app's data. A matcher picks one in under 0.2 ms with no model, its outline shows at once, and values fill in as your data lands. The model writes only the sentence.
+Optional. Your assistant answers with your own components, like a fine with a Pay button, instead of three paragraphs. The parts are made ahead of time and filled from your data, and anything that pays or books asks first.
 
-<img src="brand/kit/readme/smart-ui-live.png" width="1012" alt="A council assistant answering 'Do I have any fines?'. The unpaid-fine card is half filled: some values are in, the rest are still loading blocks. Beside it, two lanes: your agent is fetching the fines, and Smart UI has matched a ready-made card, drawn its outline and is filling it in.">
-
-Colours come from the data through your status tokens, anything that books or pays asks first and says what will happen, and every part is checked before it shows. You keep your own model and agents. Plain HTML, so it works in any framework, and it speaks A2UI and MCP Apps.
-
-<img src="brand/kit/readme/smart-ui-built.png" width="1012" alt="How an answer is built, in five steps. Prepare, once: templates.json binds each read action to a part. Then for every question: Match (list_fines to KeyFacts, under 0.2 ms, no model), Fill (values land as the data arrives), Check (every value is in the data, every colour is a token and agrees with the data, a change asks first) and Draw (the od-surface element with your tokens).">
-
-Each product gets its own list of answers, from its own data and actions:
-
-<img src="brand/kit/readme/smart-ui-products.png" width="1012" alt="The first answer types the scope step found for three example products. Fernhollow council: table, record details, ask before a change, form, progress; Tallyhaus billing: ask before a change, table, record details, chart over time, headline numbers; Orvell travel: ask before a change, table, record details, compare options, results to pick from.">
+<img src="brand/kit/readme/smart-ui-live.png" width="1012" alt="A council assistant has answered 'Do I have any fines?' with an unpaid-fine card: reference, date, place, reason, full amount £70.00, £35.00 if paid by Thursday 19 November, status Unpaid, and a Pay £35.00 button, followed by one sentence. Beside it, every step is done: the agent fetched the fines and wrote the sentence, Smart UI matched a ready-made card, drew its outline, filled it in and checked it.">
 
 [Watch the recorded demo](https://opendesigner.dev/smart-ui/) · [Add it to your assistant](https://opendesigner.dev/docs/smart-ui-quickstart/)
 
