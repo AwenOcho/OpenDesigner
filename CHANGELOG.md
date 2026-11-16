@@ -6,6 +6,10 @@ All notable changes to OpenDesigner are recorded here. The format follows [Keep 
 
 ## [Unreleased]
 
+### Fixed
+
+- **Smart UI hides an empty warning band** (2026-11-17). An approval with no warning no longer shows an amber band holding only its icon. When the answer has a fuller line for what the button sends, such as "Standard, 1 checked bag" for the fare, the approval shows that line instead of the raw value.
+
 ### Added
 
 - **Smart UI answers with pictures** (2026-11-16). New parts show products in a grid, places, a recipe, an event and a home, each with photos from your app's data. Every photo needs alt text and a shape, so nothing jumps while it loads. A price must show its currency, and "Sold out" or "Only 2 left" can never show in green.
