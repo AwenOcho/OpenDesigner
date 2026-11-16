@@ -2,14 +2,17 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; block-size: 100%; }
 body { background: var(--ds-color-bg-canvas, var(--ds-color-surface-default)); color: var(--ds-color-text-primary); font: var(--ds-text-body-md); }
-.chat { display: grid; grid-template-rows: auto 1fr auto; block-size: 100dvh; max-inline-size: 52rem; margin-inline: auto; }
+.chat { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr auto; block-size: 100dvh; max-inline-size: 52rem; margin-inline: auto; }
 
-.bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ds-space-stack-sm) var(--ds-space-inline-md);
+.bar { display: flex; align-items: center; gap: var(--ds-space-inline-md);
   padding: var(--ds-space-inset-md) var(--ds-space-inset-lg); border-block-end: var(--ds-border-width-default) solid var(--ds-color-border-subtle); }
 .who { display: flex; align-items: center; gap: var(--ds-space-inline-md); }
 .who h1 { margin: 0; font: var(--ds-text-title-sm); }
 .who p { margin: 0; color: var(--ds-color-text-secondary); font: var(--ds-text-label-md); }
-.mark { inline-size: var(--ds-size-control-md); block-size: var(--ds-size-control-md); border-radius: var(--ds-radius-full); background: var(--ds-color-bg-accent-bold); }
+/* the assistant's mark: a plane on the accent, shaped like every other tile (the control radius, never rounder than a card) */
+.mark { display: grid; place-items: center; flex: none; inline-size: var(--ds-size-control-md); block-size: var(--ds-size-control-md); border-radius: min(var(--ds-radius-control), var(--ds-radius-container));
+  background: var(--ds-color-bg-accent-bold); color: var(--ds-color-text-on-accent, var(--ds-color-text-inverse)); }
+.mark svg { inline-size: var(--ds-size-icon-md); block-size: var(--ds-size-icon-md); stroke-width: var(--ds-icon-stroke-md); }
 .tools { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-space-inline-sm); }
 .pick { display: flex; align-items: center; gap: var(--ds-space-inline-xs); color: var(--ds-color-text-secondary); font: var(--ds-text-label-md); }
 .pick select, .tool { min-block-size: max(var(--ds-size-control-md), var(--ds-size-target-min)); padding: 0 var(--ds-space-inset-sm);
@@ -41,9 +44,12 @@ body { background: var(--ds-color-bg-canvas, var(--ds-color-surface-default)); c
 .next { display: flex; flex-wrap: wrap; gap: var(--ds-space-inline-sm); }
 .ask { min-block-size: max(var(--ds-size-control-md), var(--ds-size-target-min)); padding: 0 var(--ds-space-inset-md); cursor: pointer;
   color: var(--ds-color-text-primary); font: var(--ds-text-label-lg); background: var(--ds-color-surface-raised);
-  border: var(--ds-border-width-default) solid var(--ds-color-border-subtle); border-radius: var(--ds-radius-full); }
+  border: var(--ds-border-width-default) solid var(--ds-color-border-subtle); border-radius: var(--ds-radius-control); }
 .ask:hover { background: var(--ds-color-bg-neutral-subtle-hover); }
-.note { margin: var(--ds-space-stack-sm) 0 0; color: var(--ds-color-text-secondary); font: var(--ds-text-label-md); }
+/* the demo's own settings sit with its note under the composer, not in the assistant's header */
+.meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ds-space-stack-sm) var(--ds-space-inline-lg); margin-block-start: var(--ds-space-stack-md); }
+.meta .note { flex: 1 1 20rem; }
+.note { margin: 0; color: var(--ds-color-text-secondary); font: var(--ds-text-label-md); }
 .link { padding: 0; min-block-size: var(--ds-size-target-min); color: var(--ds-color-text-accent); font: inherit; background: none; border: 0; text-decoration: underline; cursor: pointer; }
 
 @media (max-width: 40rem) {
@@ -51,6 +57,10 @@ body { background: var(--ds-color-bg-canvas, var(--ds-color-surface-default)); c
   .me { max-inline-size: 92%; }
   .next { flex-wrap: nowrap; overflow-x: auto; padding-block-end: var(--ds-space-inset-xs); }
   .ask { flex: none; }
+  /* the settings stay on one row: the select keeps its accessible name and drops the visible word */
+  .tools { flex-wrap: nowrap; }
+  .pick span { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .pick select { min-inline-size: 0; max-inline-size: 12rem; }
 }
 @media (prefers-reduced-motion: reduce) { .log { scroll-behavior: auto; } }
 .ask-form { display: flex; gap: var(--ds-space-inline-sm); margin-block-start: var(--ds-space-stack-sm); }

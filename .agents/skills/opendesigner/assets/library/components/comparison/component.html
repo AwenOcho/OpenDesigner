@@ -40,7 +40,7 @@
 .odl-comparison .odl-sr { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .odl-comparison .odl-name { font: var(--ds-text-title-sm); overflow-wrap: anywhere; }
 .odl-comparison .odl-badge { justify-self: start; max-inline-size: 100%; display: inline-flex; align-items: center; min-block-size: var(--ds-size-control-sm);
-  padding: 0 var(--ds-space-inset-sm); border-radius: var(--ds-radius-full); background: var(--ds-color-bg-accent-subtle); color: var(--ds-color-text-accent); font: var(--ds-text-label-md);
+  padding: 0 var(--ds-space-inset-sm); border-radius: var(--ds-radius-control-sm); background: var(--ds-color-bg-accent-subtle); color: var(--ds-color-text-accent); font: var(--ds-text-label-md);
   font-weight: var(--ds-font-weight-label); overflow-wrap: anywhere; }
 .odl-comparison .odl-price { font: var(--ds-text-numeric-md); font-weight: var(--ds-font-weight-heading); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .odl-comparison .odl-per { color: var(--ds-color-text-secondary); font: var(--ds-text-label-md); overflow-wrap: anywhere; }
@@ -64,7 +64,8 @@
 .odl-comparison .odl-cell[data-mark="yes"] .odl-yes { display: block; color: var(--ds-color-text-success); }
 .odl-comparison .odl-cell[data-mark="no"] .odl-no { display: block; color: var(--ds-color-text-tertiary); }
 .odl-comparison .odl-cell[data-mark="no"] { color: var(--ds-color-text-secondary); }
-/* Phone: each attribute's name sits on its own line above the values, so every column gets the full width. */
+/* Phone: each attribute's name sits on its own line above the values, so every column gets the full width. Three options
+   stay side by side rather than scrolling, so the recommended one (often the last) is never off-screen. */
 @container (max-width: 34rem) {
   .odl-comparison .odl-card { padding: var(--ds-space-inset-lg); }
   .odl-comparison [role="row"] { grid-template-columns: repeat(var(--odl-cols, 3), minmax(4.5rem, 1fr)) calc(var(--ds-space-16) - var(--ds-space-inline-sm)); column-gap: var(--ds-space-inline-sm); row-gap: var(--ds-space-stack-xs); }
@@ -124,7 +125,7 @@
       <div class="odl-row" role="row" data-od-item><span class="odl-label" role="rowheader">Refund</span><div class="odl-vals">
         <span class="odl-val" role="cell"><span class="odl-cell" data-mark="no"><svg class="odl-no" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg><span>No refund</span></span></span>
         <span class="odl-val" role="cell"><span class="odl-cell" data-mark="no"><svg class="odl-no" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg><span>No refund</span></span></span>
-        <span class="odl-val" role="cell"><span class="odl-cell" data-mark="yes"><svg class="odl-yes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Full refund to 24 h before</span></span></span></div></div>
+        <span class="odl-val" role="cell"><span class="odl-cell" data-mark="yes"><svg class="odl-yes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Full refund to 24&nbsp;h before</span></span></span></div></div>
     </div>
   </div></div>
 </div></section>

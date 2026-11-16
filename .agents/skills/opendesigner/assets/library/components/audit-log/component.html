@@ -20,7 +20,7 @@
 .odl-audit-log li:last-child { border-block-end: 0; }
 .odl-audit-log .odl-who { grid-area: who; display: grid; place-items: center; inline-size: var(--ds-size-control-sm); block-size: var(--ds-size-control-sm); border-radius: var(--ds-radius-person); object-fit: cover;
   background: var(--ds-color-bg-neutral-subtle); color: var(--ds-color-icon-default); }
-.odl-audit-log .odl-who.is-bot { border-radius: var(--ds-radius-nested); border: var(--ds-border-width-default) solid var(--ds-color-border-subtle); background: var(--ds-color-surface-sunken); }
+.odl-audit-log .odl-who.is-bot { border-radius: min(var(--ds-radius-control), var(--ds-radius-container)); border: var(--ds-border-width-default) solid var(--ds-color-border-subtle); background: var(--ds-color-surface-sunken); }
 .odl-audit-log .odl-who svg { inline-size: var(--ds-size-icon-sm); block-size: var(--ds-size-icon-sm); stroke-width: var(--ds-icon-stroke-md); }
 .odl-audit-log p { grid-area: what; margin: 0; min-inline-size: 0; align-self: center; }
 .odl-audit-log p strong { font-weight: var(--ds-font-weight-label); }

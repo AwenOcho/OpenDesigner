@@ -3464,6 +3464,1615 @@
     }
    }
   },
+  "ProductGrid": {
+   "type": "object",
+   "description": "Four to eight products in a grid that goes one to four across by the space it has: a photo with a stock status, the name, the price with the old price struck out, colour swatches and the sizes in stock.",
+   "additionalProperties": false,
+   "properties": {
+    "component": {
+     "const": "ProductGrid"
+    },
+    "id": {
+     "type": "string",
+     "maxLength": 64
+    },
+    "@accessibility": {
+     "$ref": "#/$defs/Accessibility"
+    },
+    "@metadata": {
+     "$ref": "#/$defs/Metadata"
+    },
+    "title": {
+     "type": "string",
+     "maxLength": 60
+    },
+    "note": {
+     "type": "string",
+     "maxLength": 60
+    },
+    "items": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 8,
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+       "photo": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+         "src"
+        ],
+        "x-od-media": true,
+        "properties": {
+         "src": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 2048,
+          "x-od-url": "image"
+         },
+         "alt": {
+          "type": "string",
+          "maxLength": 200
+         },
+         "width": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20000
+         },
+         "height": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20000
+         },
+         "ratio": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,3}(\\.[0-9]{1,2})?[:/][1-9][0-9]{0,3}(\\.[0-9]{1,2})?$",
+          "maxLength": 12
+         },
+         "credit": {
+          "type": "string",
+          "maxLength": 120
+         }
+        }
+       },
+       "name": {
+        "type": "string",
+        "maxLength": 48
+       },
+       "price": {
+        "type": "string",
+        "maxLength": 16
+       },
+       "old_price": {
+        "type": "string",
+        "maxLength": 16
+       },
+       "sizes": {
+        "type": "array",
+        "minItems": 0,
+        "maxItems": 8,
+        "items": {
+         "type": "object",
+         "additionalProperties": false,
+         "properties": {
+          "sold_out": {
+           "type": "string",
+           "enum": [
+            "false",
+            "true"
+           ]
+          },
+          "label": {
+           "type": "string",
+           "maxLength": 10
+          }
+         },
+         "required": [
+          "label"
+         ],
+         "x-od-name-from": "label"
+        }
+       },
+       "colours": {
+        "type": "array",
+        "minItems": 0,
+        "maxItems": 5,
+        "items": {
+         "type": "object",
+         "additionalProperties": false,
+         "properties": {
+          "swatch": {
+           "type": "string",
+           "enum": [
+            "ash",
+            "camel",
+            "chalk",
+            "charcoal",
+            "cherry",
+            "cocoa",
+            "forest",
+            "ink",
+            "midnight",
+            "moss",
+            "rose",
+            "rust",
+            "sand",
+            "sky",
+            "stone"
+           ]
+          },
+          "name": {
+           "type": "string",
+           "maxLength": 20
+          }
+         },
+         "required": [
+          "swatch",
+          "name"
+         ]
+        }
+       },
+       "status": {
+        "type": "string",
+        "maxLength": 28
+       },
+       "tone": {
+        "type": "string",
+        "enum": [
+         "neutral",
+         "success",
+         "warning",
+         "danger"
+        ],
+        "x-od-token": true
+       },
+       "open": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+         "label",
+         "event"
+        ],
+        "properties": {
+         "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+         },
+         "a11y_label": {
+          "type": "string",
+          "maxLength": 120
+         },
+         "event": {
+          "$ref": "#/$defs/Event"
+         }
+        },
+        "x-od-effect": "none"
+       }
+      },
+      "required": [
+       "photo",
+       "name",
+       "price"
+      ],
+      "x-od-name-from": "name"
+     }
+    }
+   },
+   "required": [
+    "component",
+    "id",
+    "title",
+    "items"
+   ],
+   "metadata": {
+    "extensions": {
+     "opendesigner": {
+      "slug": "product-grid",
+      "group": "pictures",
+      "name": "Product grid",
+      "use": "when someone searches a shop (\"warm wool coats under \u00a3200 in size M\") and will open one product",
+      "use_when": [
+       "a shop search or a recommendation returns four to eight products to look through"
+      ],
+      "avoid_when": [
+       "one product with all its photos and sizes: use product-gallery",
+       "two or three products side by side: use comparison",
+       "one featured product with Add to bag: use product-card"
+      ],
+      "tags": [
+       "products",
+       "grid",
+       "photo",
+       "price",
+       "stock",
+       "search"
+      ],
+      "intents": [
+       "coats",
+       "jackets",
+       "shoes",
+       "dresses",
+       "find me a",
+       "show me some",
+       "shop for",
+       "products under",
+       "in my size",
+       "what do you have in",
+       "gift ideas",
+       "under \u00a3",
+       "under $"
+      ],
+      "width": "wide",
+      "name_from": "title"
+     }
+    }
+   }
+  },
+  "PlaceList": {
+   "type": "object",
+   "description": "Three to five places with a photo each: the name, rating, area, price band, distance, a line on why it fits, and whether it is open. One row per place in a narrow space, a row of cards that scrolls sideways in a wide one.",
+   "additionalProperties": false,
+   "properties": {
+    "component": {
+     "const": "PlaceList"
+    },
+    "id": {
+     "type": "string",
+     "maxLength": 64
+    },
+    "@accessibility": {
+     "$ref": "#/$defs/Accessibility"
+    },
+    "@metadata": {
+     "$ref": "#/$defs/Metadata"
+    },
+    "title": {
+     "type": "string",
+     "maxLength": 60
+    },
+    "note": {
+     "type": "string",
+     "maxLength": 60
+    },
+    "places": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 5,
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+       "photo": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+         "src"
+        ],
+        "x-od-media": true,
+        "properties": {
+         "src": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 2048,
+          "x-od-url": "image"
+         },
+         "alt": {
+          "type": "string",
+          "maxLength": 200
+         },
+         "width": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20000
+         },
+         "height": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20000
+         },
+         "ratio": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,3}(\\.[0-9]{1,2})?[:/][1-9][0-9]{0,3}(\\.[0-9]{1,2})?$",
+          "maxLength": 12
+         },
+         "credit": {
+          "type": "string",
+          "maxLength": 120
+         }
+        }
+       },
+       "name": {
+        "type": "string",
+        "maxLength": 40
+       },
+       "rating": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 5
+       },
+       "reviews": {
+        "type": "string",
+        "maxLength": 8
+       },
+       "area": {
+        "type": "string",
+        "maxLength": 32
+       },
+       "price_band": {
+        "type": "string",
+        "maxLength": 6
+       },
+       "distance": {
+        "type": "string",
+        "maxLength": 20
+       },
+       "why": {
+        "type": "string",
+        "maxLength": 80
+       },
+       "status": {
+        "type": "string",
+        "maxLength": 28
+       },
+       "tone": {
+        "type": "string",
+        "enum": [
+         "neutral",
+         "success",
+         "warning",
+         "danger"
+        ],
+        "x-od-token": true
+       },
+       "open": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+         "label",
+         "event"
+        ],
+        "properties": {
+         "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+         },
+         "a11y_label": {
+          "type": "string",
+          "maxLength": 120
+         },
+         "event": {
+          "$ref": "#/$defs/Event"
+         }
+        },
+        "x-od-effect": "none"
+       }
+      },
+      "required": [
+       "photo",
+       "name",
+       "area"
+      ],
+      "x-od-name-from": "name"
+     }
+    }
+   },
+   "required": [
+    "component",
+    "id",
+    "title",
+    "places"
+   ],
+   "metadata": {
+    "extensions": {
+     "opendesigner": {
+      "slug": "place-list",
+      "group": "pictures",
+      "name": "Place list",
+      "use": "when someone asks for somewhere to go (\"a quiet caf\u00e9 to work from near me\") and will pick one",
+      "use_when": [
+       "a recommendation of three to five places, each with a photo"
+      ],
+      "avoid_when": [
+       "one place in depth: use place-card",
+       "only an address and directions: use location-card",
+       "more than five places: answer in text or use result-list"
+      ],
+      "tags": [
+       "places",
+       "recommendations",
+       "photo",
+       "rating",
+       "carousel",
+       "list"
+      ],
+      "intents": [
+       "places near",
+       "somewhere to",
+       "a quiet caf\u00e9",
+       "where can i eat",
+       "restaurants near",
+       "caf\u00e9s near",
+       "bars near",
+       "where should we go",
+       "places to visit",
+       "near me",
+       "things to do",
+       "recommend a place"
+      ],
+      "width": "wide",
+      "name_from": "title"
+     }
+    }
+   }
+  },
+  "PlaceCard": {
+   "type": "object",
+   "description": "One place in depth: a photo, the name and rating, area, price band and distance, whether it is open, why it fits what the person asked, the address, and a Get directions button. The photo sits beside the words when there is room.",
+   "additionalProperties": false,
+   "properties": {
+    "component": {
+     "const": "PlaceCard"
+    },
+    "id": {
+     "type": "string",
+     "maxLength": 64
+    },
+    "@accessibility": {
+     "$ref": "#/$defs/Accessibility"
+    },
+    "@metadata": {
+     "$ref": "#/$defs/Metadata"
+    },
+    "name": {
+     "type": "string",
+     "maxLength": 40
+    },
+    "photo": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "src"
+     ],
+     "x-od-media": true,
+     "properties": {
+      "src": {
+       "type": "string",
+       "format": "uri",
+       "maxLength": 2048,
+       "x-od-url": "image"
+      },
+      "alt": {
+       "type": "string",
+       "maxLength": 200
+      },
+      "width": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 20000
+      },
+      "height": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 20000
+      },
+      "ratio": {
+       "type": "string",
+       "pattern": "^[1-9][0-9]{0,3}(\\.[0-9]{1,2})?[:/][1-9][0-9]{0,3}(\\.[0-9]{1,2})?$",
+       "maxLength": 12
+      },
+      "credit": {
+       "type": "string",
+       "maxLength": 120
+      }
+     }
+    },
+    "rating": {
+     "type": "number",
+     "minimum": 0,
+     "maximum": 5
+    },
+    "reviews": {
+     "type": "string",
+     "maxLength": 8
+    },
+    "area": {
+     "type": "string",
+     "maxLength": 32
+    },
+    "price_band": {
+     "type": "string",
+     "maxLength": 6
+    },
+    "distance": {
+     "type": "string",
+     "maxLength": 20
+    },
+    "status": {
+     "type": "string",
+     "maxLength": 28
+    },
+    "tone": {
+     "type": "string",
+     "enum": [
+      "neutral",
+      "success",
+      "warning",
+      "danger"
+     ],
+     "x-od-token": true
+    },
+    "why": {
+     "type": "string",
+     "maxLength": 140
+    },
+    "address": {
+     "type": "string",
+     "maxLength": 80
+    },
+    "directions": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "label",
+      "event"
+     ],
+     "properties": {
+      "label": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 40
+      },
+      "a11y_label": {
+       "type": "string",
+       "maxLength": 120
+      },
+      "event": {
+       "$ref": "#/$defs/Event"
+      }
+     },
+     "x-od-effect": "none"
+    },
+    "open": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "label",
+      "event"
+     ],
+     "properties": {
+      "label": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 40
+      },
+      "a11y_label": {
+       "type": "string",
+       "maxLength": 120
+      },
+      "event": {
+       "$ref": "#/$defs/Event"
+      }
+     },
+     "x-od-effect": "none"
+    }
+   },
+   "required": [
+    "component",
+    "id",
+    "name",
+    "photo",
+    "area"
+   ],
+   "metadata": {
+    "extensions": {
+     "opendesigner": {
+      "slug": "place-card",
+      "group": "pictures",
+      "name": "Place card",
+      "use": "when an assistant recommends one place (\"where should I take my parents for lunch?\") or the person opens one from a list",
+      "use_when": [
+       "one recommended place, with why it fits"
+      ],
+      "avoid_when": [
+       "three to five places to choose from: use place-list",
+       "only the address and a map: use location-card"
+      ],
+      "tags": [
+       "place",
+       "recommendation",
+       "photo",
+       "rating",
+       "card"
+      ],
+      "intents": [
+       "tell me about this place",
+       "the best place for",
+       "one place for",
+       "where should i take",
+       "more about the caf\u00e9",
+       "what is it like"
+      ],
+      "width": "medium",
+      "name_from": "name"
+     }
+    }
+   }
+  },
+  "ProductDetail": {
+   "type": "object",
+   "description": "The top of a product page: a swipeable photo gallery with dots on a phone and thumbnails from tablet up, name, sale price, rating, colour swatches, size chips with one sold out, Add to bag and save.",
+   "additionalProperties": false,
+   "properties": {
+    "component": {
+     "const": "ProductDetail"
+    },
+    "id": {
+     "type": "string",
+     "maxLength": 64
+    },
+    "@accessibility": {
+     "$ref": "#/$defs/Accessibility"
+    },
+    "@metadata": {
+     "$ref": "#/$defs/Metadata"
+    },
+    "name": {
+     "type": "string",
+     "maxLength": 48
+    },
+    "photos": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 6,
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+       "photo": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+         "src"
+        ],
+        "x-od-media": true,
+        "properties": {
+         "src": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 2048,
+          "x-od-url": "image"
+         },
+         "alt": {
+          "type": "string",
+          "maxLength": 200
+         },
+         "width": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20000
+         },
+         "height": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20000
+         },
+         "ratio": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,3}(\\.[0-9]{1,2})?[:/][1-9][0-9]{0,3}(\\.[0-9]{1,2})?$",
+          "maxLength": 12
+         },
+         "credit": {
+          "type": "string",
+          "maxLength": 120
+         }
+        }
+       },
+       "label": {
+        "type": "string",
+        "maxLength": 16
+       }
+      },
+      "required": [],
+      "x-od-name-from": "label"
+     }
+    },
+    "eyebrow": {
+     "type": "string",
+     "maxLength": 40
+    },
+    "price": {
+     "type": "number"
+    },
+    "was_price": {
+     "type": "number"
+    },
+    "sale_label": {
+     "type": "string",
+     "maxLength": 20
+    },
+    "currency": {
+     "type": "string",
+     "maxLength": 80
+    },
+    "rating_average": {
+     "type": "string",
+     "maxLength": 80
+    },
+    "rating_count": {
+     "type": "string",
+     "maxLength": 80
+    },
+    "colours": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 8,
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+       "swatch": {
+        "type": "string",
+        "enum": [
+         "chalk",
+         "ink",
+         "moss",
+         "sand"
+        ]
+       },
+       "name": {
+        "type": "string",
+        "maxLength": 16
+       }
+      },
+      "required": [
+       "name"
+      ],
+      "x-od-name-from": "name"
+     }
+    },
+    "size_note": {
+     "type": "string",
+     "maxLength": 24
+    },
+    "sizes": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 5,
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+       "sold_out": {
+        "type": "string",
+        "enum": [
+         "false",
+         "true"
+        ]
+       },
+       "label": {
+        "type": "string",
+        "maxLength": 4
+       }
+      },
+      "required": [
+       "label"
+      ],
+      "x-od-name-from": "label"
+     }
+    },
+    "stock": {
+     "type": "string",
+     "maxLength": 32
+    },
+    "tone": {
+     "type": "string",
+     "enum": [
+      "neutral",
+      "success",
+      "warning",
+      "danger"
+     ],
+     "x-od-token": true
+    },
+    "add": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "label",
+      "event"
+     ],
+     "properties": {
+      "label": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 40
+      },
+      "a11y_label": {
+       "type": "string",
+       "maxLength": 120
+      },
+      "event": {
+       "$ref": "#/$defs/Event"
+      }
+     },
+     "x-od-effect": "change"
+    },
+    "perks": {
+     "type": "array",
+     "minItems": 0,
+     "maxItems": 3,
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+       "icon": {
+        "type": "string",
+        "enum": [
+         "truck",
+         "undo",
+         "shield"
+        ]
+       },
+       "title": {
+        "type": "string",
+        "maxLength": 20
+       },
+       "detail": {
+        "type": "string",
+        "maxLength": 40
+       }
+      },
+      "required": [
+       "title"
+      ],
+      "x-od-name-from": "title"
+     }
+    }
+   },
+   "required": [
+    "component",
+    "id",
+    "name",
+    "photos",
+    "price"
+   ],
+   "metadata": {
+    "extensions": {
+     "opendesigner": {
+      "slug": "product-gallery",
+      "group": "pictures",
+      "name": "Product gallery",
+      "use": "at the top of a product page, for choosing colour and size",
+      "use_when": [
+       "any single item sold in variants, such as shoes, bags or homeware, where the buyer picks options before adding it"
+      ],
+      "avoid_when": [
+       "many products in a grid or list: use product-card or wishlist-grid",
+       "the bag or checkout after adding: use cart-drawer or order-summary",
+       "a product with no options to pick: product-card with an add button is enough"
+      ],
+      "tags": [
+       "product page",
+       "gallery",
+       "swatches",
+       "sizes",
+       "add to bag",
+       "sale"
+      ],
+      "intents": [
+       "tell me about this coat",
+       "more about the",
+       "show me the",
+       "what sizes",
+       "is it in stock",
+       "what colours",
+       "product details",
+       "more photos of"
+      ],
+      "width": "wide",
+      "name_from": "eyebrow"
+     }
+    }
+   }
+  },
+  "StayCard": {
+   "type": "object",
+   "description": "A holiday rental or hotel listing: in a narrow space a swipeable photo carousel with dots, in a wider one a strip of three photos; a favourite heart, the place, host and dates, the rating, the price per night with the total, and the cancellation rule shown as a status.",
+   "additionalProperties": false,
+   "properties": {
+    "component": {
+     "const": "StayCard"
+    },
+    "id": {
+     "type": "string",
+     "maxLength": 64
+    },
+    "@accessibility": {
+     "$ref": "#/$defs/Accessibility"
+    },
+    "@metadata": {
+     "$ref": "#/$defs/Metadata"
+    },
+    "title": {
+     "type": "string",
+     "maxLength": 48
+    },
+    "photos": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 8,
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+       "photo": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+         "src"
+        ],
+        "x-od-media": true,
+        "properties": {
+         "src": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 2048,
+          "x-od-url": "image"
+         },
+         "alt": {
+          "type": "string",
+          "maxLength": 200
+         },
+         "width": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20000
+         },
+         "height": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20000
+         },
+         "ratio": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,3}(\\.[0-9]{1,2})?[:/][1-9][0-9]{0,3}(\\.[0-9]{1,2})?$",
+          "maxLength": 12
+         },
+         "credit": {
+          "type": "string",
+          "maxLength": 120
+         }
+        }
+       }
+      },
+      "required": []
+     }
+    },
+    "badge": {
+     "type": "string",
+     "maxLength": 20
+    },
+    "rating": {
+     "type": "number",
+     "minimum": 0,
+     "maximum": 5
+    },
+    "reviews": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "lines": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 2,
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+       "text": {
+        "type": "string",
+        "maxLength": 48
+       }
+      },
+      "required": [
+       "text"
+      ],
+      "x-od-name-from": "text"
+     }
+    },
+    "status": {
+     "type": "string",
+     "maxLength": 40
+    },
+    "tone": {
+     "type": "string",
+     "enum": [
+      "neutral",
+      "success",
+      "warning",
+      "danger"
+     ],
+     "x-od-token": true
+    },
+    "old_price": {
+     "type": "string",
+     "maxLength": 8
+    },
+    "price": {
+     "type": "string",
+     "maxLength": 8
+    },
+    "unit": {
+     "type": "string",
+     "maxLength": 8
+    },
+    "total": {
+     "type": "string",
+     "maxLength": 18
+    }
+   },
+   "required": [
+    "component",
+    "id",
+    "title",
+    "photos",
+    "price"
+   ],
+   "metadata": {
+    "extensions": {
+     "opendesigner": {
+      "slug": "stay-card",
+      "group": "pictures",
+      "name": "Stay card",
+      "use": "in a list or map of places to stay, for one listing a traveller can save or open",
+      "use_when": [
+       "a grid of search results where each place needs several photos and a save action before the person opens it"
+      ],
+      "avoid_when": [
+       "a restaurant with cuisine and opening times: use restaurant-card",
+       "a full booked trip with times and codes: use itinerary",
+       "a list of saved places to compare: use wishlist-grid"
+      ],
+      "tags": [
+       "rental",
+       "hotel",
+       "listing",
+       "carousel",
+       "favourite"
+      ],
+      "intents": [
+       "a room for",
+       "somewhere to stay",
+       "hotel in",
+       "flat for",
+       "a place to stay",
+       "rooms with",
+       "per night",
+       "free cancellation",
+       "holiday rental"
+      ],
+      "width": "medium",
+      "name_from": "badge"
+     }
+    }
+   }
+  },
+  "RecipeCard": {
+   "type": "object",
+   "description": "A dish with its photo, the time it takes, how many it serves, the ingredients and numbered steps. The photo sits beside the title when there is room, and the ingredients beside the steps.",
+   "additionalProperties": false,
+   "properties": {
+    "component": {
+     "const": "RecipeCard"
+    },
+    "id": {
+     "type": "string",
+     "maxLength": 64
+    },
+    "@accessibility": {
+     "$ref": "#/$defs/Accessibility"
+    },
+    "@metadata": {
+     "$ref": "#/$defs/Metadata"
+    },
+    "title": {
+     "type": "string",
+     "maxLength": 60
+    },
+    "photo": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "src"
+     ],
+     "x-od-media": true,
+     "properties": {
+      "src": {
+       "type": "string",
+       "format": "uri",
+       "maxLength": 2048,
+       "x-od-url": "image"
+      },
+      "alt": {
+       "type": "string",
+       "maxLength": 200
+      },
+      "width": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 20000
+      },
+      "height": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 20000
+      },
+      "ratio": {
+       "type": "string",
+       "pattern": "^[1-9][0-9]{0,3}(\\.[0-9]{1,2})?[:/][1-9][0-9]{0,3}(\\.[0-9]{1,2})?$",
+       "maxLength": 12
+      },
+      "credit": {
+       "type": "string",
+       "maxLength": 120
+      }
+     }
+    },
+    "kicker": {
+     "type": "string",
+     "maxLength": 40
+    },
+    "time": {
+     "type": "string",
+     "maxLength": 16
+    },
+    "servings": {
+     "type": "string",
+     "maxLength": 16
+    },
+    "level": {
+     "type": "string",
+     "maxLength": 12
+    },
+    "intro": {
+     "type": "string",
+     "maxLength": 160
+    },
+    "ingredients": {
+     "type": "array",
+     "minItems": 0,
+     "maxItems": 14,
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+       "text": {
+        "type": "string",
+        "maxLength": 60
+       }
+      },
+      "required": [
+       "text"
+      ],
+      "x-od-name-from": "text"
+     }
+    },
+    "steps": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 8,
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+       "text": {
+        "type": "string",
+        "maxLength": 200
+       }
+      },
+      "required": [
+       "text"
+      ],
+      "x-od-name-from": "text"
+     }
+    }
+   },
+   "required": [
+    "component",
+    "id",
+    "title",
+    "photo",
+    "time",
+    "servings",
+    "steps"
+   ],
+   "metadata": {
+    "extensions": {
+     "opendesigner": {
+      "slug": "recipe-card",
+      "group": "pictures",
+      "name": "Recipe card",
+      "use": "when someone asks what to cook or how to make a dish",
+      "use_when": [
+       "one recipe the person asked for, or the one the assistant recommends"
+      ],
+      "avoid_when": [
+       "several dishes to choose from: use result-list",
+       "a dish on a restaurant menu: use menu-item"
+      ],
+      "tags": [
+       "recipe",
+       "food",
+       "photo",
+       "steps",
+       "card"
+      ],
+      "intents": [
+       "recipe",
+       "how do i make",
+       "how to cook",
+       "what can i cook",
+       "dinner idea",
+       "something to cook",
+       "what should i make with"
+      ],
+      "width": "medium",
+      "name_from": "kicker"
+     }
+    }
+   }
+  },
+  "EventCard": {
+   "type": "object",
+   "description": "One event to go to: a photo, the name, the date and venue, the price with its currency, and how many seats are left as a status (sold out is never green), with a button to choose seats.",
+   "additionalProperties": false,
+   "properties": {
+    "component": {
+     "const": "EventCard"
+    },
+    "id": {
+     "type": "string",
+     "maxLength": 64
+    },
+    "@accessibility": {
+     "$ref": "#/$defs/Accessibility"
+    },
+    "@metadata": {
+     "$ref": "#/$defs/Metadata"
+    },
+    "title": {
+     "type": "string",
+     "maxLength": 60
+    },
+    "photo": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "src"
+     ],
+     "x-od-media": true,
+     "properties": {
+      "src": {
+       "type": "string",
+       "format": "uri",
+       "maxLength": 2048,
+       "x-od-url": "image"
+      },
+      "alt": {
+       "type": "string",
+       "maxLength": 200
+      },
+      "width": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 20000
+      },
+      "height": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 20000
+      },
+      "ratio": {
+       "type": "string",
+       "pattern": "^[1-9][0-9]{0,3}(\\.[0-9]{1,2})?[:/][1-9][0-9]{0,3}(\\.[0-9]{1,2})?$",
+       "maxLength": 12
+      },
+      "credit": {
+       "type": "string",
+       "maxLength": 120
+      }
+     }
+    },
+    "kicker": {
+     "type": "string",
+     "maxLength": 30
+    },
+    "date": {
+     "type": "string",
+     "maxLength": 40
+    },
+    "venue": {
+     "type": "string",
+     "maxLength": 60
+    },
+    "status": {
+     "type": "string",
+     "maxLength": 30
+    },
+    "tone": {
+     "type": "string",
+     "enum": [
+      "neutral",
+      "success",
+      "warning",
+      "danger"
+     ],
+     "x-od-token": true
+    },
+    "price": {
+     "type": "string",
+     "maxLength": 20
+    },
+    "price_note": {
+     "type": "string",
+     "maxLength": 40
+    },
+    "tickets": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "label",
+      "event"
+     ],
+     "properties": {
+      "label": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 40
+      },
+      "a11y_label": {
+       "type": "string",
+       "maxLength": 120
+      },
+      "event": {
+       "$ref": "#/$defs/Event"
+      }
+     },
+     "x-od-effect": "none"
+    }
+   },
+   "required": [
+    "component",
+    "id",
+    "title",
+    "photo",
+    "date",
+    "venue",
+    "price"
+   ],
+   "metadata": {
+    "extensions": {
+     "opendesigner": {
+      "slug": "event-card",
+      "group": "pictures",
+      "name": "Event card",
+      "use": "when someone asks what is on, or about one event",
+      "use_when": [
+       "one event with a date, a place and tickets"
+      ],
+      "avoid_when": [
+       "a ticket already bought, with seat and code: use event-ticket",
+       "several events: use result-list"
+      ],
+      "tags": [
+       "event",
+       "tickets",
+       "photo",
+       "availability",
+       "card"
+      ],
+      "intents": [
+       "what's on",
+       "whats on",
+       "tickets for",
+       "gig",
+       "concert",
+       "event on",
+       "is there anything on",
+       "show tonight"
+      ],
+      "width": "medium",
+      "name_from": "kicker"
+     }
+    }
+   }
+  },
+  "HomeListing": {
+   "type": "object",
+   "description": "A home to rent or buy: up to three photos (one large, two beside it when there is room), the price with its currency, the address, bedrooms, bathrooms and floor area, its status (available, under offer, let agreed), and a button to book a viewing.",
+   "additionalProperties": false,
+   "properties": {
+    "component": {
+     "const": "HomeListing"
+    },
+    "id": {
+     "type": "string",
+     "maxLength": 64
+    },
+    "@accessibility": {
+     "$ref": "#/$defs/Accessibility"
+    },
+    "@metadata": {
+     "$ref": "#/$defs/Metadata"
+    },
+    "title": {
+     "type": "string",
+     "maxLength": 60
+    },
+    "photos": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 3,
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+       "photo": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+         "src"
+        ],
+        "x-od-media": true,
+        "properties": {
+         "src": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 2048,
+          "x-od-url": "image"
+         },
+         "alt": {
+          "type": "string",
+          "maxLength": 200
+         },
+         "width": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20000
+         },
+         "height": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20000
+         },
+         "ratio": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,3}(\\.[0-9]{1,2})?[:/][1-9][0-9]{0,3}(\\.[0-9]{1,2})?$",
+          "maxLength": 12
+         },
+         "credit": {
+          "type": "string",
+          "maxLength": 120
+         }
+        }
+       }
+      },
+      "required": [
+       "photo"
+      ]
+     }
+    },
+    "address": {
+     "type": "string",
+     "maxLength": 60
+    },
+    "price": {
+     "type": "string",
+     "maxLength": 16
+    },
+    "price_note": {
+     "type": "string",
+     "maxLength": 40
+    },
+    "beds": {
+     "type": "string",
+     "maxLength": 16
+    },
+    "baths": {
+     "type": "string",
+     "maxLength": 16
+    },
+    "area": {
+     "type": "string",
+     "maxLength": 12
+    },
+    "status": {
+     "type": "string",
+     "maxLength": 32
+    },
+    "tone": {
+     "type": "string",
+     "enum": [
+      "neutral",
+      "success",
+      "warning",
+      "danger"
+     ],
+     "x-od-token": true
+    },
+    "viewing": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "label",
+      "event"
+     ],
+     "properties": {
+      "label": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 40
+      },
+      "a11y_label": {
+       "type": "string",
+       "maxLength": 120
+      },
+      "event": {
+       "$ref": "#/$defs/Event"
+      }
+     },
+     "x-od-effect": "none"
+    }
+   },
+   "required": [
+    "component",
+    "id",
+    "title",
+    "photos",
+    "address",
+    "price"
+   ],
+   "metadata": {
+    "extensions": {
+     "opendesigner": {
+      "slug": "home-listing",
+      "group": "pictures",
+      "name": "Home listing",
+      "use": "when someone searching for a home asks about one listing",
+      "use_when": [
+       "one home with its photos, price and key facts"
+      ],
+      "avoid_when": [
+       "a holiday rental by the night: use stay-card",
+       "several homes: use result-list"
+      ],
+      "tags": [
+       "property",
+       "listing",
+       "photo",
+       "price",
+       "card"
+      ],
+      "intents": [
+       "house for sale",
+       "flat to rent",
+       "homes in",
+       "a home with",
+       "bedroom house",
+       "bedroom flat",
+       "book a viewing",
+       "property"
+      ],
+      "width": "medium",
+      "name_from": "title"
+     }
+    }
+   }
+  },
   "FlightResults": {
    "type": "object",
    "description": "A list of flight options: departure and arrival times and airports, the duration over a stops line, the airline as a drawn mark, the price, Best and Cheapest tags, and sort chips.",
@@ -3928,6 +5537,30 @@
      "$ref": "#/components/CodeBlock"
     },
     {
+     "$ref": "#/components/ProductGrid"
+    },
+    {
+     "$ref": "#/components/PlaceList"
+    },
+    {
+     "$ref": "#/components/PlaceCard"
+    },
+    {
+     "$ref": "#/components/ProductDetail"
+    },
+    {
+     "$ref": "#/components/StayCard"
+    },
+    {
+     "$ref": "#/components/RecipeCard"
+    },
+    {
+     "$ref": "#/components/EventCard"
+    },
+    {
+     "$ref": "#/components/HomeListing"
+    },
+    {
      "$ref": "#/components/FlightResults"
     },
     {
@@ -4018,7 +5651,7 @@
    "opendesigner": {
     "system": "Orvell Travel",
     "set_version": 1,
-    "made": "2026-11-16",
+    "made": "2026-11-17",
     "allow": {
      "images": [
       "images.unsplash.com"
