@@ -46,6 +46,22 @@ On the Claude app, ChatGPT, Cursor or Codex, or have no terminal? [Pick your too
 </picture>
 
 
+## Smart UI
+
+**Answer with interface, not paragraphs.** Your assistant shows a part of your own system, like a fine with a Pay button, made ahead of time from your components. Your data fills it and picks its colours, and anything that pays or books asks first.
+
+<picture>
+  <source media="(max-width: 600px)" srcset="https://raw.githubusercontent.com/ckryptickunal/OpenDesigner/main/brand/kit/readme/smart-ui-live-narrow.png">
+  <img src="brand/kit/readme/smart-ui-live.png" width="1012" alt="A council assistant has answered 'Do I have any fines?' with one sentence, then an unpaid-fine card: reference, date, place, reason, full amount £70.00, £35.00 if paid by Thursday 19 November, status Unpaid, and a Pay £35.00 button. Beside it, every step is done: the agent fetched the fines and wrote the sentence, Smart UI matched a ready-made card, drew its outline, filled it in and checked it.">
+</picture>
+
+<picture>
+  <source media="(max-width: 600px)" srcset="https://raw.githubusercontent.com/ckryptickunal/OpenDesigner/main/brand/kit/readme/smart-ui-screens-narrow.png">
+  <img src="brand/kit/readme/smart-ui-screens.png" width="1012" alt="Three finished answers from three example apps: a council's table of parking fines, a billing tool's line chart of API calls this year, and a travel assistant's three flights from Bristol to Lisbon.">
+</picture>
+
+[Watch the recorded demo](https://opendesigner.dev/smart-ui/) · [Add it to your assistant](https://opendesigner.dev/docs/smart-ui-quickstart/)
+
 ## Every round
 
 - **A plan you sign off,** step by step, written to `opendesigner/PROTOCOL.md` so any AI follows it.
@@ -127,14 +143,6 @@ New to the repo? You only need `skills/` or a zip from above. Everything else he
 
 
 123 ready-made parts built only on your tokens, each with its words and numbers marked so an app or assistant can fill it. Optional. [Browse them](https://opendesigner.dev/library/).
-
-## Smart UI
-
-Optional. Your assistant answers with your own components, like a fine with a Pay button, instead of three paragraphs. The parts are made ahead of time and filled from your data, and anything that pays or books asks first.
-
-<img src="brand/kit/readme/smart-ui-live.png" width="1012" alt="A council assistant has answered 'Do I have any fines?' with one sentence, then an unpaid-fine card: reference, date, place, reason, full amount £70.00, £35.00 if paid by Thursday 19 November, status Unpaid, and a Pay £35.00 button. Beside it, every step is done: the agent fetched the fines and wrote the sentence, Smart UI matched a ready-made card, drew its outline, filled it in and checked it.">
-
-[Watch the recorded demo](https://opendesigner.dev/smart-ui/) · [Add it to your assistant](https://opendesigner.dev/docs/smart-ui-quickstart/)
 
 ## Status
 
