@@ -25,9 +25,10 @@ def unsplash(pid, w, h):
     return f"https://images.unsplash.com/{pid}?w={w}&h={h}&q=60&auto=format&fit=crop&crop=entropy"
 
 
-def img(pid, w, h, alt, first=False):
-    """w x h is the box the photo is drawn in at 1440 px; the 2x file is in srcset. The hero's first row loads first."""
-    load = 'fetchpriority="high"' if first else 'loading="lazy"'
+def img(pid, w, h, alt, load="lazy"):
+    """w x h is the box the photo is drawn in at 1440 px; the 2x file is in srcset. load: "high" for the hero's first row,
+    "eager" for the rest of the hero's first view, "lazy" everywhere else."""
+    load = {"high": 'fetchpriority="high"', "eager": 'loading="eager"', "lazy": 'loading="lazy"'}[load]
     return (f'<img src="{unsplash(pid, w, h)}" srcset="{unsplash(pid, w, h)} {w}w, {unsplash(pid, 2 * w, 2 * h)} {2 * w}w" sizes="{w}px" '
             f'width="{w}" height="{h}" alt="{esc(alt)}" decoding="async" {load}>')
 
@@ -145,7 +146,7 @@ def products(coats, w, h, first=False, badge=None):
     cells = []
     for i, (pid, name, p, was, sw, stock, _arr) in enumerate(coats):
         tag = st("info", badge[1]) if badge and badge[0] == i else st(*stock)
-        cells.append(f'<li class="sd-pcard{" sd-hi" if badge and badge[0] == i else ""}"><div class="sd-ph">{img(pid, w, h, name, first and i < 4)}{tag}</div>'
+        cells.append(f'<li class="sd-pcard{" sd-hi" if badge and badge[0] == i else ""}"><div class="sd-ph">{img(pid, w, h, name, ("high" if i < 3 else "eager") if first else "lazy")}{tag}</div>'
                      f'<div><p class="sd-pname">{esc(name)}</p><p class="sd-prow"><span class="sd-price">£{p}' + (f'<s aria-label="was £{was}">£{was}</s>' if was else "") + "</span>"
                      f'<span class="sd-sw" role="img" aria-label="{len(sw)} colour{"s" if len(sw) > 1 else ""}">' + "".join(f'<i style="background:{c}"></i>' for c in sw) + "</span></p></div></li>")
     return f'<ul class="sd-pgrid sd-n{len(coats)}">{"".join(cells)}</ul>'

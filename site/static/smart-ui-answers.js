@@ -10,6 +10,13 @@
   document.querySelectorAll("template[data-sd-t]").forEach(t => { T[t.dataset.sdT] = t; });
   document.querySelectorAll("template[data-sd-p]").forEach(t => { P[t.dataset.sdP] = t; });
   const KEYS = Object.keys(DATA);
+  // photos fade in once loaded (a slow photo shows its box's tint, never an empty frame)
+  const seen = i => { if (i.complete && i.naturalWidth) i.classList.add("sd-in"); };
+  document.addEventListener("load", e => { if (e.target.tagName === "IMG" && e.target.closest(".sd")) e.target.classList.add("sd-in"); }, true);
+  document.addEventListener("error", e => { if (e.target.tagName === "IMG" && e.target.closest(".sd")) e.target.classList.add("sd-in"); }, true);
+  document.querySelectorAll(".sd img").forEach(seen);
+  document.documentElement.classList.add("sd-js");
+  new MutationObserver(() => document.querySelectorAll(".sd img:not(.sd-in)").forEach(seen)).observe(document.body, { childList: true, subtree: true });
   const LAY = { canvas: 2, window: 1, single: 3 };
   const mq = matchMedia("(max-width: 820px)");
   const still = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
