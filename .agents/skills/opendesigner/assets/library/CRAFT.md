@@ -68,6 +68,10 @@ become one scrolling row or a full-width stack. Long labels wrap whole or trunca
 - **Scroll ends.** When a part scrolls (a row of cards, a photo strip, a gallery, a wide table), the space after the last
   item comes from a last spacer (`::after` with `flex: 0 0 var(--ds-space-24)`, or a spacer column), never from the
   scroller's padding, which browsers drop. The last item never touches the edge.
+  A table that runs to its card's edges (the fare comparison) starts after the card's inset and ends on a spacer
+  column of the same width, so it sits centred in the card when it fits and starts and ends alike when it scrolls.
+- **One card inset.** Every answer card pads by `--ds-space-inset-lg`, and `--ds-space-inset-xl` only when the card is 38rem
+  or wider, so cards shown one after another never differ (owner review, 2026-11-17).
 - **Balanced rows.** A grid picks its columns from the space and the number of items, so no item sits alone on a row
   unless only one column fits (4 go 4 or 2 x 2, never 3 + 1).
 - **Nested corners.** A photo flush with a bordered card rounds only the corners it shares with the card, at the card's
