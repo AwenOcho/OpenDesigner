@@ -36,7 +36,7 @@ NOT_CARDS = ["a.btn", "button", "[role=tab]", "input", "select", "textarea", ".c
              ".odl-acts > a", ".odl-actions > a"]  # controls, also when drawn in figures; a link in a library actions row is drawn as a button
 PANELS = [".fig", ".fig-panel", ".fig-scene", ".demo-stage", ".h-end-photo", ".h-end-card", ".starts", ".tree"]  # check 2 looks inside these too
 GALLERIES = [".pieces", ".ex-grid", ".bento"]  # named in a partly filled last row warning
-SCROLL_OK = [".prose .code pre", ".prose .table-wrap", ".sl-track", ".filters", ".rss", ".sl-log", ".sl-chips", ".ths"]  # may scroll sideways on purpose (a carousel; tag filters on phones; the Smart UI page's screen strip)
+SCROLL_OK = [".prose .code pre", ".prose .table-wrap", ".sl-track", ".filters", ".rss", ".sl-log", ".sl-chips", ".ths", ".cmp", ".sb-steps"]  # may scroll sideways on purpose (a carousel; tag filters on phones; the Smart UI page's screen strip)
 STUCK_OK = [".sticker", ".piece-stuck", ".a-stamp", ".a-rstamp"]  # sit on corners on purpose: never an overlap
 MARKS_OK = [".a-call", ".a-dim", ".a-crop", ".a-reg", ".a-stamp"]  # proof marks drawn outside a box on purpose: their text may pass its edge
 # Scaled previews (the component library): a live component laid out at its design width and zoomed down to a card, an aisle
@@ -270,7 +270,7 @@ MEASURE = r"""(cfg) => {
       if (scrolls(e)) sc = true;
       if (clips(e)) cut = true;
     }
-    if (sc) continue;  // scrolled content belongs to check 2
+    if (sc || el.closest(any(cfg.scrollOk))) continue;  // scrolled content belongs to check 2 (also a card inside an on-purpose scroller)
     const c = card && R(card);
     if (r.right > vw + 1 || r.left < -1 || (c && (r.right > c.right + 1 || r.left < c.left - 1))) r = ink(n, r);
     const word = `"${n.textContent.trim().slice(0, 40)}"`;

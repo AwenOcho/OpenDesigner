@@ -313,16 +313,16 @@ def compare_section(b, n):
     f = next(x for x in d["fines"] if x["status"] == "Unpaid")
     text = (f"{rec} It was issued on {day(f['date'])} at {f['time']} on {f['location']}, for this reason: {f['contravention'].lower()}. "
             f"You can challenge it until {day(f['can_challenge_until'])}. To pay, tell me and I'll take you through it.")
-    card, _ = fine_facts()
-    before = f'<div class="cmp-chat"><div class="sl-me">Do I have any fines?</div><p class="sl-say">{esc(text)}</p></div>'
-    after = f'<div class="cmp-chat"><div class="sl-me">Do I have any fines?</div><div class="odl-sys-su-fernhollow cmp-part">{card}</div></div>'
+    card, _ = fine_facts(short_=True)
+    q = '<div class="sl-me">Do I have any fines?</div>'
+    cells = [("Text only", "The same facts in a paragraph.", f'<div class="cmp-chat">{q}<p class="sl-say">{esc(text)}</p></div>')]
+    cells += [(name, "Same answer, this system's tokens." if i else "The fine, its status and a Pay button that asks first.",
+               f'<div class="cmp-chat">{q}<div class="odl-sys-{k} cmp-part">{card}</div></div>') for i, (k, name, _) in enumerate(SYS3)]
+    figs = "".join(f'<li class="cmp-side">{frame(art)}<p><b>{esc(t_)}</b> {esc(d)}</p></li>' for t_, d, art in cells)
     return f"""
 <section class="h-sec" id="compare">
-<div class="h-head">{b.idx(n, "Before and after")}<h2 class="h-h2">Text, or the answer itself.</h2></div>
-<div class="cmp">
-<figure class="cmp-side">{frame(before)}<figcaption><b>Text only</b> The same facts in a paragraph.</figcaption></figure>
-<figure class="cmp-side">{frame(after)}<figcaption><b>Smart UI</b> The fine, its status and a Pay button that asks first.</figcaption></figure>
-</div>
+<div class="h-head">{b.idx(n, "Before and after")}<h2 class="h-h2">Text, or the answer in your own system.</h2></div>
+<ul class="cmp">{figs}</ul>
 </section>
 """
 
@@ -356,17 +356,6 @@ def parts_section(b, f, n):
 
 SYS3 = [("su-fernhollow", "Fernhollow council", FERN / "opendesigner/build/css/tokens.css"),
         ("su-opendesigner", "OpenDesigner", ROOT / "examples/smart-ui-opendesigner/opendesigner/build/css/tokens.css")]
-
-
-def systems_section(b, n):
-    card, _ = fine_facts(short_=True)
-    cells = "".join(f'<figure class="sys">{frame(f"<div class=odl-sys-{k}>" + card + "</div>", "sys-shot")}<figcaption>{esc(name)}</figcaption></figure>' for k, name, _ in SYS3)
-    return f"""
-<section class="h-sec" id="systems">
-<div class="h-head">{b.idx(n, "Two systems")}<h2 class="h-h2">Same question, two design systems.</h2></div>
-<div class="syss">{cells}</div>
-</section>
-"""
 
 
 def states_section(b, n):
@@ -610,8 +599,7 @@ def add(b, files, mds, paths):
     css = b.minify_css(b.corners_match_levers(b.apple_tracking((STATIC / "smart-ui.css").read_text())))
     VER = hashlib.sha256(css.encode()).hexdigest()[:10]
     # six sections (Kunal, 2026-11-16: "about 5 or 6"); the rules, where it runs and the questions live on the docs pages
-    secs = [lambda n: parts_section(b, f, n), lambda n: real_section(b, n), lambda n: compare_section(b, n),
-            lambda n: systems_section(b, n), lambda n: built_section(b, f, n)]
+    secs = [lambda n: parts_section(b, f, n), lambda n: real_section(b, n), lambda n: compare_section(b, n), lambda n: built_section(b, f, n)]
     body, i = hero(b, f), 1
     for s in secs:
         h = s(f"{i:02d}")
