@@ -327,12 +327,15 @@ export class ODSurface extends (G.HTMLElement || class {}) {
       });
     }
     // optional parts with nothing in them go; a renderer never shows an empty label or a dangling separator
-    for (const el of marked(scope, "[data-od-optional]").reverse()) {
-      if (partial) continue;
+    // (counted before anything goes: a wrapper whose only slot was just removed is empty too, not "has no slots")
+    const INNER = "[data-od-slot],[data-od-measure],[data-od-media],[data-od-action]";
+    const optional = partial ? [] : marked(scope, "[data-od-optional]");
+    const had = new Map(optional.map((el) => [el, el.querySelectorAll(INNER).length]));
+    for (const el of optional.reverse()) {
       const own = el.matches("[data-od-missing]");
-      const inner = [...el.querySelectorAll("[data-od-slot],[data-od-measure],[data-od-media],[data-od-action]")];
+      const inner = [...el.querySelectorAll(INNER)];
       const anyValue = inner.some((n) => !n.matches("[data-od-missing]"));
-      if (own || (inner.length && !anyValue)) el.remove();
+      if (own || (had.get(el) && !anyValue)) el.remove();
     }
   }
 
@@ -442,9 +445,16 @@ export class ODSurface extends (G.HTMLElement || class {}) {
     const human = (k) => k.replace(/_/g, " ").replace(/^./, (x) => x.toUpperCase());
     const given = Array.isArray(c.details) ? c.details.filter((d) => d && d.label !== undefined) : [];
     const same = (a, b) => String(a).trim().toLowerCase() === String(b).trim().toLowerCase();
+    const startsWithValue = (full, v) => {
+      const f = String(full).trim().toLowerCase(), x = String(v).trim().toLowerCase();
+      return x !== "" && f.startsWith(x) && !/[\p{L}\p{N}.]/u.test(f.charAt(x.length));
+    };
     // each value the button sends, under the answer's own label for it when it has one ("Invoice number", not "Number")
     const sent = Object.entries(ctx).filter(([k]) => k !== "approved").map(([k, v]) => {
       const named = given.find((d) => same(d.value, v));
+      // the answer's own line for this key, when it starts with exactly what is sent ("Standard, 1 checked bag" for "standard")
+      const fuller = !named && given.find((d) => same(d.label, human(k)) && startsWithValue(d.value, v));
+      if (fuller) return { label: String(fuller.label).slice(0, 24), value: String(fuller.value).slice(0, 80) };
       return { label: String(named ? named.label : human(k)).slice(0, 24), value: String(v).slice(0, 80) };
     });
     // then the answer's other lines, once each: no second row for a label or a value already shown

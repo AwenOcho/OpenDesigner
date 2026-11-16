@@ -72,6 +72,9 @@ const out = { dates: [fmt("2026-11-01", "en-GB"), fmt("2026-11-01", "en-US"), fm
 const c = { component: "ApprovalPrompt", details: [{ label: "Invoice number", value: "TH-1043" }, { label: "Number", value: "TH-1043" }, { label: "Amount", value: "€184.00" }],
             approve: { label: "Pay", event: { name: "pay_invoice", context: { number: "TH-1043", amount: "€500.00" } } } };
 out.rows = ODSurface.prototype.approvalDetails.call({}, c).details;
+const b = { component: "ApprovalPrompt", details: [{ label: "Flight", value: "OV214, Thu 4 Dec, 08:40" }, { label: "Fare", value: "Standard, 1 checked bag" }],
+            approve: { label: "Book", event: { name: "book_flight", context: { flight: "OV214", fare: "standard", seat: "12" } } } };
+out.booking = ODSurface.prototype.approvalDetails.call({}, b).details;
 console.log(JSON.stringify(out));
 """ % json.dumps((SKILL / "assets" / "od-surface.js").as_uri())
         r = subprocess.run([node, "--input-type=module", "-e", js], capture_output=True, text=True)
@@ -83,6 +86,9 @@ console.log(JSON.stringify(out));
         self.assertEqual(rows[0], {"label": "Invoice number", "value": "TH-1043"})  # the answer's own label
         self.assertIn({"label": "Amount", "value": "€500.00"}, rows)  # what the button sends wins over what the text says
         self.assertNotIn({"label": "Amount", "value": "€184.00"}, rows)
+        # the answer's fuller line for a sent value wins over the raw value ("standard"), and only when it starts with it
+        self.assertEqual(got["booking"][:2], [{"label": "Flight", "value": "OV214, Thu 4 Dec, 08:40"}, {"label": "Fare", "value": "Standard, 1 checked bag"}])
+        self.assertIn({"label": "Seat", "value": "12"}, got["booking"])
 
     def test_extract(self):
         self.assertIsNone(smartui.extract_answer("Paris is the capital of France."))
@@ -573,6 +579,40 @@ class Render(unittest.TestCase):
                     b.close()
         self.assertGreater(n, 0, "the table's own script never built its header row")
 
+
+    def test_an_optional_wrapper_whose_only_slot_is_empty_goes(self):
+        try:
+            from playwright.sync_api import sync_playwright
+        except ImportError:
+            self.skipTest("Playwright for Python is not installed")
+        import surface_audit as A
+        with tempfile.TemporaryDirectory() as t:
+            cat, bundle = smartui.build_catalog(TOKENS, "Test", ["images.unsplash.com"], only={"approval-prompt"})
+            pathlib.Path(t, "cat").mkdir()
+            pathlib.Path(t, "cat", "catalog.json").write_text(json.dumps(cat))
+            pathlib.Path(t, "cat", "od-components.js").write_text(smartui.bundle_js(bundle))
+            with tempfile.TemporaryDirectory() as site, A.serve(site) as url:
+                A.stage(pathlib.Path(t, "cat"), TOKENS, site)
+                with sync_playwright() as p:
+                    b = A.launch(p)
+                    pg = b.new_page()
+                    pg.goto(url + "/index.html")
+                    pg.wait_for_function("window.__ready === true")
+                    got = pg.evaluate("""async () => {
+                      const cat = await (await fetch("catalog.json")).json();
+                      const one = async (extra) => {
+                        const s = document.createElement("od-surface"); s.catalog = cat; document.body.append(s);
+                        const r = s.process([{version: "1.0", createSurface: {surfaceId: "x" + Math.random(), components: [{id: "root",
+                          component: "ApprovalPrompt", title: "Book the 08:40 to Lisbon?", summary: "Your card is charged when you confirm.",
+                          details: [{label: "Fare", value: "Standard"}], ...extra,
+                          approve: {label: "Book", event: {name: "book_flight", context: {fare: "standard"}}},
+                          cancel: {label: "Not now", event: {name: "cancel_booking"}}}]}}]);
+                        return {ok: r.ok, warning: s.querySelectorAll(".odl-warning").length};
+                      };
+                      return [await one({}), await one({warning: "A booked fare can't be refunded."})]; }""")
+                    b.close()
+        self.assertEqual(got[0], {"ok": True, "warning": 0}, "the warning band stayed with nothing in it")
+        self.assertEqual(got[1], {"ok": True, "warning": 1})
 
 class Offer(unittest.TestCase):
     def test_offer_on_a_chat_and_not_without(self):
