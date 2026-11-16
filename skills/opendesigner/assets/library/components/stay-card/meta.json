@@ -1,6 +1,6 @@
 {
   "name": "Stay card",
-  "summary": "A holiday rental or hotel listing: a swipeable photo carousel with dots, a favourite heart, the place, host and dates, the rating, and the price per night with the total.",
+  "summary": "A holiday rental or hotel listing: a swipeable photo carousel with dots, a favourite heart, the place, host and dates, the rating, and the price per night with the total, and the cancellation rule shown as a status.",
   "use": "in a list or map of places to stay, for one listing a traveller can save or open",
   "type": "commerce",
   "style": "friendly",
@@ -19,7 +19,9 @@
     "saved",
     "discounted",
     "hover",
-    "focus"
+    "focus",
+    "free cancellation",
+    "non-refundable"
   ],
   "source": null,
   "a11y": "The title is the one link; previous and next photo buttons appear on hover or focus and announce the photo count, the heart is a toggle button with aria-pressed, and each photo has alt text.",
@@ -111,6 +113,12 @@
         "slot": "list"
       },
       {
+        "name": "status",
+        "selector": ".odl-status",
+        "what": "the cancellation rule as a status: free cancellation in the success colour, non-refundable in neutral or danger",
+        "slot": "text"
+      },
+      {
         "name": "price",
         "selector": ".odl-price",
         "what": "old price struck through, price a night and the total",
@@ -171,6 +179,20 @@
                   "alt": {
                     "type": "string",
                     "maxLength": 200
+                  },
+                  "width": {
+                    "type": "integer"
+                  },
+                  "height": {
+                    "type": "integer"
+                  },
+                  "ratio": {
+                    "type": "string",
+                    "maxLength": 12
+                  },
+                  "credit": {
+                    "type": "string",
+                    "maxLength": 120
                   }
                 }
               }
@@ -234,6 +256,21 @@
           "type": "string",
           "maxLength": 18,
           "part": "price"
+        },
+        "status": {
+          "type": "string",
+          "maxLength": 40,
+          "part": "status"
+        },
+        "tone": {
+          "type": "string",
+          "enum": [
+            "neutral",
+            "success",
+            "warning",
+            "danger"
+          ],
+          "part": "status"
         }
       }
     },

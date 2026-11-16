@@ -10,6 +10,8 @@
 .odl-product-gallery .odl-stage { position: relative; display: grid; gap: var(--ds-space-stack-sm); min-inline-size: 0; }
 .odl-product-gallery .odl-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; border-radius: var(--ds-radius-container); background: var(--ds-color-surface-sunken); }
 .odl-product-gallery .odl-track::-webkit-scrollbar { display: none; }
+/* the last photo never meets the edge: the end space is a last spacer, never the scroller's padding (browsers drop it) */
+.odl-product-gallery .odl-track::after { content: ""; flex: 0 0 var(--ds-space-24); scroll-snap-align: end; }
 .odl-product-gallery .odl-slide { flex: 0 0 100%; margin: 0; aspect-ratio: 4 / 5; scroll-snap-align: start; }
 .odl-product-gallery .odl-slide img, .odl-product-gallery .odl-thumb img { display: block; inline-size: 100%; block-size: 100%; object-fit: cover; }
 .odl-product-gallery .odl-dots { display: flex; justify-content: center; }
@@ -82,12 +84,20 @@
 .odl-product-gallery .odl-size input:checked + span { border-color: var(--ds-color-text-primary); box-shadow: inset 0 0 0 var(--ds-border-width-default) var(--ds-color-text-primary); }
 .odl-product-gallery .odl-size input:disabled { cursor: not-allowed; }
 .odl-product-gallery .odl-size input:disabled + span { background: var(--ds-color-surface-sunken); border-color: var(--ds-color-border-subtle); color: var(--ds-color-text-tertiary); text-decoration: line-through; }
-.odl-product-gallery .odl-low { margin: 0; color: var(--ds-color-text-secondary); font: var(--ds-text-label-md); }
+.odl-product-gallery .odl-low { display: inline-flex; align-items: center; gap: var(--ds-space-inline-xs); margin: 0; color: var(--ds-color-text-secondary); font: var(--ds-text-label-md); font-weight: var(--ds-font-weight-label); }
+/* stock is a status: its colour comes from what it says (sold out is never green) */
+.odl-product-gallery .odl-low::before { content: ""; flex: none; inline-size: var(--ds-space-6); block-size: var(--ds-space-6); border-radius: var(--ds-radius-full); background: currentColor; }
+.odl-product-gallery .odl-low[data-tone="neutral"] { color: var(--ds-color-text-secondary); }
+.odl-product-gallery .odl-low[data-tone="success"] { color: var(--ds-color-text-success); }
+.odl-product-gallery .odl-low[data-tone="warning"] { color: var(--ds-color-text-warning); }
+.odl-product-gallery .odl-low[data-tone="danger"] { color: var(--ds-color-text-danger); }
 .odl-product-gallery .odl-buy { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--ds-space-inline-sm); }
 .odl-product-gallery .odl-add, .odl-product-gallery .odl-fav { display: inline-flex; align-items: center; justify-content: center; gap: var(--ds-space-inline-md); min-block-size: max(var(--ds-size-control-lg), var(--ds-size-target-min));
   padding: 0 var(--ds-space-inset-lg); border: 0; border-radius: var(--ds-radius-control); font: var(--ds-text-label-lg); cursor: pointer;
   transition: background-color var(--ds-motion-duration-short) var(--ds-motion-easing-standard), transform var(--ds-motion-duration-micro) var(--ds-motion-easing-standard); }
 .odl-product-gallery .odl-add { background: var(--ds-color-bg-action-primary); color: var(--ds-color-text-on-action); }
+/* adding to the basket changes data: the main action is at least the touch target (44 px) */
+.odl-product-gallery .odl-add { min-block-size: max(var(--ds-size-control-md), var(--ds-size-target-touch)); }
 .odl-product-gallery .odl-add:hover { background: var(--ds-color-bg-action-primary-hover); }
 .odl-product-gallery .odl-add:active { background: var(--ds-color-bg-action-primary-pressed); transform: scale(var(--ds-motion-scale-press)); }
 .odl-product-gallery .odl-add svg, .odl-product-gallery .odl-fav svg { inline-size: var(--ds-size-icon-md); block-size: var(--ds-size-icon-md); stroke-width: var(--ds-icon-stroke-md); }
@@ -163,7 +173,7 @@
           <label class="odl-size" data-od-item><input type="radio" name="odl-product-gallery-size" value="XL" disabled aria-label="XL, sold out"><span>XL</span></label>
           <label class="odl-size" data-od-item><input type="radio" name="odl-product-gallery-size" value="XXL"><span>XXL</span></label>
         </div>
-        <p class="odl-low" data-od-slot="stock" data-od-optional>Only 3 left in M</p>
+        <p class="odl-low" data-od-slot="stock" data-od-var="tone" data-tone="warning" data-od-optional>Only 3 left in M</p>
       </fieldset>
       <div class="odl-buy">
         <button type="button" class="odl-add" data-od-action="add" data-od-effect="change"><svg class="is-bag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><svg class="is-done" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span class="odl-add-label" data-od-slot="label">Add to bag</span></button>

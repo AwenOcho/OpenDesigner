@@ -1,0 +1,49 @@
+{
+ "photo": {
+  "src": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=960&h=640&fit=crop&auto=format&q=70",
+  "alt": "Grain bowl with vegetables and meat",
+  "width": 960,
+  "height": 640,
+  "credit": "Photo: Anh Nguyen on Unsplash"
+ },
+ "kicker": "Lunch · Vegetarian",
+ "title": "Warm grain bowl with roast squash",
+ "time": "40 min",
+ "servings": "Serves 2",
+ "level": "Easy",
+ "intro": "Uses the squash and kale you already have, and keeps for lunch tomorrow.",
+ "ingredients": [
+  {
+   "text": "Half a butternut squash"
+  },
+  {
+   "text": "150 g farro or brown rice"
+  },
+  {
+   "text": "2 handfuls of kale"
+  },
+  {
+   "text": "1 lemon"
+  },
+  {
+   "text": "2 tbsp tahini"
+  },
+  {
+   "text": "A handful of toasted seeds"
+  }
+ ],
+ "steps": [
+  {
+   "text": "Heat the oven to 200 °C. Cube the squash, toss it in oil and salt, and roast for 30 minutes."
+  },
+  {
+   "text": "Simmer the farro in salted water for 25 minutes, then drain."
+  },
+  {
+   "text": "Whisk the tahini with the lemon juice and a splash of water until it pours."
+  },
+  {
+   "text": "Wilt the kale in the warm pan, then build the bowls and top with the dressing and seeds."
+  }
+ ]
+}

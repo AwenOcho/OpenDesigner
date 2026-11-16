@@ -13,7 +13,7 @@
 .odl-key-facts dt { color: var(--ds-color-text-secondary); font: var(--ds-text-label-lg); overflow-wrap: anywhere; }
 .odl-key-facts dd { display: grid; gap: var(--ds-space-2); margin: 0; min-inline-size: 0; }
 .odl-key-facts .odl-value { display: inline-flex; align-items: baseline; gap: var(--ds-space-inline-sm); font: var(--ds-text-label-lg); font-weight: var(--ds-font-weight-label); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-.odl-key-facts .odl-value::before { content: ""; flex: none; align-self: center; inline-size: var(--ds-space-6); block-size: var(--ds-space-6); border-radius: var(--ds-radius-full); background: currentColor; }
+.odl-key-facts .odl-value::before { content: ""; flex: none; align-self: flex-start; margin-block-start: calc((1lh - var(--ds-space-6)) / 2); inline-size: var(--ds-space-6); block-size: var(--ds-space-6); border-radius: var(--ds-radius-full); background: currentColor; }
 .odl-key-facts .odl-value[data-tone="neutral"] { color: var(--ds-color-text-primary); }
 .odl-key-facts .odl-value[data-tone="neutral"]::before { content: none; }
 .odl-key-facts .odl-value[data-tone="accent"] { color: var(--ds-color-text-accent); }

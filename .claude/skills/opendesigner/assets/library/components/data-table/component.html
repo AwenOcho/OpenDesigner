@@ -94,6 +94,7 @@
   .odl-data-table tbody:last-of-type, .odl-data-table tbody:has(+ tbody[hidden]) { border-block-end: 0; }
   .odl-data-table td, .odl-data-table td:first-child, .odl-data-table td:last-child { display: grid; grid-template-columns: minmax(5.5rem, 38%) minmax(0, 1fr); gap: var(--ds-space-inline-md);
     position: static; block-size: auto; padding: var(--ds-space-inset-xs) 0; border: 0; text-align: start; background: transparent; }
+  .odl-data-table td[data-align="end"] { text-align: start; }
   .odl-data-table td::before { content: attr(data-label); color: var(--ds-color-text-secondary); font: var(--ds-text-label-md); font-weight: var(--ds-font-weight-body); }
   .odl-data-table td > span, .odl-data-table td:first-child > span, .odl-data-table td[data-align="end"] > span { inline-size: auto; max-inline-size: none; margin: 0; }
   .odl-data-table tbody.od-empty { display: block; }

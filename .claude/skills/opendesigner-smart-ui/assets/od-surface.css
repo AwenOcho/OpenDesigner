@@ -1,6 +1,8 @@
 /* <od-surface> states: loading, missing, stale, no permission, empty, approval. Tokens only (--ds-*), like the
    library components. Load after tokens.css. MIT. */
-.od-surface { display: block; container-type: inline-size; color: var(--ds-color-text-primary); font: var(--ds-text-body-md); }
+.od-surface { display: block; align-self: start; container-type: inline-size; color: var(--ds-color-text-primary); font: var(--ds-text-body-md); }
+/* a part keeps its natural height in a taller grid row: a text card never stretches (align-self above). A photo may fill
+   only beside words in the part's own columns; alone in one column it keeps its own shape and is at least 160 px tall. */
 /* an answer's words can be longer than the sample's: break a long word rather than push the page sideways */
 .od-surface [data-od-slot] { overflow-wrap: anywhere; }
 /* a button label written by the model may be longer than the sample: let it wrap inside the button, never past the edge */
@@ -21,8 +23,20 @@
 
 /* A value the answer did not have shows as missing, never as an invented number (R6). */
 .od-surface [data-od-missing]:empty::before { content: "–"; color: var(--ds-color-text-tertiary); }
-.od-surface .od-missing-image { display: grid; place-items: center; min-block-size: var(--ds-size-control-lg); padding: var(--ds-space-inset-md);
-  color: var(--ds-color-text-secondary); font: var(--ds-text-label-md); text-align: center; background: var(--ds-color-bg-neutral-subtle); }
+/* Pictures. The box has the picture's shape from the first frame (the part's own CSS shape wins; :where keeps this rule
+   weaker than any part's), a quiet token block while it loads, a short fade when it arrives. */
+:where(.od-surface img[data-od-img]) { aspect-ratio: var(--od-img-ratio, auto); }
+.od-surface img[data-od-img="loading"] { color: transparent; background-color: var(--ds-color-bg-neutral-subtle);
+  animation: od-pulse var(--ds-motion-duration-extra) var(--ds-motion-easing-standard) infinite alternate; }
+.od-surface img[data-od-img="ready"] { animation: od-fade-in var(--ds-motion-duration-short) var(--ds-motion-easing-standard) both; }
+@keyframes od-fade-in { from { opacity: 0; } }
+/* A picture that fails: a calm tile of the same shape with an icon and the alt text, never a broken-image glyph. */
+.od-surface .od-missing-image { display: grid; place-content: center; justify-items: center; gap: var(--ds-space-stack-xs);
+  box-sizing: border-box; inline-size: 100%; block-size: 100%; aspect-ratio: var(--od-img-ratio, auto); min-block-size: var(--ds-size-control-lg);
+  padding: var(--ds-space-inset-md); overflow: hidden; color: var(--ds-color-text-secondary); font: var(--ds-text-label-md); text-align: center;
+  background: var(--ds-color-bg-neutral-subtle); }
+.od-surface .od-missing-image svg { inline-size: var(--ds-size-icon-md); block-size: var(--ds-size-icon-md); stroke-width: var(--ds-icon-stroke-md); color: var(--ds-color-text-tertiary); }
+.od-surface .od-missing-image span { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; max-inline-size: 28ch; }
 
 .od-surface .od-notice { display: flex; gap: var(--ds-space-inline-xs); margin: 0 0 var(--ds-space-stack-sm); color: var(--ds-color-text-secondary); font: var(--ds-text-label-md); }
 .od-surface .od-notice[data-kind="lock"] { margin: 0; padding: var(--ds-space-inset-lg); border: var(--ds-border-width-default) solid var(--ds-color-border-subtle);
@@ -38,7 +52,7 @@
 .od-live { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 @media (prefers-reduced-motion: reduce) {
-  .od-surface [data-od-pending] { animation: none; }
+  .od-surface [data-od-pending], .od-surface img[data-od-img] { animation: none; }
 }
 
 /* od-chat: the tool call that picked the part, and the toast after a change. Tokens only. */

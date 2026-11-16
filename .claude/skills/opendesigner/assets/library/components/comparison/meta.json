@@ -1,6 +1,6 @@
 {
   "name": "Comparison",
-  "summary": "Two to four options side by side: each with its name, price and a Choose button, then one row per attribute so the differences line up.",
+  "summary": "Two to four options side by side: each with its name, price and a Choose button, then one row per attribute so the differences line up. Products can carry a photo each.",
   "use": "when someone is choosing between a few fares, plans or memberships and wants the differences in one view",
   "type": "commerce",
   "style": "quiet",
@@ -25,7 +25,8 @@
     "hover",
     "focus",
     "disabled",
-    "scrolls sideways on a phone"
+    "scrolls sideways on a phone",
+    "with photos"
   ],
   "source": null,
   "a11y": "A table with a column header per option and a row header per attribute, so each value is read with both; ticks and crosses are decorative and the value is always in words; each Choose button is named with its option.",
@@ -57,6 +58,12 @@
         "selector": ".odl-head > .odl-opt",
         "what": "one option's column header",
         "slot": "list"
+      },
+      {
+        "name": "photo",
+        "selector": ".odl-thumb .odl-img",
+        "what": "an optional photo above each option, for products compared by how they look",
+        "slot": "media"
       },
       {
         "name": "name",
@@ -179,6 +186,38 @@
                   "label",
                   "event"
                 ]
+              },
+              "photo": {
+                "type": "object",
+                "part": "photo",
+                "required": [
+                  "src",
+                  "alt"
+                ],
+                "properties": {
+                  "src": {
+                    "type": "string",
+                    "maxLength": 2048
+                  },
+                  "alt": {
+                    "type": "string",
+                    "maxLength": 200
+                  },
+                  "width": {
+                    "type": "integer"
+                  },
+                  "height": {
+                    "type": "integer"
+                  },
+                  "ratio": {
+                    "type": "string",
+                    "maxLength": 12
+                  },
+                  "credit": {
+                    "type": "string",
+                    "maxLength": 120
+                  }
+                }
               }
             }
           }
@@ -264,13 +303,21 @@
         "evidence": "overflow-wrap: anywhere"
       },
       "missing_image": {
-        "status": "none",
-        "how": "the part has no photo"
+        "status": "handled",
+        "evidence": "data-od-media",
+        "how": "photos are optional; one that fails to load becomes a calm tile of the same shape with an icon and its alt text, and options sent without photos show none"
       }
     },
     "keyboard": [
       "Tab moves through the Choose buttons, one per option, left to right",
       "Enter or Space presses one"
     ]
-  }
+  },
+  "photos": [
+    {
+      "img": "photo-1605733513597-a8f8341084e6",
+      "author": "mostafa mahmoudi",
+      "page": "J4DnKxz_3sA"
+    }
+  ]
 }

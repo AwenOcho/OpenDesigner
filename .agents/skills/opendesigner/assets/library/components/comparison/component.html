@@ -11,7 +11,9 @@
 /* the table scrolls sideways in its own box when four options do not fit */
 .odl-comparison .odl-scroll { overflow-x: auto; overscroll-behavior-x: contain; margin-inline: calc(var(--ds-space-inset-xs) * -1); padding-inline: var(--ds-space-inset-xs); }
 .odl-comparison .odl-table { display: grid; min-inline-size: 100%; }
-.odl-comparison [role="row"] { display: grid; grid-template-columns: var(--odl-label) repeat(var(--odl-cols, 3), var(--odl-col)); column-gap: var(--ds-space-inline-md); }
+/* when the table scrolls, the last column never meets the edge: a spacer column ends each row (never the scroller's padding) */
+.odl-comparison [role="row"]::after { content: ""; }
+.odl-comparison [role="row"] { display: grid; grid-template-columns: var(--odl-label) repeat(var(--odl-cols, 3), var(--odl-col)) calc(var(--ds-space-24) - var(--ds-space-inline-md)); column-gap: var(--ds-space-inline-md); }
 .odl-comparison .odl-vals { display: contents; }
 .odl-comparison .odl-head { align-items: stretch; padding-block-end: var(--ds-space-stack-md); }
 /* the badge sits above its option's name; the other options keep that much room so the names line up */
@@ -48,20 +50,27 @@
 /* Phone: each attribute's name sits on its own line above the values, so every column gets the full width. */
 @container (max-width: 34rem) {
   .odl-comparison .odl-card { padding: var(--ds-space-inset-lg); }
-  .odl-comparison [role="row"] { grid-template-columns: repeat(var(--odl-cols, 3), minmax(4.5rem, 1fr)); column-gap: var(--ds-space-inline-sm); row-gap: var(--ds-space-stack-xs); }
+  .odl-comparison [role="row"] { grid-template-columns: repeat(var(--odl-cols, 3), minmax(4.5rem, 1fr)) calc(var(--ds-space-16) - var(--ds-space-inline-sm)); column-gap: var(--ds-space-inline-sm); row-gap: var(--ds-space-stack-xs); }
   .odl-comparison .odl-corner { display: none; }
   .odl-comparison .odl-label { grid-column: 1 / -1; position: sticky; inset-inline-start: 0; justify-self: start; }
 }
 /* the hidden template item (data-od-template) stays out of sight in the static file */
 .odl-comparison [hidden] { display: none !important; }
 @media (prefers-reduced-motion: reduce) { .odl-comparison, .odl-comparison *, .odl-comparison *::before { transition: none !important; animation: none !important; } }
+/* products compared with their pictures: a photo above each option's name, in one shape so the names line up */
+.odl-comparison .odl-thumb { position: relative; order: -2; overflow: hidden; aspect-ratio: 4 / 5; margin-block-end: var(--ds-space-stack-xs); border-radius: var(--ds-radius-nested); background: var(--ds-color-surface-sunken); }
+.odl-comparison .odl-thumb::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 var(--ds-border-width-default) var(--ds-color-border-subtle); pointer-events: none; }
+.odl-comparison .odl-thumb .odl-img { display: block; inline-size: 100%; block-size: 100%; object-fit: cover; }
+/* with photos, the photos line up at the top and the room kept for a badge sits under each photo instead */
+.odl-comparison .odl-head:has(.odl-badge):has(.odl-thumb) .odl-opt:not(:has(.odl-badge)) { padding-block-start: 0; }
+.odl-comparison .odl-head:has(.odl-badge) .odl-opt:not(:has(.odl-badge)) .odl-thumb { margin-block-end: calc(2 * var(--ds-space-stack-xs) + var(--ds-size-control-sm)); }
 </style>
 <section class="odl-comparison" aria-label="Compare fares" data-od-label="title" style="--odl-cols: 3"><div class="odl-card">
   <header><h3 data-od-slot="title">Compare fares</h3><p class="odl-note" data-od-slot="note" data-od-optional>London to Lisbon, Friday 21 November, one adult</p></header>
   <div class="odl-scroll"><div class="odl-table" role="table" aria-label="Fares side by side">
     <div role="rowgroup"><div class="odl-head" role="row" data-od-list="options">
       <span class="odl-corner" role="cell"></span>
-      <div class="odl-opt" role="columnheader" data-od-item data-od-template hidden><span class="odl-name" data-od-slot="name"></span><span class="odl-badge" data-od-slot="badge" data-od-optional></span>
+      <div class="odl-opt" role="columnheader" data-od-item data-od-template hidden><span class="odl-name" data-od-slot="name"></span><span class="odl-thumb" data-od-optional><img class="odl-img" data-od-media="photo" src="https://images.unsplash.com/photo-1605733513597-a8f8341084e6?w=400&amp;h=500&amp;fit=crop&amp;auto=format&amp;q=70" alt="" width="200" height="250" loading="lazy" decoding="async"></span><span class="odl-badge" data-od-slot="badge" data-od-optional></span>
         <span class="odl-price" data-od-slot="price" data-od-optional></span><span class="odl-per" data-od-slot="price_note" data-od-optional></span>
         <button type="button" class="odl-choose" data-od-action="choose">Choose</button></div>
       <div class="odl-opt" role="columnheader" data-od-item><span class="odl-name">Basic</span><span class="odl-price">€89</span><span class="odl-per">per person</span>

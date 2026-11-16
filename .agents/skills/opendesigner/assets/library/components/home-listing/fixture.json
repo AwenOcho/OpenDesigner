@@ -1,0 +1,49 @@
+{
+ "photos": [
+  {
+   "photo": {
+    "src": "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1280&h=960&fit=crop&auto=format&q=70",
+    "alt": "Brown and black wooden house",
+    "width": 1280,
+    "height": 960,
+    "credit": "Photo: vu anh on Unsplash"
+   }
+  },
+  {
+   "photo": {
+    "src": "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=640&h=480&fit=crop&auto=format&q=70",
+    "alt": "Holiday-rental living room with a large window",
+    "width": 640,
+    "height": 480,
+    "credit": "Photo: Minh Pham on Unsplash"
+   }
+  },
+  {
+   "photo": {
+    "src": "https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=640&h=480&fit=crop&auto=format&q=70",
+    "alt": "Hotel bedroom with a wooden bed and garden view",
+    "width": 640,
+    "height": 480,
+    "credit": "Photo: visualsofdana on Unsplash"
+   }
+  }
+ ],
+ "title": "Three-bedroom house with a garden",
+ "address": "Larch Road, Fernhollow",
+ "price": "£385,000",
+ "price_note": "freehold",
+ "beds": "3 bedrooms",
+ "baths": "2 bathrooms",
+ "area": "96 m²",
+ "status": "Under offer",
+ "tone": "warning",
+ "viewing": {
+  "label": "Book a viewing",
+  "event": {
+   "name": "book_viewing",
+   "context": {
+    "listing": "larch-road-14"
+   }
+  }
+ }
+}
