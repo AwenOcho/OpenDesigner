@@ -149,14 +149,17 @@
       var ui = L.ui || [];
       // the UI agent: match a prepared part (or decide on text) and draw its outline at once
       if (ui[0]) await this.step(ui[0], id);
-      // the sentence goes under the part: it arrives last, so nothing above it moves when it does
+      // a turn reads question, sentence, part. The sentence's lines are reserved before the part is drawn (the full text,
+      // invisible, sizes the slot), so the words fill in place and nothing below them moves.
+      say.append(el("span", "sl-say-ghost", s.say), el("span", "sl-say-live", null));
+      say.firstChild.setAttribute("aria-hidden", "true");
+      turn.append(say);
       if (s.view) {
         part = this.build(s.view, true);
         if (ui[1]) await this.step(ui[1], id);
         turn.append(part.node);
         this.time("outline", t0);
       }
-      turn.append(say);
       await data;
       // no prepared part covers a change: the model writes the part first, then it fills and is checked like any other
       var w = (L.text || [])[0];
@@ -189,15 +192,14 @@
     });
   };
 
-  Demo.prototype.stream = async function (node, text, id) {
+  Demo.prototype.stream = async function (say, text, id) {
+    var node = say.querySelector(".sl-say-live") || say;
     if (reduce.matches) { node.textContent = text; return; }
     var words = text.split(" ");
-    node.classList.add("typing");
     for (var i = 0; i < words.length; i++) {
       node.textContent += (i ? " " : "") + words[i];
       await this.wait(18, id);
     }
-    node.classList.remove("typing");
   };
 
   // ---------------------------------------------------------------- parts
@@ -467,6 +469,16 @@
     fit();
     if (ro) document.querySelectorAll("[data-fit]").forEach(function (b) { ro.observe(b); });
   }
-  document.addEventListener("od:variant", boot, true);  // (capture: the event does not bubble) a review copy's variant picker mounts new markup
+  document.addEventListener("od:variant", boot, true);
+  // "See all": the rest of the parts open in place; the button then folds them away again
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest("[data-more-btn]"); if (!b) return;
+    var list = document.getElementById(b.getAttribute("aria-controls")), open = b.getAttribute("aria-expanded") !== "true";
+    list.querySelectorAll("[data-more]").forEach(function (li) { li.hidden = !open; });
+    b.setAttribute("aria-expanded", String(open));
+    if (!b.hasAttribute("data-label")) b.setAttribute("data-label", b.textContent);
+    b.textContent = open ? "Show fewer" : b.getAttribute("data-label");
+    fit();
+  });  // (capture: the event does not bubble) a review copy's variant picker mounts new markup
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
 })();

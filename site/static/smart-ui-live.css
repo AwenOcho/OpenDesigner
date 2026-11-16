@@ -31,7 +31,9 @@
 .sl-call.done .sl-dot { background: var(--ok); }
 .sl-tag-p { padding: 0 6px; border-radius: 4px; background: var(--accent-soft); color: var(--accent-text); font-size: 11px; }
 .sl-say { margin: 0; max-width: 62ch; font-size: 16px; line-height: 24px; text-wrap: pretty; }
-.sl-say:empty { display: none; }
+.sl-say { display: grid; }
+.sl-say > span { grid-area: 1 / 1; }
+.sl-say-ghost { visibility: hidden; }
 .sl-checked { margin: 0; font-size: 13px; line-height: 18px; color: var(--ink-muted); }
 .sl-chips { flex: none; display: flex; flex-wrap: wrap; gap: 8px; padding: 14px 24px 16px; border-top: 1px solid var(--line); }
 .sl-chip { min-height: 40px; padding: 0 14px; border: 1px solid var(--line); border-radius: var(--r-pill); background: var(--surface-raised); color: var(--ink); font: 400 14px/20px "Hanken Grotesk", system-ui, sans-serif; letter-spacing: -0.01em; cursor: pointer; transition: border-color 160ms ease, background-color 160ms ease, transform 160ms var(--ease-out); }

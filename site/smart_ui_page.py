@@ -327,23 +327,29 @@ def compare_section(b, n):
 """
 
 
+FEATURED = ["key-facts", "bar-chart", "comparison", "approval-prompt", "receipt", "location-card"]  # one per job, shown first
+
+
 def parts_section(b, f, n):
+    """Six large previews, one per job; the rest open in place behind one button."""
     import library_page
     comps, quiet = lib_components()
     slugs = [c[0] for g in f["groups"] for c in f["by_group"][g]] + [c[0] for c in f["by_group"].get("domain", [])]
+    slugs = FEATURED + [s for s in slugs if s not in FEATURED]
     tiles = []
-    for slug in slugs:
+    for i, slug in enumerate(slugs):
         c = comps.get(slug)
         if not c:
             continue
         w = library_page.FRAME_W[c["width"]]
-        tiles.append(f'<li class="th"><div class="th-view lib-fit" data-fit="{w}" inert aria-hidden="true"><div class="th-zoom odl-sys-nordic" style="width:{w}px">{quiet(c["markup"])}</div></div>'
+        tiles.append(f'<li class="th"{" data-more hidden" if i >= len(FEATURED) else ""}><div class="th-view lib-fit" data-fit="{w}" inert aria-hidden="true"><div class="th-zoom odl-sys-nordic" style="width:{w}px">{quiet(c["markup"])}</div></div>'
                      f'<a class="th-name" href="/library/{slug}/">{esc(c["name"])}</a><p class="th-line">{esc(library_page.short(c))}</p></li>')
     return f"""
 <section class="h-sec" id="parts">
-<div class="h-head h-head-row"><div>{b.idx(n, "Every part")}<h2 class="h-h2">{len(tiles)} parts an answer can use.</h2></div>
+<div class="h-head h-head-row"><div>{b.idx(n, "Every part")}<h2 class="h-h2">One part for each job an answer does.</h2></div>
 <a class="h-link" href="/library/">The whole library {b.ARROW}</a></div>
-<ul class="ths">{"".join(tiles)}</ul>
+<ul class="ths" id="su-parts">{"".join(tiles)}</ul>
+<p class="ths-more"><button class="btn secondary" type="button" data-more-btn aria-controls="su-parts" aria-expanded="false">See all {len(tiles)} parts</button></p>
 </section>
 """
 
@@ -448,27 +454,6 @@ def built_section(b, f, n):
 <ol class="flow3"><li><b>Your data agent</b><span>Your API, documents or database</span></li><li><b>Smart UI</b><span>Matches, fills and checks the part</span></li><li><b>The screen</b><span>Your components, your tokens</span></li></ol>
 <a class="h-link" href="/docs/smart-ui-quickstart/#use-your-own-agents">Use your own agents {b.ARROW}</a></div>
 <p class="su-more"><a href="/docs/smart-ui/">How it works</a><a href="/docs/smart-ui-quickstart/">Add it to your assistant</a><a href="/docs/smart-ui-adapters/">Where it runs</a><a href="/smart-ui/demo/">The renderer demo</a></p>
-</section>
-"""
-
-
-def products_section(b, n):
-    """Different products, different answers: evals/smart-ui/use-cases.json, or nothing when it isn't there (no invented data)."""
-    if not USE_CASES.exists():
-        return ""
-    u = json.loads(USE_CASES.read_text())
-    ps = u.get("products") or []
-    if not ps:
-        return ""
-    cols = []
-    for p in ps:
-        # at most five, in plain words: the part names and the evidence stay in the Markdown copy and use-cases.json
-        kinds = [a["type"][:1].upper() + a["type"][1:] for a in p["answer_types"] if not a.get("missing")][:5]
-        cols.append(f'<div class="pr"><h3>{esc(p["name"])}</h3><ul class="pr-chips">{"".join(f"<li>{esc(k)}</li>" for k in kinds)}</ul></div>')
-    return f"""
-<section class="h-sec" id="products">
-<div class="h-head">{b.idx(n, "Different products")}<h2 class="h-h2">Different products, different answers.</h2></div>
-<div class="prs">{"".join(cols)}</div>
 </section>
 """
 
@@ -626,7 +611,7 @@ def add(b, files, mds, paths):
     VER = hashlib.sha256(css.encode()).hexdigest()[:10]
     # six sections (Kunal, 2026-11-16: "about 5 or 6"); the rules, where it runs and the questions live on the docs pages
     secs = [lambda n: parts_section(b, f, n), lambda n: real_section(b, n), lambda n: compare_section(b, n),
-            lambda n: systems_section(b, n), lambda n: products_section(b, n), lambda n: built_section(b, f, n)]
+            lambda n: systems_section(b, n), lambda n: built_section(b, f, n)]
     body, i = hero(b, f), 1
     for s in secs:
         h = s(f"{i:02d}")

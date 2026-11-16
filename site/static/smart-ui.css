@@ -117,19 +117,6 @@
 }
 @media (max-width: 600px) { .sb-steps { grid-template-columns: minmax(0, 1fr); } .sb-agents { padding: 20px; } }
 
-/* 03 different products, different answers (evals/smart-ui/use-cases.json) */
-.prs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-.pr { min-width: 0; padding: 24px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); }
-.pr h3 { margin: 0; font-size: 18px; line-height: 24px; font-weight: 500; letter-spacing: -0.02em; }
-.pr-kind { margin: 2px 0 0; font-size: 12px; line-height: 16px; color: var(--ink-muted); text-transform: uppercase; letter-spacing: .07em; }
-.pr ol { list-style: none; margin: 16px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.pr li { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 10px 12px; border-radius: max(2px, calc(var(--r-card) - 24px)); background: var(--surface-raised); border: 1px solid var(--line); }
-.pr-type { font-size: 15px; line-height: 20px; }
-.pr-type::first-letter { text-transform: uppercase; }
-.pr-part { font-size: 12px; line-height: 16px; color: var(--accent-text); overflow-wrap: anywhere; }
-.pr-missing .pr-part { color: var(--warn); }
-@media (max-width: 1000px) { .prs { grid-template-columns: minmax(0, 1fr); } }
-
 .su-faq { border-bottom: 1px solid var(--line); }
 
 /* one calm frame for every sample on this page (framed visuals: nested corners, one shell, no photo or glow) */
@@ -162,7 +149,7 @@
 /* every part: real library markup at its design width, zoomed down; the visual heart of the page */
 .ths { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 16px; }
 .th { display: flex; flex-direction: column; min-width: 0; }
-.th-view { display: block; height: 320px; box-sizing: border-box; overflow: hidden; padding: 16px; border: 1px solid var(--line); border-radius: var(--r-card); background: var(--surface); }
+.th-view { display: block; height: 380px; box-sizing: border-box; overflow: hidden; padding: 16px; border: 1px solid var(--line); border-radius: var(--r-card); background: var(--surface); }
 .th-zoom { pointer-events: none; transform-origin: 0 0; }
 .th-name { margin-top: 12px; font-size: 16px; line-height: 22px; font-weight: 500; color: var(--ink); text-decoration: none; }
 .th-name:hover { color: var(--accent-text); text-decoration: underline; }
@@ -211,7 +198,6 @@
 .sys { display: flex; flex-direction: column; }
 .sys .su-shot { flex: 1; }
 .tones .sl-tag { font-family: "Hanken Grotesk", system-ui, sans-serif; font-size: 13px; }
-.pr li:last-child:nth-child(odd) { grid-column: 1 / -1; }
 .sys-shot { padding: 30px; }
 
 .flow3 { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; counter-reset: f; }
@@ -223,10 +209,10 @@
 .su-hero .su-lede { max-width: 52ch; }
 @media (min-width: 1101px) { .sb-agents { grid-template-columns: minmax(0, 3fr) minmax(0, 8fr) auto; } }
 
-@supports (corner-shape: superellipse(1.35)) { .su-shot, .su-shot-in, .th-view, .sb-step, .sb-vis, .sb-agents, .pr, .pr li, .rs img, .flow3 li { corner-shape: superellipse(1.35); --corner-k: 1.22; } }
+@supports (corner-shape: superellipse(1.35)) { .su-shot, .su-shot-in, .th-view, .sb-step, .sb-vis, .sb-agents, .rs img, .flow3 li { corner-shape: superellipse(1.35); --corner-k: 1.22; } }
 
-.pr-chips { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
-.pr-chips li { padding: 6px 12px; border-radius: var(--r-pill); background: var(--surface-raised); border: 1px solid var(--line); font-size: 14px; line-height: 20px; }
 .su-more { display: flex; flex-wrap: wrap; gap: 8px 24px; margin: 24px 0 0; font-size: 15px; line-height: 22px; }
 .su-more a { color: var(--ink); text-underline-offset: 4px; }
 .su-more a:hover { color: var(--accent-text); }
+.ths-more { margin: 32px 0 0; text-align: center; }
+.th[hidden] { display: none; }
