@@ -28326,7 +28326,6 @@
     "--ds-space-stack-sm",
     "--ds-text-body-md",
     "--ds-text-label-lg",
-    "--ds-text-label-md",
     "--ds-text-title-lg",
     "--ds-text-title-md"
    ],
@@ -28353,7 +28352,7 @@
    },
    "files": {
     "html": "components/receipt/component.html",
-    "bytes": 8576,
+    "bytes": 8809,
     "script": false
    },
    "source": null,
