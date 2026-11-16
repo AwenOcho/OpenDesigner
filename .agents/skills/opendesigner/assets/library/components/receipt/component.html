@@ -17,17 +17,20 @@
 .odl-receipt .odl-status[data-tone="danger"] .odl-i-danger, .odl-receipt .odl-status[data-tone="info"] .odl-i-info { display: block; }
 .odl-receipt .odl-head { display: grid; gap: var(--ds-space-stack-sm); }
 .odl-receipt h3 { margin: 0; font: var(--ds-text-title-lg); overflow-wrap: anywhere; text-wrap: balance; }
-.odl-receipt .odl-ref { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--ds-space-inline-xs); margin: 0; color: var(--ds-color-text-secondary); font: var(--ds-text-label-md); }
+/* "Reference" and the reference share one size: the word quiet, the code in the primary colour */
+.odl-receipt .odl-ref { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--ds-space-inline-xs); margin: 0; color: var(--ds-color-text-secondary); font: var(--ds-text-label-lg); }
 /* the reference stays in the answer's one typeface, its figures lined up, so the window never gains a second font */
 .odl-receipt .odl-ref span { color: var(--ds-color-text-primary); font: var(--ds-text-label-lg); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 /* details read the same as in the approval before it: a sunken panel, the label in the first third, the value after it.
-   The one deliberate difference is the total, the money that moved: its own line under the panel, in the heading weight. */
+   The one deliberate difference is the total, the money that moved: its own line under the panel, in the heading weight,
+   label on the card's content edge and amount at the end, like the total line of any receipt. */
 .odl-receipt dl { margin: 0; display: grid; gap: var(--ds-space-stack-sm); font-variant-numeric: tabular-nums; }
 .odl-receipt .odl-lines { padding: var(--ds-space-inset-md) var(--ds-space-inset-lg); border-radius: min(var(--ds-radius-control), var(--ds-radius-container)); background: var(--ds-color-surface-sunken); }
 .odl-receipt dl > div { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: var(--ds-space-inline-md); align-items: baseline; }
 .odl-receipt dt { color: var(--ds-color-text-secondary); overflow-wrap: anywhere; }
 .odl-receipt dd { margin: 0; overflow-wrap: anywhere; }
-.odl-receipt .odl-total { padding-inline: var(--ds-space-inset-lg); font-weight: var(--ds-font-weight-heading); }
+.odl-receipt .odl-total { font-weight: var(--ds-font-weight-heading); }
+.odl-receipt .odl-total > div { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: var(--ds-space-inline-md); }
 .odl-receipt .odl-total dt { color: var(--ds-color-text-primary); }
 .odl-receipt .odl-total dd { font: var(--ds-text-title-md); }
 .odl-receipt .odl-note { margin: 0; color: var(--ds-color-text-secondary); overflow-wrap: anywhere; }
@@ -46,7 +49,6 @@
 @container (max-width: 26rem) {
   .odl-receipt h3 { font: var(--ds-text-title-md); }
   .odl-receipt .odl-lines { padding: var(--ds-space-inset-md); }
-  .odl-receipt .odl-total { padding-inline: var(--ds-space-inset-md); }
   .odl-receipt dl > div { grid-template-columns: minmax(0, 1fr); gap: var(--ds-space-2); }
 }
 /* Disabled or still loading: quiet but readable (AA), never the faint disabled pair. */
