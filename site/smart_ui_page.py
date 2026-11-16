@@ -336,17 +336,21 @@ def a_map():
 
 
 def a_fine():
-    rows = [("Reference", "FH40018273"), ("Date", f"Fri{NB}6{NB}Nov{NB}2026, 10:42"), ("Full amount", "£70.00")]
-    kv = "".join(f"<dt>{k}</dt><dd>{v}</dd>" for k, v in rows) + f"<dt>Pay by Thu{NB}19{NB}Nov</dt><dd><b>£35.00</b></dd>"
+    # the Fernhollow example's unpaid fine (examples/smart-ui-fernhollow/data.json), in plain words
+    rows = [("Reference", "FH40018273"), ("Date", f"Fri{NB}6{NB}Nov{NB}2026, 10:42"), ("Place", f"Mill Street, Zone{NB}B"), ("Reason", "Residents' bay, no permit"),
+            ("Full amount", "£70.00"), (f"Pay by Thu{NB}19{NB}Nov", "<b>£35.00</b>"), ("Challenge by", f"Thu{NB}3{NB}Dec")]
+    kv = "".join(f"<dt>{k}</dt><dd>{v}</dd>" for k, v in rows)
     return (f'<div class="sd-card sd-fine"><div class="sd-cardh"><div><p class="sd-ct">Unpaid parking fine</p><p class="sd-sub">Vehicle AB12 CDE</p></div>{a_status("warn", "Unpaid")}</div>'
-            f'{a_map()}<dl class="sd-kv">{kv}</dl><span class="sd-btn">Pay £35.00</span></div>')
+            f'<dl class="sd-kv">{kv}</dl><span class="sd-btn">Pay £35.00</span></div>')
 
 
 def a_checks():
-    rows = [("ok", "Pass", "Colours all come from tokens"), ("ok", "Pass", f"Body text contrast is 7.2{NB}to{NB}1"), ("ok", "Pass", f"Spacing follows the 8{NB}px scale"),
-            ("warn", "Look", f"Two buttons use a 10{NB}px radius, the system says 12"), ("bad", "Broken", f"Plan names are cut off at 375{NB}px")]
-    return ('<div class="sd-card sd-wide"><p class="sd-ct">Pricing page, checked against your system</p><p class="sd-sub">5 checks: 3 pass, 1 to look at, 1 broken</p><ul class="sd-checks">'
-            + "".join(f"<li>{a_status(t, l)}{esc(x)}</li>" for t, l, x in rows) + "</ul></div>")
+    # each check with a short second line (shown where the window has room; the rows never stretch)
+    rows = [("ok", "Pass", "Colours all come from tokens", "38 of 38 colours"), ("ok", "Pass", f"Body text contrast is 7.2{NB}to{NB}1", f"The floor is 4.5{NB}to{NB}1"),
+            ("ok", "Pass", f"Spacing follows the 8{NB}px scale", "Every gap is on the scale"),
+            ("warn", "Look", f"Two buttons use a 10{NB}px radius, the system says 12", f"Fix: use 12{NB}px"), ("bad", "Broken", f"Plan names are cut off at 375{NB}px", "Fix: let the name wrap")]
+    return ('<div class="sd-card sd-wide sd-findings"><p class="sd-ct">Pricing page, checked against your system</p><p class="sd-sub">5 checks: 3 pass, 1 to look at, 1 broken</p><ul class="sd-checks">'
+            + "".join(f'<li>{a_status(t, l)}<span>{esc(x)}<small>{esc(d)}</small></span></li>' for t, l, x, d in rows) + "</ul></div>")
 
 
 def a_mock():
@@ -367,7 +371,8 @@ def a_part(k, v):
     if k == "council":
         opts = [("Pay £35.00 today", f"The lower amount ends Thursday 19{NB}November"), ("Challenge the fine", f"Send photos or a permit within 28{NB}days"),
                 ("Ask for more time", f"Up to 14{NB}days if you ask before the 19th")]
-        return (f'<div class="sd-duo">{a_fine()}<div class="sd-opts"><p class="kicker">What you can do</p>'
+        # the fine card and the option cards keep their natural height; only the map flexes, so both columns end on one line
+        return (f'<div class="sd-duo sd-council">{a_fine()}<div class="sd-opts">{a_map()}<p class="kicker">What you can do</p>'
                 + "".join(f'<div class="sd-opt"><b>{t}</b><span>{d}</span></div>' for t, d in opts) + "</div></div>")
     if k == "review":
         return f'<div class="sd-duo">{a_checks()}{a_mock()}</div>'

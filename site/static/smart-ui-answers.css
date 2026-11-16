@@ -47,6 +47,9 @@
 .sd-a { flex: none; max-width: 62ch; margin-top: 16px !important; font-size: 16px; line-height: 25px; text-wrap: pretty; }
 .sd-part { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; margin-top: 12px; }
 .sd-part > * { flex: 1 1 auto; min-height: 0; }
+/* text cards never stretch: the council and review pair take the height of their text card, and the map or the sketch beside it flexes to match */
+.sd-part > .sd-duo { flex: none; align-items: start; }
+.sd-duo > .sd-opts, .sd-duo > .sd-sk { align-self: stretch; }
 .sd-compose { display: flex; gap: 8px; padding: 12px 16px; overflow-x: auto; scrollbar-width: none; border-top: 1px solid var(--sd-soft); }
 .sd-compose::-webkit-scrollbar { display: none; }
 .sd-chip { flex: none; padding: 8px 14px; border: 1px solid var(--line); border-radius: var(--r-pill); background: var(--surface-raised); font-size: 14px; line-height: 20px; white-space: nowrap; }
@@ -100,7 +103,7 @@
 .sd-kv dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .sd-kv b { font-weight: 600; }
 .sd-btn { align-self: flex-start; display: inline-flex; margin-top: 14px; padding: 10px 18px; border-radius: var(--r-pill); background: var(--accent); color: var(--on-accent); font-size: 14px; line-height: 20px; font-weight: 500; }
-.sd-map { position: relative; flex: 1 1 auto; min-height: 64px; margin-top: 12px; overflow: hidden; border: 1px solid var(--sd-soft); border-radius: 8px; }
+.sd-map { position: relative; flex: 1 1 auto; min-height: 40px; overflow: hidden; border: 1px solid var(--sd-soft); border-radius: 8px; }
 .sd-map svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .sd-map .m-bg { fill: var(--surface-raised); }
 .sd-map .m-blk { fill: var(--surface-sunken); }
@@ -110,14 +113,38 @@
 .sd-map .m-pin { fill: var(--accent); stroke: var(--surface-raised); stroke-width: 2.5; }
 .sd-maplbl { position: absolute; left: 8px; bottom: 8px; padding: 2px 8px; border-radius: var(--r-pill); background: var(--surface-raised); box-shadow: 0 0 0 1px var(--sd-soft);
   font-size: 12px; line-height: 16px; color: var(--ink-muted); }
-.sd-opts { display: grid; grid-template-rows: auto; grid-auto-rows: minmax(0, 1fr); gap: 12px; }
+.sd-opts { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.sd-opts > .kicker { margin-top: 6px; }
 .sd-opts > .kicker, .sd-sk > .kicker { line-height: 16px; }
-.sd-opt { display: flex; flex-direction: column; justify-content: center; padding: 14px 16px; border: 1px solid var(--sd-soft); border-radius: var(--sd-card-r); background: var(--surface-raised); }
+.sd-opt { flex: none; padding: 12px 16px; border: 1px solid var(--sd-soft); border-radius: var(--sd-card-r); background: var(--surface-raised); }
 .sd-opt b { display: block; font-size: 15px; line-height: 20px; font-weight: 500; }
 .sd-opt span { font-size: 13px; line-height: 18px; color: var(--ink-muted); }
-.sd-checks { flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; margin-top: 16px; border-top: 1px solid var(--sd-soft); }
+.sd-checks { display: flex; flex-direction: column; margin-top: 16px; border-top: 1px solid var(--sd-soft); }
 .sd-checks li { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--sd-soft); font-size: 14px; line-height: 20px; }
 .sd-checks .sd-st { flex: none; justify-content: center; width: 72px; }
+.sd-checks small { display: none; font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+
+/* text cards keep their natural height; where the answer has more room (the tall canvas, the window) their rows grow roomier,
+   so the card, not an empty band, meets the picture beside it. Wide screens only: phones size the window from the content. */
+@media (min-width: 821px) {
+  .sd-part { container: sd-part / size; }
+  @container sd-part (max-height: 339px) { .sd-mini { gap: 8px; padding: 10px; } .sd-mhero { padding: 0; } .sd-pl { gap: 5px; padding: 8px; } }
+  @container sd-part (min-height: 340px) {
+    .sd-kv { row-gap: 10px; }
+    .sd-checks li { padding: 11px 0; }
+  }
+  @container sd-part (min-height: 520px) {
+    .sd-fine, .sd-findings { padding: 22px 24px; }
+    .sd-kv { row-gap: 0; margin-top: 18px; }
+    .sd-kv dt, .sd-kv dd { padding: 16px 0; border-top: 1px solid var(--sd-soft); }
+    .sd-fine .sd-ct, .sd-findings .sd-ct { font-size: 20px; line-height: 28px; }
+    .sd-fine .sd-btn { margin-top: 22px; padding: 12px 20px; }
+    .sd-checks { margin-top: 18px; }
+    .sd-checks li { padding: 18px 0; }
+    .sd-checks small { display: block; }
+    .sd-checks li > span:last-child { display: grid; gap: 4px; }
+  }
+}
 
 .sd-sk { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .sd-mini { flex: 1 1 auto; display: flex; flex-direction: column; gap: 12px; min-height: 0; padding: 12px; border: 1px solid var(--sd-soft); border-radius: var(--sd-card-r); background: var(--surface-sunken); }
@@ -129,7 +156,7 @@
 .sd-mhero { display: grid; justify-items: center; gap: 6px; padding: 4px 0; }
 .sd-mhero .t { width: 55%; height: 9px; border-radius: 4px; background: var(--line-strong); }
 .sd-mhero .s { width: 38%; height: 5px; border-radius: 3px; background: var(--line); }
-.sd-plans { flex: 1 1 auto; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; min-height: 96px; }
+.sd-plans { flex: 1 1 auto; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; min-height: 72px; }
 .sd-pl { display: flex; flex-direction: column; gap: 6px; padding: 10px; border: 1px solid var(--sd-soft); border-radius: max(2px, calc(var(--sd-card-r) - 4px)); background: var(--surface-raised); }
 .sd-pl.w { box-shadow: 0 0 0 1.5px var(--accent); }
 .sd-pl i { height: 5px; border-radius: 3px; background: var(--surface-sunken); }
