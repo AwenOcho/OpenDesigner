@@ -8,6 +8,7 @@ All notable changes to OpenDesigner are recorded here. The format follows [Keep 
 
 ### Added
 
+- **Research names the answers an assistant should show** (2026-11-16). A research finding can now list answer types (a table, a time to book, a step to approve), each with its evidence. Smart UI's use cases cite those findings by id. A plain keyword count of the research is used only when no finding names a type, and it says so.
 - **Smart UI prepares its answers ahead of time** (2026-11-16). `smartui.py usecases` works out which answers a product needs from its own data, description, research and screens. `templates` then prepares a part for each, bound to the app's data. A question is matched to a prepared part without a model, the part fills as data lands, and the model writes only the sentence.
 - **Smart UI colours and feedback follow the data** (2026-11-16). A value that says "Unpaid" or "Failed" can't be shown as good: the check refuses it. An approval states what a change will do before its button. A change that can be undone gives a toast with Undo, using the system's own toast part.
 - **Plug your own agents into Smart UI** (2026-11-16). `references/your-agents.md` shows how a data agent or a document search sits beside the UI step, and how `show_ui` fills a prepared part over MCP. Smart UI ships no orchestrator.

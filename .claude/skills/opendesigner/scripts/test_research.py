@@ -108,6 +108,41 @@ class Checks(unittest.TestCase):
         rec["findings"][0]["confidence"] = "inferred"
         self.assertEqual(errors(rec), [])
 
+    def test_answer_types_are_checked(self):
+        rec = example()
+        rec["findings"][0]["answer_types"] = [{"type": "spreadsheet", "evidence": "x"}]
+        rec["findings"][1]["answer_types"] = [{"type": "table"}]
+        rec["findings"][2]["answer_types"] = "table"
+        errs = " | ".join(errors(rec))
+        for bit in ("'spreadsheet' is not a known answer type", "'table' needs its evidence", "must be a list"):
+            self.assertIn(bit, errs)
+        rec = example()
+        rec["findings"][0]["answer_types"] = [{"type": "table", "evidence": "they keep a monthly list"}]
+        self.assertEqual(errors(rec), [])
+
+    def test_answer_types_match_smart_ui(self):
+        sys.path.insert(0, str(SKILL.parent / "opendesigner-smart-ui" / "scripts"))
+        import smartui
+        self.assertEqual(list(research.ANSWER_TYPES), [t for t, _, _ in smartui.ANSWER_TYPES])
+
+    def test_use_cases_cite_findings_and_fall_back_to_keywords(self):
+        sys.path.insert(0, str(SKILL.parent / "opendesigner-smart-ui" / "scripts"))
+        import smartui
+        with tempfile.TemporaryDirectory() as t:
+            res = Path(t) / "opendesigner" / "research"
+            res.mkdir(parents=True)
+            (res / "users.md").write_text("They compare plans in a table and a chart.")
+            uc = smartui.use_cases(t)
+            table = next(x for x in uc["answer_types"] if x["type"] == "table")
+            self.assertIn("keyword count", table["reasons"][0])
+            self.assertTrue(any("no research finding names an answer type" in g for g in uc["gaps"]))
+            (res / "users.json").write_text(json.dumps(example()))
+            uc = smartui.use_cases(t)
+            ask = next(x for x in uc["answer_types"] if x["type"] == "ask before a change")
+            self.assertEqual(ask["evidence"], ["research: users.json F7"])
+            self.assertTrue(ask["reasons"][0].startswith("research F7:"))
+            self.assertFalse(any(x["type"] == "table" for x in uc["answer_types"]))  # no keyword count once findings name types
+
     def test_unknown_source_signal_topic_and_confidence_fail(self):
         rec = example()
         rec["findings"][0]["sources"] = ["S99"]
