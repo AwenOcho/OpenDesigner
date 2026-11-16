@@ -868,7 +868,7 @@ class LayoutRules(unittest.TestCase):
         cases = [("place row", {**places, "places": more}, ".odl-place-list .odl-list", ":scope > li", 640, 1200, 24),
                  ("stay gallery", stay, ".odl-stay-card .odl-track", ":scope > .odl-slide", 360, 1200, 24),
                  ("product photos", gallery, ".odl-product-gallery .odl-track", ":scope > .odl-slide", 360, 400, 16),
-                 ("comparison table", comp, ".odl-comparison .odl-scroll", "[role=cell], [role=columnheader]", 600, 1200, 24)]
+                 ("comparison table", comp, ".odl-comparison .odl-scroll", "[role=cell], [role=columnheader]", 600, 1200, "inset")]
         for label, part, sel, items, width, viewport, need in cases:
             with self.subTest(label):
                 self.draw([part], width, viewport=viewport)
@@ -878,8 +878,14 @@ class LayoutRules(unittest.TestCase):
                   s.style.scrollSnapType = 'none'; s.scrollLeft = s.scrollWidth; await new Promise(r => setTimeout(r, 50));
                   const items = [...s.querySelectorAll('{items}')].filter(e => e.getClientRects().length);
                   const right = Math.max(...items.map(e => e.getBoundingClientRect().right));
-                  return s.getBoundingClientRect().right - right;
+                  const end = s.getBoundingClientRect().right - right;
+                  // a table that runs to its card's edges ends as far from the edge as it starts: the card's inset
+                  return {json.dumps(need)} === "inset" ? [end, parseFloat(getComputedStyle(s).paddingInlineStart)] : end;
                 }})()""")
+                if need == "inset":
+                    self.assertNotEqual(gap, "no scroll", f"{label} did not scroll at {width} px")
+                    gap, need = gap
+                    self.assertGreater(need, 0)
                 self.assertNotEqual(gap, "no scroll", f"{label} did not scroll at {width} px")
                 self.assertGreaterEqual(gap, need - 0.5, f"{label}: {gap} px after the last item")
 

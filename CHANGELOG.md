@@ -7,7 +7,7 @@ All notable changes to OpenDesigner are recorded here. The format follows [Keep 
 ## [Unreleased]
 
 ### Fixed
-- **One corner shape per answer** (2026-11-17). Icon tiles, the airline mark and the approval's detail and warning bands now take the buttons' corner radius instead of near-square 2 px corners, and every tag uses the same shape. The flight route has a dot at both ends. The travel demo's chips match its buttons, its mark shows a plane, and its demo settings moved under the composer.
+- **Smart UI answers look like one system** (2026-11-17). Icon tiles and detail panels take the buttons' corners, every tag has one shape, and every answer card has one inset. The fare grid sits centred, the flight route has a dot at both ends, and the receipt lists its details like the approval before it, in the same typeface.
 
 - **Smart UI hides an empty warning band** (2026-11-17). An approval with no warning no longer shows an amber band holding only its icon. When the answer has a fuller line for what the button sends, such as "Standard, 1 checked bag" for the fare, the approval shows that line instead of the raw value.
 

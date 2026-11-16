@@ -220,8 +220,8 @@
       },
       "long_text": {
         "status": "handled",
-        "how": "labels, values, the title and the reference wrap; values never take more than 60% of a row",
-        "evidence": "max-inline-size: 60%"
+        "how": "labels, values, the title and the reference wrap; a label takes a third of the row and its value two thirds, and on a phone the value goes under its label",
+        "evidence": "grid-template-columns: minmax(0, 1fr) minmax(0, 2fr)"
       },
       "missing_image": {
         "status": "none",

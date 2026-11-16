@@ -3191,7 +3191,6 @@
     "--ds-space-inline-sm",
     "--ds-space-inset-lg",
     "--ds-space-inset-md",
-    "--ds-space-inset-xl",
     "--ds-space-inset-xs",
     "--ds-space-stack-lg",
     "--ds-space-stack-sm",
@@ -3224,7 +3223,7 @@
    },
    "files": {
     "html": "components/approval-prompt/component.html",
-    "bytes": 7773,
+    "bytes": 7701,
     "script": false
    },
    "source": null,
@@ -8732,16 +8731,13 @@
     "--ds-size-control-sm",
     "--ds-size-icon-sm",
     "--ds-size-target-min",
-    "--ds-space-16",
     "--ds-space-2",
-    "--ds-space-24",
     "--ds-space-6",
     "--ds-space-inline-md",
     "--ds-space-inline-sm",
     "--ds-space-inset-lg",
     "--ds-space-inset-sm",
     "--ds-space-inset-xl",
-    "--ds-space-inset-xs",
     "--ds-space-stack-lg",
     "--ds-space-stack-md",
     "--ds-space-stack-sm",
@@ -8784,7 +8780,7 @@
    },
    "files": {
     "html": "components/comparison/component.html",
-    "bytes": 18077,
+    "bytes": 18699,
     "script": true
    },
    "source": null,
@@ -14274,7 +14270,7 @@
    },
    "files": {
     "html": "components/flight-results/component.html",
-    "bytes": 22365,
+    "bytes": 22358,
     "script": true
    },
    "source": null,
@@ -28279,8 +28275,8 @@
      },
      "long_text": {
       "status": "handled",
-      "how": "labels, values, the title and the reference wrap; values never take more than 60% of a row",
-      "evidence": "max-inline-size: 60%"
+      "how": "labels, values, the title and the reference wrap; a label takes a third of the row and its value two thirds, and on a phone the value goes under its label",
+      "evidence": "grid-template-columns: minmax(0, 1fr) minmax(0, 2fr)"
      },
      "missing_image": {
       "status": "none",
@@ -28297,6 +28293,7 @@
     "--ds-color-border-focus",
     "--ds-color-border-subtle",
     "--ds-color-surface-raised",
+    "--ds-color-surface-sunken",
     "--ds-color-text-danger",
     "--ds-color-text-info",
     "--ds-color-text-on-action",
@@ -28318,20 +28315,18 @@
     "--ds-size-icon-md",
     "--ds-size-icon-sm",
     "--ds-size-target-min",
+    "--ds-space-2",
     "--ds-space-inline-md",
     "--ds-space-inline-sm",
     "--ds-space-inline-xs",
     "--ds-space-inset-lg",
-    "--ds-space-inset-xl",
+    "--ds-space-inset-md",
     "--ds-space-inset-xs",
     "--ds-space-stack-lg",
-    "--ds-space-stack-md",
     "--ds-space-stack-sm",
     "--ds-text-body-md",
-    "--ds-text-code-md",
     "--ds-text-label-lg",
     "--ds-text-label-md",
-    "--ds-text-label-md-tracking",
     "--ds-text-title-lg",
     "--ds-text-title-md"
    ],
@@ -28358,7 +28353,7 @@
    },
    "files": {
     "html": "components/receipt/component.html",
-    "bytes": 8160,
+    "bytes": 8576,
     "script": false
    },
    "source": null,

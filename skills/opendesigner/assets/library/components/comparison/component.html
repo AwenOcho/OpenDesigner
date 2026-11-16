@@ -3,17 +3,22 @@
 .odl-comparison { --odl-label: minmax(7rem, 0.9fr); --odl-col: minmax(7.5rem, 1fr); box-sizing: border-box; inline-size: 100%; max-inline-size: 44rem; margin-inline: auto; container-type: inline-size;
   color: var(--ds-color-text-primary); font: var(--ds-text-body-md); text-wrap: pretty; }
 .odl-comparison *, .odl-comparison *::before { box-sizing: border-box; }
-.odl-comparison .odl-card { display: grid; gap: var(--ds-space-stack-lg); padding: var(--ds-space-inset-xl); background: var(--ds-color-surface-raised);
-  border: var(--ds-border-width-default) solid var(--ds-color-border-subtle); border-radius: var(--ds-radius-container); box-shadow: var(--ds-elevation-raised); }
+.odl-comparison .odl-card { display: grid; gap: var(--ds-space-stack-lg); padding: var(--odl-inset); background: var(--ds-color-surface-raised);
+  border: var(--ds-border-width-default) solid var(--ds-color-border-subtle); border-radius: var(--ds-radius-container); box-shadow: var(--ds-elevation-raised);
+  /* every answer card has one inset: inset-lg, inset-xl when the card is 38rem or wider (CRAFT 1) */
+  --odl-inset: var(--ds-space-inset-lg); --odl-gap: var(--ds-space-inline-md); --odl-end: max(0px, calc(var(--odl-inset) - var(--odl-gap))); }
+@container (min-width: 38rem) { .odl-comparison .odl-card { --odl-inset: var(--ds-space-inset-xl); } }
 .odl-comparison header { display: grid; gap: var(--ds-space-stack-xs); }
 .odl-comparison h3 { margin: 0; font: var(--ds-text-title-md); overflow-wrap: anywhere; }
 .odl-comparison .odl-note { margin: 0; color: var(--ds-color-text-secondary); font: var(--ds-text-body-md); overflow-wrap: anywhere; }
 /* the table scrolls sideways in its own box when four options do not fit */
-.odl-comparison .odl-scroll { overflow-x: auto; overscroll-behavior-x: contain; margin-inline: calc(var(--ds-space-inset-xs) * -1); padding-inline: var(--ds-space-inset-xs); }
+/* the scroller reaches the card's edges, so the columns sit centred in the card's inset; when the table scrolls it runs
+   edge to edge, starting after the inset and ending on a spacer column of the same width (never the scroller's padding) */
+.odl-comparison .odl-scroll { overflow-x: auto; overscroll-behavior-x: contain; margin-inline: calc(var(--odl-inset) * -1); padding-inline-start: var(--odl-inset); }
 .odl-comparison .odl-table { display: grid; min-inline-size: 100%; }
 /* when the table scrolls, the last column never meets the edge: a spacer column ends each row (never the scroller's padding) */
 .odl-comparison [role="row"]::after { content: ""; }
-.odl-comparison [role="row"] { display: grid; grid-template-columns: var(--odl-label) repeat(var(--odl-cols, 3), var(--odl-col)) calc(var(--ds-space-24) - var(--ds-space-inline-md)); column-gap: var(--ds-space-inline-md); }
+.odl-comparison [role="row"] { display: grid; grid-template-columns: var(--odl-label) repeat(var(--odl-cols, 3), var(--odl-col)) var(--odl-end); column-gap: var(--odl-gap); }
 .odl-comparison .odl-vals { display: contents; }
 .odl-comparison .odl-head { align-items: stretch; padding-block-end: var(--ds-space-stack-md); }
 /* the badge sits above its option's name; the other options keep that much room so the names line up */
@@ -54,7 +59,9 @@
 .odl-comparison .odl-opt:has(.odl-badge) .odl-choose:hover { background: var(--ds-color-bg-action-primary-hover); }
 .odl-comparison .odl-choose:disabled, .odl-comparison .odl-opt:has(.odl-badge) .odl-choose:disabled { cursor: not-allowed; border-color: var(--ds-color-border-subtle); background: var(--ds-color-bg-neutral-subtle); color: var(--ds-color-text-secondary); }
 .odl-comparison .odl-choose:focus-visible { outline: var(--ds-focus-ring-width) solid var(--ds-color-border-focus); outline-offset: var(--ds-focus-ring-offset); }
-.odl-comparison .odl-row { padding-block: var(--ds-space-stack-md); border-block-start: var(--ds-border-width-default) solid var(--ds-color-border-separator); align-items: start; }
+/* the divider stops where the last column stops, not at the end of the spacer */
+.odl-comparison .odl-row { padding-block: var(--ds-space-stack-md);
+  background: linear-gradient(var(--ds-color-border-separator), var(--ds-color-border-separator)) 0 0 / calc(100% - var(--odl-end) - var(--odl-gap)) var(--ds-border-width-default) no-repeat; align-items: start; }
 .odl-comparison .odl-row:last-child { padding-block-end: 0; }
 .odl-comparison .odl-label { color: var(--ds-color-text-secondary); font: var(--ds-text-label-lg); overflow-wrap: anywhere; }
 .odl-comparison .odl-val { min-inline-size: 0; }
@@ -67,8 +74,8 @@
 /* Phone: each attribute's name sits on its own line above the values, so every column gets the full width. Three options
    stay side by side rather than scrolling, so the recommended one (often the last) is never off-screen. */
 @container (max-width: 34rem) {
-  .odl-comparison .odl-card { padding: var(--ds-space-inset-lg); }
-  .odl-comparison [role="row"] { grid-template-columns: repeat(var(--odl-cols, 3), minmax(4.5rem, 1fr)) calc(var(--ds-space-16) - var(--ds-space-inline-sm)); column-gap: var(--ds-space-inline-sm); row-gap: var(--ds-space-stack-xs); }
+  .odl-comparison .odl-card { --odl-gap: var(--ds-space-inline-sm); }
+  .odl-comparison [role="row"] { grid-template-columns: repeat(var(--odl-cols, 3), minmax(4.5rem, 1fr)) var(--odl-end); column-gap: var(--odl-gap); row-gap: var(--ds-space-stack-xs); }
   .odl-comparison .odl-corner { display: none; }
   .odl-comparison .odl-label { grid-column: 1 / -1; position: sticky; inset-inline-start: 0; justify-self: start; }
 }
@@ -82,7 +89,7 @@
 /* with photos, the photos line up at the top and the room kept for a badge sits under each photo instead */
 /* products with photos: no empty corner above the attribute names; each name sits on its own line over the values,
    at every width, so the photos start at the left edge */
-.odl-comparison:has(.odl-opt:not([hidden]) .odl-thumb) [role="row"] { grid-template-columns: repeat(var(--odl-cols, 3), minmax(4.5rem, 1fr)) calc(var(--ds-space-24) - var(--ds-space-inline-md)); row-gap: var(--ds-space-stack-xs); }
+.odl-comparison:has(.odl-opt:not([hidden]) .odl-thumb) [role="row"] { grid-template-columns: repeat(var(--odl-cols, 3), minmax(4.5rem, 1fr)) var(--odl-end); row-gap: var(--ds-space-stack-xs); }
 .odl-comparison:has(.odl-opt:not([hidden]) .odl-thumb) .odl-corner { display: none; }
 .odl-comparison:has(.odl-opt:not([hidden]) .odl-thumb) .odl-label { grid-column: 1 / -1; position: sticky; inset-inline-start: 0; justify-self: start; }
 </style>
