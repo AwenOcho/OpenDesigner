@@ -336,8 +336,9 @@ def states(name):
             + "".join(f'<button type="button" data-s="{k}" aria-pressed="{str(k == "normal").lower()}">{t}</button>' for k, t in STATES) + "</span></span>")
 
 
-def stage(name, tab, views, cls):
-    return (f'<div class="sd {cls}" data-sd="{name}" data-tab="{tab}"><div class="sd-stage">'
+def stage(name, tab, views, cls, look=""):
+    """look: a class on the stage itself, so the controls under it keep the page's own colours."""
+    return (f'<div class="sd {cls}" data-sd="{name}" data-tab="{tab}"><div class="sd-stage{" " + look if look else ""}">'
             f'<div class="sd-bar">{tabs(tab)}<span class="sd-rec">Recorded answers</span></div>{views}{island(tab)}'
             f'<div class="sd-toasts" role="status" aria-live="polite"></div><p class="vh" data-live aria-live="polite"></p></div>'
             f'<div class="sd-under">{states(name)}</div></div>')
@@ -368,7 +369,7 @@ def answers_section(b, n):
     seg = lambda label, attr, items, on: (f'<span class="sd-ctl{" sd-laywrap" if attr == "l" else ""}"><span class="sd-lbl" id="sd-lbl-{attr}">{label}</span>'
                                           f'<span class="sd-seg" role="group" aria-labelledby="sd-lbl-{attr}">'
                                           + "".join(f'<button type="button" data-{attr}="{k}" aria-pressed="{str(k == on).lower()}">{t}</button>' for k, t, *_ in items) + "</span></span>")
-    st_ = stage("any", "places", f'<div class="sd-view sd-v1" data-v="1">{view("places", 1)}</div>', "sd-any sd-lay-1 sd-look-blue")
+    st_ = stage("any", "places", f'<div class="sd-view sd-v1" data-v="1">{view("places", 1)}</div>', "sd-any sd-lay-1", "sd-look-blue")
     return f"""
 <section class="h-sec" id="any-look">
 <div class="h-head">{b.idx(n, "Layouts and looks")}<h2 class="h-h2">One answer. Any layout, any look.</h2></div>

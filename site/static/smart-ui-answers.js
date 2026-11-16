@@ -154,7 +154,8 @@
     const vs = views(box);
     if (box.name === "any") {
       const v = mq.matches ? 1 : box.lay;
-      box.el.className = `sd sd-any sd-lay-${v} sd-look-${box.look}`;
+      box.el.className = `sd sd-any sd-lay-${v}`;
+      box.el.querySelector(".sd-stage").className = `sd-stage sd-look-${box.look}`;
       vs[0].className = `sd-view sd-v${v}`;
       vs[0].dataset.v = v;
     }

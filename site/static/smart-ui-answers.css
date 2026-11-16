@@ -15,7 +15,7 @@
 
 /* the stage: page width, tinted, one height */
 .sd-stage { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; gap: 20px; height: 792px; padding: var(--sd-pad);
-  border-radius: var(--sd-stage-r); background: var(--sd-stage-bg); }
+  border-radius: var(--sd-stage-r); background: var(--sd-stage-bg); color: var(--ink); }
 .sd .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .sd-stage > * { min-width: 0; }
 .sd-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 44px; }
@@ -115,7 +115,7 @@
 .sd-side .sd-plb { flex: 1 1 0; min-width: 0; align-content: center; }
 
 /* the fine with its map, the options, the findings and the page sketch: two columns from one top to one bottom */
-.sd-duo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: stretch; }
+.sd-duo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
 .sd-card { display: flex; flex-direction: column; min-width: 0; padding: 16px 20px; border: 1px solid var(--sd-soft); border-radius: var(--sd-card-r); background: var(--surface-raised); }
 .sd-cardh { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
 .sd-ct { font-size: 17px; line-height: 24px; font-weight: 500; }
@@ -149,8 +149,8 @@
    only: on phones the window is sized from the content. In one column every picture keeps its aspect ratio (see below). */
 @media (min-width: 821px) {
   @container sd-win (min-width: 760px) {
-    .sd-part { container: sd-part / size; }
-    .sd-duo .sd-pic { flex: 1 1 auto; aspect-ratio: auto; min-height: 40px; max-height: none; }
+    .sd-canvas .sd-part, .sd-v1 .sd-part { container: sd-part / size; }
+    .sd-duo .sd-pic { flex: 1 1 auto; aspect-ratio: auto; min-height: 100px; max-height: none; }
   }
   @container sd-part (max-height: 339px) { .sd-mini { gap: 8px; padding: 10px; } .sd-mhero { padding: 0; } .sd-pl { gap: 5px; padding: 8px; } }
   @container sd-part (max-height: 300px) {
@@ -164,7 +164,9 @@
     .sd-side2 { gap: 6px; }
     .sd-opt { padding: 7px 12px; }
   }
-  @container sd-part (min-height: 340px) { .sd-kv { row-gap: 10px; } }
+  @container sd-part (min-height: 420px) { .sd-kv { row-gap: 10px; } }
+  @container sd-part (max-height: 420px) { .sd-duo .sd-pic { min-height: 40px; } .sd-plans { min-height: 40px; } .sd-mini .sd-faq, .sd-mini .sd-mhero { display: none; } .sd-side2 { gap: 6px; } .sd-opt { padding: 8px 12px; } }
+  @container sd-part (min-height: 340px) and (max-height: 420px) { .sd-checks li { padding: 10px 0; } .sd-checks { margin-top: 12px; } .sd-mini { gap: 8px; padding: 10px; } }
   @container sd-part (min-height: 480px) {
     .sd-duo .sd-tcard { padding: 22px 24px; }
     .sd-duo .sd-kv { row-gap: 0; margin-top: 18px; }
@@ -277,8 +279,9 @@
 .sd-note { flex: none; align-self: flex-start; padding: 10px 14px; border-radius: var(--sd-card-r); background: var(--surface-sunken); font-size: 13px; line-height: 18px; color: var(--ink-muted); }
 .sd-state .sd-sub { margin-top: 6px !important; }
 /* a state card or a text-only note sits in the middle of a tall answer area, like an empty state in an app */
-.sd-canvas .sd-part > .sd-state, .sd-canvas .sd-part > .sd-note { margin-block: auto; align-self: center; width: min(100%, 440px); }
-.sd-canvas .sd-part > .sd-tcard:not(.sd-state) { margin-block: auto; align-self: center; width: min(100%, 560px); }
+.sd-part > .sd-state, .sd-part > .sd-note { margin-block: auto; align-self: center; width: min(100%, 440px); }
+.sd-part > .sd-tcard:not(.sd-state) { margin-block: auto; }
+.sd-canvas .sd-part > .sd-tcard:not(.sd-state) { align-self: center; width: min(100%, 560px); }
 .sd-state .sd-acts, .sd-approve .sd-acts { display: flex; flex-wrap: wrap; gap: 8px; }
 .sd-approve .sd-warnl { margin-top: 12px !important; font-size: 13px; line-height: 18px; color: var(--warn); }
 .sd-under { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 16px; }
@@ -298,13 +301,13 @@
 .sd-track b { font-weight: 500; }
 .sd-track small { font-size: 12px; line-height: 16px; color: var(--ink-muted); }
 .sd-meter { display: flex; align-items: baseline; gap: 12px; }
-.sd-meter b { font: 300 40px/44px "Hanken Grotesk", system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+.sd-meter b { font: 300 36px/40px "Hanken Grotesk", system-ui, sans-serif; font-variant-numeric: tabular-nums; }
 .sd-meter span { font-size: 14px; line-height: 20px; color: var(--ink-muted); }
 .sd-bar { display: block; height: 8px; overflow: hidden; border-radius: 4px; background: var(--surface-sunken); }
 .sd-bar > i { display: block; height: 100%; border-radius: 4px; background: var(--accent); }
 .sd-bar.bad > i { background: var(--bad); }
 .sd-bar.big { height: 12px; margin-top: 12px; border-radius: 6px; }
-.sd-bars { display: grid; gap: 10px; margin-top: 18px; }
+.sd-bars { display: grid; gap: 6px; margin-top: 12px; }
 .sd-bars li { display: grid; grid-template-columns: 96px minmax(0, 1fr) 40px; align-items: center; gap: 12px; font-size: 13px; line-height: 18px; }
 .sd-bars b { font-weight: 500; text-align: right; font-variant-numeric: tabular-nums; }
 .sd-bas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
