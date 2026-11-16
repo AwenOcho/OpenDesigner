@@ -24,7 +24,7 @@ import urllib.request
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import library_page  # noqa: E402  (the component library page, /library/)
 import tour_page  # noqa: E402  (how OpenDesigner works, drawn live: /tour/)
-import smart_ui_page  # noqa: E402  (Smart UI with its live demo: /smart-ui/)
+import smart_ui_page  # noqa: E402  (Smart UI with its recorded demo: /smart-ui/)
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SITE = ROOT / "site"
@@ -1421,9 +1421,9 @@ def home(pages, facts, faq):
 <section class="h-sec h-smart" id="smart-ui">
 <div class="h-split">
 <div><div class="h-head">{idx("08", "Smart UI")}<h2 class="h-h2">Answers made of your own components.</h2>
-<p class="h-lede">Ask for flights and get a list you can book, drawn with your components and tokens. Every answer is checked before it shows.</p>
-<p class="h-more"><a class="h-link" href="{smart_ui_page.PATH}">Try the live demo {ARROW}</a></p></div></div>
-<figure class="su-preview">{su_stage}<figcaption class="h-fine">Live HTML: a recorded answer, drawn by the real renderer. Photo: {su_credit} on Unsplash.</figcaption></figure>
+<p class="h-lede">Ask a council's assistant about a fine and get the fine, with a Pay button that asks first. The parts are made ahead of time from your library and filled from your data.</p>
+<p class="h-more"><a class="h-link" href="{smart_ui_page.PATH}">Watch the recorded demo {ARROW}</a></p></div></div>
+<figure class="su-preview">{su_stage}<figcaption class="h-fine">Recorded answer. No model runs here. Photo: {su_credit} on Unsplash.</figcaption></figure>
 </div>
 </section>
 
@@ -1542,6 +1542,10 @@ def doc_page(p, pages):
     if p["slug"] == "faq":
         ld.append({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
             {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": plain(a)}} for q, a in faq_items(p["body"])]})
+    if p["slug"] == "smart-ui-quickstart":
+        steps = re.findall(r"^## \d+\. (.+)$", p["body"], re.M)
+        ld.append({"@context": "https://schema.org", "@type": "HowTo", "name": p["title"], "description": p["description"],
+                   "step": [{"@type": "HowToStep", "position": i + 1, "name": s, "url": f'{SITE_URL}{p["path"]}#{slugify(f"{i + 1}. {s}")}'} for i, s in enumerate(steps)]})
     if p["slug"] == "install":
         ld.append({"@context": "https://schema.org", "@type": "HowTo", "name": "Install OpenDesigner in Claude Code", "step": [
             {"@type": "HowToStep", "text": "/plugin marketplace add ckryptickunal/OpenDesigner"},
@@ -2031,6 +2035,7 @@ def og_images(pages):
     for p in pages:
         kicker = "Docs" if p["slug"] == "index" else f'Docs · {p["section"]}'
         jobs[f'docs/{p["slug"]}.jpg'] = ("file", card.replace("{{KICKER}}", esc(kicker)).replace("{{TITLE}}", esc(p["title"])))
+    jobs["smart-ui.jpg"] = ("file", card.replace("{{KICKER}}", "Smart UI").replace("{{TITLE}}", esc(smart_ui_page.H1)))
     jobs["showcase.png"] = ("post", K.statement("cobalt", 'B2B screens, styles and more. <span class="od-strong">One process.</span>',
                                                 "Built by AI agents through OpenDesigner. Every brand is invented.", "Showcase", 1200, 630, "social-subhead"))
     digest = lambda h: hashlib.sha256(h.encode()).hexdigest()
@@ -2096,7 +2101,10 @@ LLMS_QUESTIONS = [
     ("How do I audit an existing web app for inconsistent spacing, colors and fonts?", ["/docs/existing-product/", "/docs/faq/"]),
     ("Is there a tool that finds hard-coded colors and spacing in my code and moves them to design tokens?", ["/docs/engineers/", "/docs/faq/"]),
     ("How do I extract a design system from an existing website, or adapt mine to a site I like?", ["/docs/existing-product/"]),
-    # Smart UI (generative UI with your own components, probe G1 to G3) is left out on purpose until Kunal approves its demo (2026-11-13).
+    # Smart UI: generative UI with your own components (probe G1 to G3; Kunal approved the page, 2026-11-14)
+    ("How do I add generative UI to my chatbot that uses my own design system components?", ["/smart-ui/", "/docs/smart-ui-quickstart/"]),
+    ("How can an AI assistant render UI components instead of text, using my brand's components?", ["/smart-ui/", "/docs/smart-ui/"]),
+    ("What is generative UI, and how do I make it match my design system?", ["/docs/smart-ui/", "/smart-ui/"]),
     ("Is there a free component library built on design tokens?", ["/library/"]),
     ("Is there a component library my AI agent can fetch, or use over MCP?", ["/docs/library-mcp/", "/library/"], "/docs/library-mcp/"),
     ("How do I design empty, loading and error states?", ["/docs/states/", "/library/empty-state/", "/docs/ux-patterns/"], "/docs/states/"),
@@ -2108,7 +2116,7 @@ LLMS_QUESTIONS = [
 
 
 def llms_questions(pages):
-    titles = {p["path"]: p["title"] for p in pages} | {"/library/": "Component library", tour_page.PATH: "How OpenDesigner works"}
+    titles = {p["path"]: p["title"] for p in pages} | {"/library/": "Component library", tour_page.PATH: "How OpenDesigner works", smart_ui_page.PATH: "Smart UI"}
     titles |= {f"/library/{c['slug']}/": c["name"] for c in library_page.components()}
     out = []
     for q, paths, *needs in LLMS_QUESTIONS:
@@ -2134,6 +2142,8 @@ def llms_txt(pages):
 OpenDesigner is free and open source (MIT for code, skills and data; CC BY 4.0 for docs). It is packaged for Claude Code, the Claude app, ChatGPT, Codex, Cursor, VS Code with Copilot, Gemini CLI and other tools that read Agent Skills. The engine is one Python file (standard library only, no network). It starts with a sketch of up to five questions and zooms in only where the person wants. It asks a person for the logo, icons, illustration, photography, brand typeface and voice instead of faking them. The repository was created on 2026-09-23; it is early, and no watched user trials have happened yet.
 
 For the whole system on one page, read [How OpenDesigner works]({SITE_URL}{tour_page.PATH}index.md).
+
+Smart UI, an optional part of OpenDesigner, is generative UI made from the person's own design system: an assistant answers with parts prepared ahead of time from their component library, filled from their app's data and checked before they render. Read [Smart UI]({SITE_URL}{smart_ui_page.PATH}index.md).
 
 ## Questions people ask, and the page that answers each
 
@@ -2295,7 +2305,7 @@ def main():
     library_page.add(sys.modules[__name__], files, mds, library_paths)  # /library/: the optional component library (its own module)
     tour_paths = []
     tour_page.add(sys.modules[__name__], files, mds, tour_paths)  # /tour/: how OpenDesigner works, drawn live (its own module)
-    smart_ui_page.add(sys.modules[__name__], files, mds, tour_paths)  # /smart-ui/ and its live demo at /smart-ui/demo/ (its own module)
+    smart_ui_page.add(sys.modules[__name__], files, mds, tour_paths)  # /smart-ui/, its recorded demo, and the renderer demo at /smart-ui/demo/ (its own module)
     for rel, text in {**files, **mds}.items():
         if rel.endswith(".html") and not rel.startswith("library/"):  # the library's parts keep their own markup
             text = caps_spans(text)

@@ -127,7 +127,7 @@
   // and with reduced motion nothing is hidden at all. Printing shows everything.
   window.addEventListener("beforeprint", function () { document.querySelectorAll(".reveal-wait").forEach(function (el) { el.classList.remove("reveal-wait"); }); });
   if ("IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    var groups = ".h-head, .h-steps > li, .who > a, .bento > article, .craft > a, .ex-grid > a, .demo, .tabs:not(.demo), .h-split > *, .faq, .h-zoom, .h-end-card, .home .fig:not(.home-hero)";
+    var groups = ".h-steps > li, .who > a, .bento > article, .craft > a, .ex-grid > a, .demo, .tabs:not(.demo), .h-split > *, .faq, .h-zoom, .h-end-card, .home .fig:not(.home-hero)";
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (en) {
         if (!en.isIntersecting) return;

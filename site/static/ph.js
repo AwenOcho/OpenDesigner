@@ -89,7 +89,14 @@
         b.remove();  // recording starts from the next page, in full mode
       });
     };
-    if (document.body) setTimeout(show, 1500); else document.addEventListener("DOMContentLoaded", function () { setTimeout(show, 1500); });
+    // a page that opens on a live demo (/smart-ui/) shows the card only once the demo has left the screen, so it never covers it
+    var later = function () {
+      var demo = document.querySelector(".su-hero .sl-app");
+      if (!demo || !("IntersectionObserver" in window)) { setTimeout(show, 1500); return; }
+      var io = new IntersectionObserver(function (es) { if (!es[0].isIntersecting) { io.disconnect(); setTimeout(show, 300); } });
+      io.observe(demo);
+    };
+    if (document.body) later(); else document.addEventListener("DOMContentLoaded", later);
   }
 
   // site-wide intent: GitHub, install, booking and any copy button (commands, prompts)

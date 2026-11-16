@@ -537,3 +537,15 @@ Updated onto today's `main` by a session, as a fast-forward each time.
 - **Decision:** the owner said yes in chat on 2026-11-13 ("Yes, close all three"). Each was closed at about 16:50 IST with a short comment saying why. Issues 20, 21 and 22 stay open.
 - **Note:** on each PR, Vercel's GitHub app commented that the account was "attempting to deploy a commit" to the owner's Vercel team. Vercel waits for approval before deploying a fork's commit. Whether preview deploys from forks stay on is the owner's setting.
 - **Lesson:** a pull request from an agent run in bulk is reviewed like any other, but "merge after changes" assumes someone will make the changes. Check the author's history first.
+
+## Tenth review: PR 152, Smart UI picture parts (2026-11-16)
+
+| PR | What | Head | Result |
+|---|---|---|---|
+| #152 | Picture-based Smart UI parts: product grid, place list and card, recipe, event and home listing; photos in product detail, stay card and comparison; rules R5-alt, R5-ratio, R6-currency, R6-stock | `71727091` and the merge of main | merged as `b2982e01` |
+
+- **Who:** the Smart UI session (S6), from a brief by the coordinator after the owner asked for picture answers.
+- **Security:** `scan_pr.py` gave 1 BLOCK: an optional Playwright import inside a browser test (`LayoutRules`), guarded by `ImportError` and skipped without it. The same pattern is already on main. The only `fetch` is a test page reading its own `catalog.json` from a temp folder. No storage, eval or outside calls in the library components.
+- **Tested** on a merge into main: `test_smartui.py` (57 tests), `sync_skills.py`, `build_data.py`, `build_dist.py`, `library.py check` (129 components), `jev_nav.py check`, `changelog_check.py`, `check_links.py` and `design_evals.py` (180 of 180 required) passed. Renders looked at: place list 1440 light, event card in three layouts dark.
+- **Decision:** the coordinator merged it under the owner's standing authorisation to merge after verification.
+- **Open:** the 10 coat and café photographers are "not confirmed" in the photo ledger, because Unsplash blocks automated reading. Read the names off unsplash.com before the next release. Coat photo `photo-1565532070333-43edd7d75c90` was dropped: its hanger shows a brand logo.

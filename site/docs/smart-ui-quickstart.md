@@ -4,7 +4,7 @@ seo_title: "Add generative UI to your chatbot with your own components"
 description: Add OpenDesigner Smart UI to a chatbot you already have: scope the repo, confirm the parts, write the catalog, then check and render each answer.
 section: Guides
 order: 9
-updated: 2026-11-13
+updated: 2026-11-14
 ---
 
 This guide sets up your assistant to answer by rendering your own components instead of plain text. You need an assistant in your product (or a plan for one) and an OpenDesigner system. No system yet? Run the five-question sketch first: it takes a few minutes. Smart UI comes with OpenDesigner, so there's nothing more to install. Ask your AI: "Add Smart UI to our assistant."
@@ -28,9 +28,17 @@ python3 smartui.py catalog --allow-images images.your-cdn.example
 
 The catalog lands in `opendesigner/smart-ui/`. Images and links are off until you name the hosts they may come from.
 
-## 3. Send the right parts with each message
+## 3. Make parts ahead of time
 
-Before each call to your model, add the prompt for that message. It holds the rules and only the parts that fit:
+```
+python3 smartui.py templates --app server.py --write
+```
+
+Each read action your assistant can call gets a part bound to the shape of its real result, saved in `opendesigner/smart-ui/templates.json`. Fix the titles and labels, and pick which fields show. At run time a prepared part fills from the data by code, and the model writes only the sentence. Colours come from the data: you map values to your status tokens ("Unpaid" to warning, anything else to success).
+
+## 4. Send the right parts with each message
+
+For a question no prepared part covers, the model writes the part. Before each call to your model, add the prompt for that message. It holds the rules and only the parts that fit:
 
 ```
 python3 smartui.py prompt --for "Flights from Bristol to Lisbon on 4 December" --data flights.json
@@ -38,7 +46,7 @@ python3 smartui.py prompt --for "Flights from Bristol to Lisbon on 4 December" -
 
 The model answers in text, plus one block of A2UI messages when a part helps.
 
-## 4. Check and show the answer
+## 5. Check and show the answer
 
 In the browser, `<od-surface>` checks the answer and draws it:
 
@@ -56,7 +64,7 @@ In the browser, `<od-surface>` checks the answer and draws it:
 
 On a server, the same check runs in Python: `smartui.py validate reply.txt --source data.json`.
 
-## 5. Audit it
+## 6. Audit it
 
 ```
 python3 smartui.py audit --fixtures
@@ -67,3 +75,7 @@ Every part you confirmed renders in every state, at 320, 375 and 1440 px, at 200
 ## In Claude or ChatGPT
 
 The OpenDesigner MCP server adds a `show_ui` tool and a view, so the same parts show inside hosts that support MCP Apps. See [where it runs](/docs/smart-ui-adapters/).
+
+## Use your own agents
+
+Smart UI doesn't run your agents. Your code fetches the data and calls the model, and Smart UI is the UI step beside them. Its events tell your page what to draw as they come: the tool call, the outline, the part filled so far, the sentence, and optionally your agents' steps. The event list and an example data agent over documents are in the [guide to using your own agents](https://github.com/ckryptickunal/OpenDesigner/blob/main/skills/opendesigner-smart-ui/references/your-agents.md).

@@ -36,7 +36,7 @@ NOT_CARDS = ["a.btn", "button", "[role=tab]", "input", "select", "textarea", ".c
              ".odl-acts > a", ".odl-actions > a"]  # controls, also when drawn in figures; a link in a library actions row is drawn as a button
 PANELS = [".fig", ".fig-panel", ".fig-scene", ".demo-stage", ".h-end-photo", ".h-end-card", ".starts", ".tree"]  # check 2 looks inside these too
 GALLERIES = [".pieces", ".ex-grid", ".bento"]  # named in a partly filled last row warning
-SCROLL_OK = [".prose .code pre", ".prose .table-wrap", ".sl-track", ".filters"]  # may scroll sideways on purpose (a carousel; tag filters on phones)
+SCROLL_OK = [".prose .code pre", ".prose .table-wrap", ".sl-track", ".filters", ".rss", ".sl-log", ".sl-chips", ".ths", ".cmp", ".sb-steps", ".sd-seg", ".sd-compose"]  # may scroll sideways on purpose (a carousel; tag filters on phones; the Smart UI page's screen strip, its demo's tabs and question chips)
 STUCK_OK = [".sticker", ".piece-stuck", ".a-stamp", ".a-rstamp"]  # sit on corners on purpose: never an overlap
 MARKS_OK = [".a-call", ".a-dim", ".a-crop", ".a-reg", ".a-stamp"]  # proof marks drawn outside a box on purpose: their text may pass its edge
 # Scaled previews (the component library): a live component laid out at its design width and zoomed down to a card, an aisle
@@ -230,7 +230,10 @@ MEASURE = r"""(cfg) => {
   for (let i = 0; i < pool.length; i++) for (let j = i + 1; j < pool.length; j++) {
     const a = pool[i], b = pool[j];
     if (a.contains(b) || b.contains(a)) continue;
-    const ra = R(a), rb = R(b), w = Math.min(ra.right, rb.right) - Math.max(ra.left, rb.left), h = Math.min(ra.bottom, rb.bottom) - Math.max(ra.top, rb.top);
+    // a box inside a container that scrolls on purpose is seen only through that container's window
+    const shown = e => { const r = R(e), s = e.parentElement && e.parentElement.closest(any(cfg.scrollOk)); if (!s) return r; const q = R(s);
+      return { left: Math.max(r.left, q.left), right: Math.min(r.right, q.right), top: Math.max(r.top, q.top), bottom: Math.min(r.bottom, q.bottom) }; };
+    const ra = shown(a), rb = shown(b), w = Math.min(ra.right, rb.right) - Math.max(ra.left, rb.left), h = Math.min(ra.bottom, rb.bottom) - Math.max(ra.top, rb.top);
     if (w > 2 && h > 2) add("overlap", "error", a, `overlaps ${path(b)} by ${px(w)} × ${px(h)} px`, [ra, rb]);
   }
 
@@ -267,7 +270,7 @@ MEASURE = r"""(cfg) => {
       if (scrolls(e)) sc = true;
       if (clips(e)) cut = true;
     }
-    if (sc) continue;  // scrolled content belongs to check 2
+    if (sc || el.closest(any(cfg.scrollOk))) continue;  // scrolled content belongs to check 2 (also a card inside an on-purpose scroller)
     const c = card && R(card);
     if (r.right > vw + 1 || r.left < -1 || (c && (r.right > c.right + 1 || r.left < c.left - 1))) r = ink(n, r);
     const word = `"${n.textContent.trim().slice(0, 40)}"`;
