@@ -1,0 +1,620 @@
+{
+ "about": "Parts made ahead of time for this app's read actions, bound to their data (smartui.py templates). live.py fills them by code; the model writes only the sentence.",
+ "templates": [
+  {
+   "action": "list_fines",
+   "intent": "a parking fine",
+   "when": "count(fines[status=Unpaid]) == 1",
+   "part": {
+    "component": "KeyFacts",
+    "title": "Unpaid parking fine",
+    "subtitle": "Vehicle {vehicle}",
+    "facts": [
+     {
+      "label": "Reference",
+      "value": "{fines[status=Unpaid][0].reference}"
+     },
+     {
+      "label": "Date",
+      "value": "{fines[status=Unpaid][0].date_in_words}, {fines[status=Unpaid][0].time}"
+     },
+     {
+      "label": "Place",
+      "value": "{fines[status=Unpaid][0].location}"
+     },
+     {
+      "label": "Reason",
+      "value": "{fines[status=Unpaid][0].contravention}"
+     },
+     {
+      "label": "Full amount",
+      "value": "{fines[status=Unpaid][0].amount}"
+     },
+     {
+      "when": "fines[status=Unpaid][0].status == Unpaid",
+      "then": {
+       "label": "Pay by {fines[status=Unpaid][0].discount_ends}",
+       "value": "{fines[status=Unpaid][0].discounted_amount}",
+       "tone": "accent",
+       "note": "The lower amount ends on {fines[status=Unpaid][0].discount_ends}. After that it is {fines[status=Unpaid][0].amount}."
+      }
+     },
+     {
+      "when": "fines[status=Unpaid][0].status == Unpaid",
+      "then": {
+       "label": "Challenge by",
+       "value": "{fines[status=Unpaid][0].challenge_until}"
+      }
+     },
+     {
+      "label": "Status",
+      "value": "{fines[status=Unpaid][0].status}",
+      "tone": {
+       "tone": "fines[status=Unpaid][0].status",
+       "map": {
+        "Unpaid": "warning",
+        "Paid*": "success"
+       }
+      }
+     }
+    ],
+    "action": {
+     "when": "fines[status=Unpaid][0].status == Unpaid",
+     "then": {
+      "label": "Pay {fines[status=Unpaid][0].to_pay_now}",
+      "event": {
+       "name": "pay_fine",
+       "context": {
+        "reference": "{fines[status=Unpaid][0].reference}"
+       }
+      }
+     }
+    }
+   }
+  },
+  {
+   "action": "list_fines",
+   "intent": "parking fines",
+   "part": {
+    "component": "DataTable",
+    "title": "Parking fines for {vehicle}",
+    "columns": [
+     {
+      "label": "Reference"
+     },
+     {
+      "label": "Date"
+     },
+     {
+      "label": "Time"
+     },
+     {
+      "label": "Location"
+     },
+     {
+      "label": "Contravention"
+     }
+    ],
+    "rows": {
+     "each": "fines",
+     "item": {
+      "cells": [
+       {
+        "text": "{.reference|or:–}"
+       },
+       {
+        "text": "{.date_in_words|or:–}"
+       },
+       {
+        "text": "{.time|or:–}"
+       },
+       {
+        "text": "{.location|or:–}"
+       },
+       {
+        "text": "{.contravention|or:–}"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "action": "get_fine",
+   "intent": "one parking fine",
+   "when": "fine.status == Unpaid",
+   "part": {
+    "component": "KeyFacts",
+    "title": "Unpaid parking fine",
+    "facts": [
+     {
+      "label": "Reference",
+      "value": "{fine.reference}"
+     },
+     {
+      "label": "Date",
+      "value": "{fine.date_in_words}, {fine.time}"
+     },
+     {
+      "label": "Place",
+      "value": "{fine.location}"
+     },
+     {
+      "label": "Reason",
+      "value": "{fine.contravention}"
+     },
+     {
+      "label": "Full amount",
+      "value": "{fine.amount}"
+     },
+     {
+      "when": "fine.status == Unpaid",
+      "then": {
+       "label": "Pay by {fine.discount_ends}",
+       "value": "{fine.discounted_amount}",
+       "tone": "accent",
+       "note": "The lower amount ends on {fine.discount_ends}. After that it is {fine.amount}."
+      }
+     },
+     {
+      "when": "fine.status == Unpaid",
+      "then": {
+       "label": "Challenge by",
+       "value": "{fine.challenge_until}"
+      }
+     },
+     {
+      "label": "Status",
+      "value": "{fine.status}",
+      "tone": {
+       "tone": "fine.status",
+       "map": {
+        "Unpaid": "warning",
+        "Paid*": "success"
+       }
+      }
+     }
+    ],
+    "action": {
+     "when": "fine.status == Unpaid",
+     "then": {
+      "label": "Pay {fine.to_pay_now}",
+      "event": {
+       "name": "pay_fine",
+       "context": {
+        "reference": "{fine.reference}"
+       }
+      }
+     }
+    }
+   }
+  },
+  {
+   "action": "get_fine",
+   "intent": "one parking fine",
+   "when": "fine",
+   "part": {
+    "component": "KeyFacts",
+    "title": "Parking fine",
+    "facts": [
+     {
+      "label": "Reference",
+      "value": "{fine.reference}"
+     },
+     {
+      "label": "Date",
+      "value": "{fine.date_in_words}, {fine.time}"
+     },
+     {
+      "label": "Place",
+      "value": "{fine.location}"
+     },
+     {
+      "label": "Reason",
+      "value": "{fine.contravention}"
+     },
+     {
+      "label": "Full amount",
+      "value": "{fine.amount}"
+     },
+     {
+      "when": "fine.status == Unpaid",
+      "then": {
+       "label": "Pay by {fine.discount_ends}",
+       "value": "{fine.discounted_amount}",
+       "tone": "accent",
+       "note": "The lower amount ends on {fine.discount_ends}. After that it is {fine.amount}."
+      }
+     },
+     {
+      "when": "fine.status == Unpaid",
+      "then": {
+       "label": "Challenge by",
+       "value": "{fine.challenge_until}"
+      }
+     },
+     {
+      "label": "Status",
+      "value": "{fine.status}",
+      "tone": {
+       "tone": "fine.status",
+       "map": {
+        "Unpaid": "warning",
+        "Paid*": "success"
+       }
+      }
+     }
+    ],
+    "action": {
+     "when": "fine.status == Unpaid",
+     "then": {
+      "label": "Pay {fine.to_pay_now}",
+      "event": {
+       "name": "pay_fine",
+       "context": {
+        "reference": "{fine.reference}"
+       }
+      }
+     }
+    }
+   }
+  },
+  {
+   "action": "application_status",
+   "intent": "where an application is",
+   "part": {
+    "component": "ProgressStatus",
+    "title": "Application {application.reference}",
+    "tone": {
+     "tone": "application.current_step",
+     "map": {
+      "Waiting for your document": "warning",
+      "*": "info"
+     }
+    },
+    "status": "{application.current_step}",
+    "steps": {
+     "each": "application.steps",
+     "item": {
+      "label": "{.label}",
+      "state": {
+       "tone": ".state",
+       "map": {
+        "done": "done",
+        "current": "now",
+        "*": "next"
+       }
+      }
+     }
+    }
+   }
+  },
+  {
+   "action": "get_permit",
+   "intent": "Get permit",
+   "part": {
+    "component": "KeyFacts",
+    "title": "Permit",
+    "facts": [
+     {
+      "label": "Type",
+      "value": "{permit.type}"
+     },
+     {
+      "label": "Number",
+      "value": "{permit.number}"
+     },
+     {
+      "label": "Zone",
+      "value": "{permit.zone}"
+     },
+     {
+      "label": "Vehicle",
+      "value": "{permit.vehicle}"
+     },
+     {
+      "label": "Vehicle type",
+      "value": "{permit.vehicle_type}"
+     },
+     {
+      "label": "Started",
+      "value": "{permit.started_in_words}"
+     },
+     {
+      "label": "Expires",
+      "value": "{permit.expires_in_words}"
+     },
+     {
+      "label": "Price paid",
+      "value": "{permit.price_paid}"
+     }
+    ]
+   }
+  },
+  {
+   "action": "renewal_quote",
+   "intent": "Renewal quote",
+   "part": {
+    "component": "DataTable",
+    "title": "Options",
+    "columns": [
+     {
+      "label": "Length"
+     },
+     {
+      "label": "Price"
+     },
+     {
+      "label": "From"
+     },
+     {
+      "label": "To"
+     }
+    ],
+    "rows": {
+     "each": "renewal.options",
+     "item": {
+      "cells": [
+       {
+        "text": "{.length|or:–}"
+       },
+       {
+        "text": "{.price|or:–}"
+       },
+       {
+        "text": "{.from_in_words|or:–}"
+       },
+       {
+        "text": "{.to_in_words|or:–}"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "action": "available_slots",
+   "intent": "Available slots",
+   "part": {
+    "component": "DataTable",
+    "title": "Slots",
+    "columns": [
+     {
+      "label": "Id"
+     },
+     {
+      "label": "Date"
+     },
+     {
+      "label": "Day"
+     },
+     {
+      "label": "Time"
+     }
+    ],
+    "rows": {
+     "each": "slots",
+     "item": {
+      "cells": [
+       {
+        "text": "{.id|or:–}"
+       },
+       {
+        "text": "{.date_in_words|or:–}"
+       },
+       {
+        "text": "{.day|or:–}"
+       },
+       {
+        "text": "{.time|or:–}"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "action": "list_documents",
+   "intent": "List documents",
+   "part": {
+    "component": "DataTable",
+    "title": "Documents",
+    "columns": [
+     {
+      "label": "Document"
+     },
+     {
+      "label": "Examples"
+     },
+     {
+      "label": "Status"
+     },
+     {
+      "label": "File"
+     }
+    ],
+    "rows": {
+     "each": "documents",
+     "item": {
+      "cells": [
+       {
+        "text": "{.document|or:–}"
+       },
+       {
+        "text": "{.examples|or:–}"
+       },
+       {
+        "text": "{.status|or:–}"
+       },
+       {
+        "text": "{.file|or:–}"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "action": "list_offices",
+   "intent": "List offices",
+   "part": {
+    "component": "DataTable",
+    "title": "Offices",
+    "columns": [
+     {
+      "label": "Name"
+     },
+     {
+      "label": "Address"
+     },
+     {
+      "label": "Hours"
+     },
+     {
+      "label": "Open today"
+     },
+     {
+      "label": "Closures"
+     }
+    ],
+    "rows": {
+     "each": "offices",
+     "item": {
+      "cells": [
+       {
+        "text": "{.name|or:–}"
+       },
+       {
+        "text": "{.address|or:–}"
+       },
+       {
+        "text": "{.hours|or:–}"
+       },
+       {
+        "text": "{.open_today|or:–}"
+       },
+       {
+        "text": "{.closures|or:–}"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "action": "office_details",
+   "intent": "Office details",
+   "part": {
+    "component": "KeyFacts",
+    "title": "Details",
+    "facts": [
+     {
+      "label": "Name",
+      "value": "{office.name}"
+     },
+     {
+      "label": "Address",
+      "value": "{office.address}"
+     },
+     {
+      "label": "Hours",
+      "value": "{office.hours}"
+     },
+     {
+      "label": "Open today",
+      "value": "{office.open_today}"
+     },
+     {
+      "label": "Access",
+      "value": "{office.access}"
+     },
+     {
+      "label": "Closures",
+      "value": "{office.closures}"
+     },
+     {
+      "label": "Phone",
+      "value": "{office.phone}"
+     }
+    ]
+   }
+  },
+  {
+   "action": "permit_prices",
+   "intent": "Permit prices",
+   "part": {
+    "component": "DataTable",
+    "title": "Permit types",
+    "columns": [
+     {
+      "label": "Name"
+     },
+     {
+      "label": "Who"
+     },
+     {
+      "label": "Price"
+     },
+     {
+      "label": "Electric"
+     },
+     {
+      "label": "Blue badge"
+     }
+    ],
+    "rows": {
+     "each": "permit_types",
+     "item": {
+      "cells": [
+       {
+        "text": "{.name|or:–}"
+       },
+       {
+        "text": "{.who|or:–}"
+       },
+       {
+        "text": "{.price|or:–}"
+       },
+       {
+        "text": "{.electric|or:–}"
+       },
+       {
+        "text": "{.blue_badge|or:–}"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "action": "check_eligibility",
+   "intent": "Check eligibility",
+   "part": {
+    "component": "KeyFacts",
+    "title": "Eligibility",
+    "facts": [
+     {
+      "label": "Permit",
+      "value": "{permit}"
+     },
+     {
+      "label": "Zone",
+      "value": "{zone}"
+     },
+     {
+      "label": "Vehicle",
+      "value": "{vehicle}"
+     },
+     {
+      "label": "Eligible",
+      "value": "{eligible}"
+     },
+     {
+      "label": "Price",
+      "value": "{price}"
+     }
+    ]
+   }
+  }
+ ]
+}

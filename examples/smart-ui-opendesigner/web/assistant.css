@@ -1,0 +1,102 @@
+/* The page around the assistant, on OpenDesigner's own brand tokens. Tokens only. */
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--ds-color-surface-base); color: var(--ds-color-text-primary); font: var(--ds-text-body-md); }
+a { color: var(--ds-color-text-link); text-underline-offset: 0.2em; }
+:focus-visible { outline: var(--ds-focus-ring-width) solid var(--ds-color-border-focus); outline-offset: var(--ds-focus-ring-offset); }
+strong { font-weight: var(--ds-font-weight-heading); }
+
+.skip { position: absolute; inset-inline-start: var(--ds-space-inset-md); inset-block-start: var(--ds-space-inset-md); z-index: 1;
+  padding: var(--ds-space-inset-sm) var(--ds-space-inset-md); color: var(--ds-color-text-primary); background: var(--ds-color-surface-raised);
+  border-radius: var(--ds-radius-control); transform: translateY(-200%); font: var(--ds-text-label-lg); }
+.skip:focus-visible { transform: none; }
+
+.masthead { background: var(--ds-color-surface-raised); border-block-end: var(--ds-border-width-default) solid var(--ds-color-border-separator); }
+.masthead-in, .page, .foot p { inline-size: 100%; max-inline-size: 75rem; margin-inline: auto; padding-inline: var(--ds-space-40); }
+.masthead-in { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-space-inline-sm); min-block-size: var(--ds-size-row-two-line); }
+.wordmark { font: var(--ds-text-title-md); letter-spacing: var(--ds-text-title-md-tracking); }
+.tag { padding: var(--ds-space-2) var(--ds-space-8); color: var(--ds-color-text-accent); background: var(--ds-color-bg-accent-subtle);
+  border-radius: var(--ds-radius-detail); font: var(--ds-text-label-md); }
+
+.page { display: grid; gap: var(--ds-space-stack-xl); padding-block: var(--ds-space-48) var(--ds-space-section-sm); }
+.intro { display: grid; gap: var(--ds-space-stack-sm); }
+.intro h1 { margin: 0; font: var(--ds-text-headline-sm); letter-spacing: var(--ds-text-headline-sm-tracking); text-wrap: balance; }
+.lead { margin: 0; max-inline-size: 40em; color: var(--ds-color-text-secondary); font: var(--ds-text-body-lg); text-wrap: pretty; }
+.notice { margin: 0; max-inline-size: 48em; padding: var(--ds-space-inset-md) var(--ds-space-inset-lg); text-wrap: pretty;
+  background: var(--ds-color-bg-info-subtle); border-inline-start: var(--ds-border-width-emphasis) solid var(--ds-color-border-info);
+  border-radius: var(--ds-radius-nested); }
+
+.layout { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: var(--ds-space-24); align-items: start; }
+.panel { display: grid; gap: var(--ds-space-stack-md); min-inline-size: 0; padding: var(--ds-space-inset-xl);
+  background: var(--ds-color-surface-raised); border: var(--ds-border-width-default) solid var(--ds-color-border-separator);
+  border-radius: var(--ds-radius-container); }
+.panel h2 { margin: 0; font: var(--ds-text-title-md); letter-spacing: var(--ds-text-title-md-tracking); }
+
+/* What runs behind the answer */
+.behind { gap: var(--ds-space-stack-lg); position: sticky; inset-block-start: var(--ds-space-24); }
+.sub { margin: 0; color: var(--ds-color-text-secondary); font: var(--ds-text-body-sm); }
+.lane { display: grid; gap: var(--ds-space-stack-xs); }
+.lane h3 { margin: 0; font: var(--ds-text-title-sm); }
+.lane h3 span { color: var(--ds-color-text-secondary); font: var(--ds-text-body-sm); }
+.steps { display: grid; margin: 0; padding: 0; list-style: none; min-block-size: var(--ds-size-row-md);
+  border-block-start: var(--ds-border-width-default) solid var(--ds-color-border-separator); }
+.steps:empty::after { content: "Waiting"; display: block; padding-block: var(--ds-space-8); color: var(--ds-color-text-tertiary); font: var(--ds-text-body-sm); }
+.step { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--ds-space-inline-sm);
+  padding-block: var(--ds-space-8); border-block-end: var(--ds-border-width-default) solid var(--ds-color-border-separator); font: var(--ds-text-body-sm); }
+.step .dot { inline-size: var(--ds-space-8); block-size: var(--ds-space-8); border-radius: var(--ds-radius-full); background: var(--ds-color-bg-info-bold); }
+.step.is-done .dot { background: var(--ds-color-bg-success-bold); }
+.step .ms { color: var(--ds-color-text-secondary); font: var(--ds-text-code-sm); font-variant-numeric: tabular-nums; }
+.totals { display: grid; margin: 0; }
+.totals div { display: flex; justify-content: space-between; gap: var(--ds-space-inline-sm); padding-block: var(--ds-space-8);
+  border-block-end: var(--ds-border-width-default) solid var(--ds-color-border-separator); }
+.totals dt { color: var(--ds-color-text-secondary); font: var(--ds-text-label-lg); }
+.totals dd { margin: 0; font: var(--ds-text-code-md); font-variant-numeric: tabular-nums; }
+.how { display: grid; gap: var(--ds-space-stack-xs); margin: 0; padding-inline-start: var(--ds-space-20); color: var(--ds-color-text-secondary); font: var(--ds-text-body-sm); }
+@media (prefers-reduced-motion: no-preference) {
+  .step:not(.is-done) .dot { animation: od-pulse 1s var(--ds-motion-easing-standard) infinite; }
+}
+@keyframes od-pulse { 50% { opacity: 0.4; } }
+
+.foot { border-block-start: var(--ds-border-width-default) solid var(--ds-color-border-separator); }
+.foot p { margin-block: 0; padding-block: var(--ds-space-inset-xl); color: var(--ds-color-text-secondary); font: var(--ds-text-body-sm); overflow-wrap: anywhere; }
+
+/* The assistant (od-chat.js) */
+.od-chat { display: grid; gap: var(--ds-space-stack-md); }
+.od-chat-mode { margin: 0; color: var(--ds-color-text-secondary); font: var(--ds-text-label-md); }
+.od-chat-log { display: grid; gap: var(--ds-space-stack-lg); max-block-size: 70dvh; overflow-y: auto; }
+.od-chat-log:empty { display: none; }
+.od-chat-turn { display: grid; gap: var(--ds-space-stack-sm); min-inline-size: 0; }
+.od-chat-turn > * { min-inline-size: 0; }
+.od-chat-turn od-surface > [data-od-component], .od-chat-turn .od-approval > * { margin-inline: 0; }
+.od-chat-me { justify-self: end; max-inline-size: 85%; margin: 0; padding: var(--ds-space-inset-sm) var(--ds-space-inset-md);
+  color: var(--ds-color-text-primary); background: var(--ds-color-bg-accent-subtle); border-radius: var(--ds-radius-container); }
+.od-chat-bot, .od-chat-wait, .od-chat-error { margin: 0; max-inline-size: 40em; }
+.od-chat-wait, .od-chat-note { margin: 0; color: var(--ds-color-text-secondary); font: var(--ds-text-label-lg); }
+.od-chat-error { color: var(--ds-color-text-danger); }
+.od-chat-chips { display: flex; flex-wrap: wrap; gap: var(--ds-space-inline-sm); }
+.od-chat-chip, .od-chat-form button { min-block-size: max(var(--ds-size-control-md), var(--ds-size-target-touch)); padding: 0 var(--ds-space-inset-md); cursor: pointer;
+  color: var(--ds-color-text-primary); font: var(--ds-text-label-lg); text-align: start; background: var(--ds-color-surface-raised);
+  border: var(--ds-border-width-default) solid var(--ds-color-border-default); border-radius: var(--ds-radius-control); }
+.od-chat-chip:hover { background: var(--ds-color-bg-neutral-subtle-hover); }
+.od-chat-form { display: flex; gap: var(--ds-space-inline-sm); }
+.od-chat-form input { flex: 1; min-inline-size: 0; min-block-size: max(var(--ds-size-control-md), var(--ds-size-target-touch)); padding: 0 var(--ds-space-inset-md);
+  color: var(--ds-color-text-primary); font: var(--ds-text-body-md); font-size: max(var(--ds-font-size-input), var(--ds-font-size-16));
+  background: var(--ds-color-bg-field); border: var(--ds-border-width-default) solid var(--ds-color-border-input); border-radius: var(--ds-radius-control); }
+.od-chat-form input::placeholder { color: var(--ds-color-text-secondary); }
+.od-chat-form button { color: var(--ds-color-text-on-action); background: var(--ds-color-bg-action-primary); border-color: transparent; font-weight: var(--ds-font-weight-heading); }
+.od-chat-form button:hover { background: var(--ds-color-bg-action-primary-hover); }
+.od-chat [disabled] { opacity: 0.6; cursor: progress; }
+
+@media (max-width: 64rem) {
+  .layout { grid-template-columns: minmax(0, 1fr); }
+  .behind { position: static; }
+}
+@media (max-width: 48rem) {
+  .masthead-in, .page, .foot p { padding-inline: var(--ds-space-16); }
+  .page { padding-block: var(--ds-space-32) var(--ds-space-section-sm); gap: var(--ds-space-stack-lg); }
+  .intro h1 { font: var(--ds-text-title-lg); letter-spacing: var(--ds-text-title-lg-tracking); }
+  .lead { font: var(--ds-text-body-md); }
+  .panel { padding: var(--ds-space-inset-lg); }
+  /* the page scrolls, not a box inside it, so an approval's buttons are never cut off */
+  .od-chat-log { max-block-size: none; overflow-y: visible; }
+}

@@ -1,0 +1,175 @@
+{
+ "product": "A council service for residents of Fernhollow: parking permits, penalty charge notices, appointments, documents and application progress, with an assistant that answers residents' questions on the page",
+ "kind": "public-service",
+ "answer_types": [
+  {
+   "type": "table",
+   "for": "rows of records to scan and sort",
+   "score": 15,
+   "reasons": [
+    "renewal_quote returns 2 options with 6 fields each",
+    "list_fines returns 2 fines with 12 fields each",
+    "list_documents returns 3 documents with 4 fields each",
+    "list_offices returns 3 offices with 6 fields each"
+   ],
+   "evidence": [
+    "data from list_documents",
+    "data from list_fines",
+    "data from list_offices",
+    "data from permit_prices",
+    "data from renewal_quote"
+   ],
+   "part": "DataTable",
+   "missing": null
+  },
+  {
+   "type": "record details",
+   "for": "one thing with its facts",
+   "score": 14,
+   "reasons": [
+    "common in public service assistants",
+    "get_permit returns one permit with 9 facts",
+    "get_fine returns one fine with 15 facts",
+    "application_status returns one application with 5 facts"
+   ],
+   "evidence": [
+    "data from application_status",
+    "data from get_fine",
+    "data from get_permit",
+    "data from office_details",
+    "product: A council service for residents of Fernhollow: parking permits, penalty charge n"
+   ],
+   "part": "KeyFacts",
+   "missing": null
+  },
+  {
+   "type": "ask before a change",
+   "for": "pay, book, send or delete, after a yes",
+   "score": 14,
+   "reasons": [
+    "common in public service assistants",
+    "renew_permit changes data",
+    "pay_fine changes data",
+    "book_appointment changes data"
+   ],
+   "evidence": [
+    "action book_appointment",
+    "action pay_fine",
+    "action renew_permit",
+    "action upload_document",
+    "product: A council service for residents of Fernhollow: parking permits, penalty charge n"
+   ],
+   "part": "ApprovalPrompt",
+   "missing": null
+  },
+  {
+   "type": "form",
+   "for": "a few fields to fill",
+   "score": 6,
+   "reasons": [
+    "common in public service assistants",
+    "book_appointment takes 3 values",
+    "upload_document takes 3 values"
+   ],
+   "evidence": [
+    "action book_appointment",
+    "action upload_document",
+    "product: A council service for residents of Fernhollow: parking permits, penalty charge n"
+   ],
+   "part": "FormFields",
+   "missing": null
+  },
+  {
+   "type": "progress",
+   "for": "where something is, step by step",
+   "score": 5,
+   "reasons": [
+    "common in public service assistants",
+    "application_status returns steps with a state"
+   ],
+   "evidence": [
+    "data from application_status",
+    "product: A council service for residents of Fernhollow: parking permits, penalty charge n"
+   ],
+   "part": "ProgressStatus",
+   "missing": null
+  },
+  {
+   "type": "pick a time",
+   "for": "free times to book",
+   "score": 5,
+   "reasons": [
+    "common in public service assistants",
+    "available_slots returns free slots"
+   ],
+   "evidence": [
+    "data from available_slots",
+    "product: A council service for residents of Fernhollow: parking permits, penalty charge n"
+   ],
+   "part": "TimeSlots",
+   "missing": null
+  },
+  {
+   "type": "place",
+   "for": "an address on a map",
+   "score": 5,
+   "reasons": [
+    "common in public service assistants",
+    "office_details returns a place with an address"
+   ],
+   "evidence": [
+    "data from office_details",
+    "product: A council service for residents of Fernhollow: parking permits, penalty charge n"
+   ],
+   "part": "LocationCard",
+   "missing": null
+  },
+  {
+   "type": "what happened",
+   "for": "the result of a change",
+   "score": 4,
+   "reasons": [
+    "renew_permit has a result to show",
+    "pay_fine has a result to show",
+    "book_appointment has a result to show",
+    "upload_document has a result to show"
+   ],
+   "evidence": [
+    "action book_appointment",
+    "action pay_fine",
+    "action renew_permit",
+    "action upload_document"
+   ],
+   "part": "Receipt",
+   "missing": null
+  },
+  {
+   "type": "compare options",
+   "for": "two to four options side by side",
+   "score": 3,
+   "reasons": [
+    "renewal_quote returns 2 options to compare"
+   ],
+   "evidence": [
+    "data from renewal_quote"
+   ],
+   "part": "Comparison",
+   "missing": null
+  }
+ ],
+ "gaps": [
+  "no research on this product's users or on what assistants in its industry show: run `engine.py research plan --brief \"what answers do assistants for <this product> show, and which do people use\"`"
+ ],
+ "confirmed": [
+  "table",
+  "record details",
+  "ask before a change",
+  "form",
+  "progress",
+  "pick a time",
+  "place",
+  "what happened",
+  "compare options"
+ ],
+ "confirmed_on": "2026-11-14"
+}

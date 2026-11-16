@@ -260,6 +260,9 @@ def run_live(model, runs, pattern, do_render, cases_file="live-cases.json"):
                     ms = (r.get("log") or {}).get("ms") or {}
                     used = {k: {f: v[f] - before.get(k, {}).get(f, 0) for f in v} for k, v in live.USAGE.items()}
                     turns_t.append({"id": c["id"], "skeleton": ms.get("skeleton", full), "first_text": ms.get("first_text", full), "full": full,
+                                    "shell": ms.get("shell"), "first_data": ms.get("first_data"),
+                                    "template": bool((r.get("log") or {}).get("template")), "ui": bool(r.get("answer")),
+                                    "mode": (r.get("log") or {}).get("mode"),
                                     "calls": sum(u["calls"] for u in used.values()),
                                     "tokens": sum(u["input"] + u["output"] for u in used.values())})
             except RuntimeError as e:
@@ -282,6 +285,15 @@ def run_live(model, runs, pattern, do_render, cases_file="live-cases.json"):
                 if isinstance(chk, dict) and "contains" in chk and chk["contains"].lower() not in shown:
                     row["right"] = False
                     row.setdefault("checks_failed", []).append("missing: " + chk["contains"])
+                if isinstance(chk, dict) and "mode" in chk and (r.get("log") or {}).get("mode") != chk["mode"]:
+                    row["right"] = False
+                    row.setdefault("checks_failed", []).append(f"mode {(r.get('log') or {}).get('mode')}, wanted {chk['mode']}")
+                if isinstance(chk, dict) and "rows" in chk:
+                    comp = ((r.get("answer") or [{}])[0].get("createSurface") or {}).get("components", [{}])[0] if r.get("answer") else {}
+                    n = len(next((v for k, v in comp.items() if k in ("rows", "facts", "items") and isinstance(v, list)), []))
+                    if n != chk["rows"]:
+                        row["right"] = False
+                        row.setdefault("checks_failed", []).append(f"{n} rows, wanted {chk['rows']}")
                 if isinstance(chk, dict) and "not" in chk and re.search(chk["not"], shown + " " + str(r.get("text", "")).lower()):
                     row["right"] = False
                     row.setdefault("checks_failed", []).append("has: " + chk["not"])
@@ -318,6 +330,14 @@ def run_live(model, runs, pattern, do_render, cases_file="live-cases.json"):
     summary["speed"] = {"turns": len(turns_t),
                         "skeleton_ms_p50": q([t["skeleton"] for t in turns_t], .5), "skeleton_ms_p95": q([t["skeleton"] for t in turns_t], .95),
                         "full_ms_p50": q([t["full"] for t in turns_t], .5), "full_ms_p95": q([t["full"] for t in turns_t], .95),
+                        "shell_ms_p50": q([t["shell"] for t in turns_t if t.get("shell") is not None], .5),
+                        "shell_ms_p95": q([t["shell"] for t in turns_t if t.get("shell") is not None], .95),
+                        "first_data_ms_p50": q([t["first_data"] for t in turns_t if t.get("first_data") is not None and t.get("ui")], .5),
+                        "first_data_ms_p95": q([t["first_data"] for t in turns_t if t.get("first_data") is not None and t.get("ui")], .95),
+                        "parts_shown": sum(1 for t in turns_t if t.get("ui")),
+                        "template_share_pct": round(100 * sum(1 for t in turns_t if t.get("template")) / max(1, sum(1 for t in turns_t if t.get("ui"))), 1),
+                        "modes_pct": {m: round(100 * sum(1 for t in turns_t if t.get("mode") == m) / max(1, len(turns_t)), 1)
+                                      for m in ("fill", "edit", "generate", "text")},
                         "calls_per_turn": round(sum(t["calls"] for t in turns_t) / max(1, len(turns_t)), 2),
                         "tokens_per_turn": round(sum(t["tokens"] for t in turns_t) / max(1, len(turns_t)))}
     summary["tokens"] = live.USAGE.get(live.MODELS.get(provider, provider))  # API providers only; the claude CLI doesn't report them here
@@ -366,17 +386,18 @@ def report():
                         why.append("floors: " + "; ".join(x.get("floors", [])[:3]))
                     lines.append(f"- `{x['id']}` run {x['run']}: " + " · ".join(why))
                 lines.append("")
-    after = [f for f in sorted((EV / "results").glob("live-*.json")) if "round" not in f.stem and "fernhollow" not in f.stem]
+    after = [f for f in sorted((EV / "results").glob("live-*.json")) if "round" not in f.stem and "fernhollow" not in f.stem and "opendesigner" not in f.stem]
+    sec = lambda ms: "–" if ms is None else f"{ms / 1000:.1f} s" if ms >= 1000 else f"{ms} ms"
     if after:
-        sec = lambda ms: "–" if ms is None else f"{ms / 1000:.1f} s" if ms >= 1000 else f"{ms} ms"
         lines += ["## Speed: before and after (billing app, live path)", "",
-                  "Per turn, measured around each answer: **first** is when something shows (the chosen part's skeleton, or the first "
-                  "words); **full** is the checked answer. Before: the model routed every turn, answered in free text, thought as much as "
-                  "it liked, and nothing showed until the end (one run of each case, 31 turns). After: words route to the app's read "
-                  "actions without a model unless it's unclear, one answer call constrained to the chosen parts' JSON schema, thinking "
-                  "off or low, a skeleton first and the words streamed (three runs, 93 turns). Models ran side by side, sharing the API.", "",
-                  "| Model | Before: first, p50 / p95 | Before: full, p50 / p95 | Calls a turn | After: first, p50 / p95 | After: full, p50 / p95 | Calls a turn | Tokens a turn | Right part, before → after | Approval for changes, before → after |",
-                  "|---|---|---|---|---|---|---|---|---|---|"]
+                  "Per turn, measured around each answer. **Before**: a model routed every turn, the model wrote the whole part as "
+                  "free text, it thought as long as it liked, and nothing showed until the end (one run of each case). **After**: the "
+                  "question's words pick the app's read action and a prepared part with no model, the part's outline shows at once and "
+                  "fills as the data lands, and one short model call writes the sentence (a part the model writes is the fallback). "
+                  "**First** is when something shows (the outline, the filled part or the first words); **full** is the checked "
+                  "answer. Models ran side by side, sharing the API.", "",
+                  "| Model | Before: full, p50 / p95 | Calls a turn | After: first, p50 / p95 | After: full, p50 / p95 | Calls a turn | Tokens a turn | Right part, before → after | Approval, before → after |",
+                  "|---|---|---|---|---|---|---|---|---|"]
         for f in after:
             r = json.loads(f.read_text())
             b4 = EV / "results" / f"before-{r['model']}.json"
@@ -384,13 +405,101 @@ def report():
             sa, sb = r["summary"].get("speed") or {}, (b["summary"].get("speed") or {}) if b else {}
             if not sa:
                 continue
-            lines.append(f"| {r['model']} | {sec(sb.get('skeleton_ms_p50'))} / {sec(sb.get('skeleton_ms_p95'))} | {sec(sb.get('full_ms_p50'))} / {sec(sb.get('full_ms_p95'))} | "
-                         f"{sb.get('calls_per_turn', '–')} | {sec(sa['skeleton_ms_p50'])} / {sec(sa['skeleton_ms_p95'])} | {sec(sa['full_ms_p50'])} / {sec(sa['full_ms_p95'])} | "
+            lines.append(f"| {r['model']} | {sec(sb.get('full_ms_p50'))} / {sec(sb.get('full_ms_p95'))} | {sb.get('calls_per_turn', '–')} | "
+                         f"{sec(sa['skeleton_ms_p50'])} / {sec(sa['skeleton_ms_p95'])} | {sec(sa['full_ms_p50'])} / {sec(sa['full_ms_p95'])} | "
                          f"{sa['calls_per_turn']} | {sa['tokens_per_turn']:,} | {b['summary']['picked_right_pct'] if b else '–'}% → {r['summary']['picked_right_pct']}% | "
                          f"{b['summary']['approval_shown_pct'] if b else '–'}% → {r['summary']['approval_shown_pct']}% |")
         lines += ["", "The `claude` rows run through the `claude` command (no API key on this computer): each call starts a Claude Code "
                   "process, which adds seconds and loads its own context (the tokens column). With an API key the same path uses the "
                   "Messages API with a forced tool for the schema.", ""]
+    for label, tag in (("Fernhollow, a council service", "fernhollow"), ("OpenDesigner on a sample app", "opendesigner")):
+        fs = sorted((EV / "results").glob(f"live-{tag}-*.json"))
+        if not fs:
+            continue
+        lines += [f"## Prepared parts: {label}", "",
+                  "**Outline** is the prepared part's outline on screen; **first data** is the part filled with the first data. "
+                  "**Turns**: filled from a prepared part by code / a prepared part with a small edit from the model (rows kept, ordered "
+                  "or filtered, details hidden, another variant) / a part the model wrote (the fallback) / text only.", "",
+                  "| Model | Runs | Right part | Valid first time | After one repair | Held back (text-only) | Outline, p50 / p95 | First data, p50 / p95 | Full, p50 / p95 | Turns: filled / edited / written / text | Calls a turn |",
+                  "|---|---|---|---|---|---|---|---|---|---|---|"]
+        for f in fs:
+            r = json.loads(f.read_text())
+            sm, sp = r["summary"], r["summary"].get("speed") or {}
+            lines.append(f"| {r['model']} | {sm['runs']} | {sm['picked_right_pct']}% | {sm['valid_first_pct']}% | {sm['valid_after_repair_pct']}% | "
+                         f"{sm['held_back_pct']}% | {sec(sp.get('shell_ms_p50'))} / {sec(sp.get('shell_ms_p95'))} | "
+                         f"{sec(sp.get('first_data_ms_p50'))} / {sec(sp.get('first_data_ms_p95'))} | {sec(sp.get('full_ms_p50'))} / {sec(sp.get('full_ms_p95'))} | "
+                         + ("{fill}% / {edit}% / {generate}% / {text}%".format(**sp["modes_pct"]) if sp.get("modes_pct") else "–")
+                         + f" | {sp.get('calls_per_turn', '–')} |")
+        lines.append("")
+        if tag == "fernhollow":
+            lines += ["### The fines question in ten wordings", "",
+                      "`fh-fines-w01` to `w10` ask whether there is a fine in ten different ways (\"have I got any parking fines?\", "
+                      "\"did I get a parking ticket?\", \"my penalty charge notice\"...). Right means the fine card with its Pay button, "
+                      "the discount date and no payment prompt.", "",
+                      "| Model | Runs | Card with Pay, every time | First answer passed | Repaired |", "|---|---|---|---|---|"]
+            for f in fs:
+                r = json.loads(f.read_text())
+                rows = [x for x in r["rows"] if x["id"].startswith("fh-fines-w")]
+                if rows:
+                    n = len(rows)
+                    lines.append(f"| {r['model']} | {n} | {round(100 * sum(x['right'] for x in rows) / n, 1)}% | "
+                                 f"{round(100 * sum(1 for x in rows if not x.get('first_errors')) / n, 1)}% | "
+                                 f"{round(100 * sum(1 for x in rows if x.get('repaired')) / n, 1)}% |")
+            lines.append("")
+    uc = EV / "use-cases.json"
+    if uc.exists():
+        d = json.loads(uc.read_text())
+        ps = d["products"]
+        lines += ["## Different products, different answers", "",
+                  "`smartui.py usecases` on three example products, from each one's own data, actions, description and screens "
+                  "(none of the three has research files, which the step reports as a gap). Best first.", "",
+                  "| " + " | ".join(f"{p['name']} ({p['kind']})" for p in ps) + " |", "|" + "---|" * len(ps)]
+        for i in range(max(len(p["answer_types"]) for p in ps)):
+            cells = []
+            for p in ps:
+                t = p["answer_types"][i] if i < len(p["answer_types"]) else None
+                cells.append(f"{t['type']}: {t['part'] or 'no part yet'}" if t else "")
+            lines.append("| " + " | ".join(cells) + " |")
+        lines.append("")
+    lines += ["## How the prepared part is found", "",
+              "- **Lexical first, measured.** A BM25-style index (`smartui.Matcher`) over each prepared part's intent and example "
+              "phrasings (weighted most), its action's name and description, the data fields it binds, its title and the scope's phrases "
+              "for that route. Words match on their stems and on a shared start of four letters. It runs in about 0.03 to 0.2 ms per "
+              "question on these examples.",
+              "- **Why not embeddings.** The skill runs offline, from the standard library, wherever the person's agent runs: no "
+              "packages, no network, no keys. On these products the questions use the app's own words (fines, permit, invoices), and "
+              "the cases that missed were fixed by data the app owns (a description that says \"also called a parking ticket\"), not "
+              "by meaning-matching. A product with a wide vocabulary can add its own embedding index beside `Matcher`; the "
+              "interface is one call that returns ranked templates.",
+              "- **A model only when it's close.** When the router isn't sure (the best match needs a value the question doesn't give, "
+              "\"the refunded one\") and the matcher's top two belong to different actions, a small model call routes. Otherwise no "
+              "model runs before the sentence.", ""]
+    prices = {"gemini-3.1-flash-lite": (0.25, 1.50), "gemini-3.8-flash": (0.75, 3.75), "gemini-3.1-pro-preview": (2.00, 12.00),
+              "gemini-4-argon": (2.00, 10.00), "gemini-4-hydrogen": (1.50, 7.50)}
+    spend = {}
+    for f in sorted((EV / "results").glob("*.json")):
+        try:
+            r = json.loads(f.read_text())
+        except ValueError:
+            continue
+        tk = (r.get("summary") or {}).get("tokens") if isinstance(r, dict) else None
+        if tk and r.get("model") in prices:
+            a = spend.setdefault(r["model"], [0, 0, 0])
+            a[0] += tk["input"]; a[1] += tk["output"]; a[2] += tk.get("calls", 0)
+    if spend:
+        lines += ["## Spend", "",
+                  "Tokens counted from the provider's own usage figures in every result file here, priced per million tokens at "
+                  "November 2026 list prices (third-party pricing pages; Argon at its introductory rate). Runs that were stopped "
+                  "and rerun after a fix are not in these files, so the real total was higher.", "",
+                  "| Model | Calls | Input tokens | Output tokens | Price in / out | Cost |", "|---|---|---|---|---|---|"]
+        total = 0.0
+        for m, (i, o, c) in sorted(spend.items()):
+            pi, po = prices[m]
+            cost = i / 1e6 * pi + o / 1e6 * po
+            total += cost
+            lines.append(f"| {m} | {c:,} | {i:,} | {o:,} | ${pi:.2f} / ${po:.2f} | ${cost:.2f} |")
+        lines += [f"| **Total** | | | | | **${total:.2f}** |", "",
+                  "Claude ran through the `claude` command on the owner's subscription: tokens, no API bill.", ""]
     live = sorted((EV / "results").glob("live-*.json"))
     if live:
         lines += ["## The live path (examples/smart-ui-support)", "",

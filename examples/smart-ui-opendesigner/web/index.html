@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ask OpenDesigner: Smart UI example</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300..700&display=swap">
+<link rel="stylesheet" href="/system/build/css/tokens.css">
+<link rel="stylesheet" href="/opendesigner-smart-ui/od-surface.css">
+<link rel="stylesheet" href="assistant.css">
+<script src="/system/smart-ui/od-components.js"></script>
+</head>
+<body>
+<a class="skip" href="#ask">Skip to the assistant</a>
+<header class="masthead">
+  <div class="masthead-in">
+    <span class="wordmark">OpenDesigner</span>
+    <span class="tag">Smart UI example</span>
+  </div>
+</header>
+<main class="page" id="main">
+  <div class="intro">
+    <h1>Ask OpenDesigner about your system</h1>
+    <p class="lead">Ask in your own words. Each answer picks a part made ahead of time, then fills it while the data arrives. Colours follow meaning: green passes and red is broken.</p>
+  </div>
+  <p class="notice" role="note"><strong>The data is real.</strong> It comes from OpenDesigner's own engine, component library and glossary, run on a small sample app: a pricing page with three mistakes left in on purpose. Fixes and changes go to a scratch copy, and Undo puts them back.</p>
+  <div class="layout">
+    <section class="panel" id="ask" aria-labelledby="ask-title">
+      <h2 id="ask-title">Ask the assistant</h2>
+      <od-chat data-catalog="/system/smart-ui/catalog.json" data-placeholder="Ask about your design system"></od-chat>
+    </section>
+    <aside class="panel behind" aria-labelledby="behind-title">
+      <h2 id="behind-title">What runs behind the answer</h2>
+      <p class="sub" id="behind-sub">Ask a question to watch both agents work at the same time.</p>
+      <section class="lane" aria-labelledby="lane-data-title">
+        <h3 id="lane-data-title">Data agent <span>gets the facts</span></h3>
+        <ol class="steps" id="lane-data"></ol>
+      </section>
+      <section class="lane" aria-labelledby="lane-ui-title">
+        <h3 id="lane-ui-title">UI agent <span>builds the part</span></h3>
+        <ol class="steps" id="lane-ui"></ol>
+      </section>
+      <dl class="totals">
+        <div><dt>First thing on screen</dt><dd id="t-first">Not yet</dd></div>
+        <div><dt>Answer complete</dt><dd id="t-full">Not yet</dd></div>
+      </dl>
+      <ol class="how">
+        <li>The parts for this product's questions are made ahead of time, from its tokens.</li>
+        <li>A quick tool call picks the part. No model writes interface code.</li>
+        <li>The data fills the part as it lands, one check at a time.</li>
+        <li>A plain fact stays a sentence. A change to your system asks you first.</li>
+      </ol>
+    </aside>
+  </div>
+</main>
+<footer class="foot">
+  <p>An OpenDesigner example. The sample app, Tallyline, is made up. Its page and CSS are in examples/smart-ui-opendesigner/sample-app.</p>
+</footer>
+<script type="module" src="assistant.js"></script>
+</body>
+</html>

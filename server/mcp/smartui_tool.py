@@ -63,6 +63,17 @@ def show_ui(args, tool_error):
     except NoCatalog as e:
         raise tool_error(str(e))
     answer = args.get("answer")
+    if args.get("template"):  # a part made ahead of time (templates.json), filled from the data agent's result by code
+        tp = project() / "opendesigner" / "smart-ui" / "templates.json"
+        temps = json.loads(tp.read_text()).get("templates", []) if tp.exists() else []
+        hit = smartui.pick_template(temps, args["template"], args.get("data") or {})
+        if not hit:
+            raise tool_error(f"No template for {args['template']!r} fits this data. The templates are: "
+                             + ", ".join(sorted({t.get("action", "?") for t in temps})) + ". Or pass answer instead.")
+        answer = smartui.wrap(hit[1])
+        args = {**args, "source": args.get("data")}
+    if answer is None:
+        raise tool_error("Pass template (with data) or answer.")
     r = smartui.validate(answer, cat, {"source": args.get("source"), "limits": {"leaves": args.get("max_parts")}})
     if not r["ok"]:
         lines = [json.dumps({"version": "1.0", "error": {k: e[k] for k in ("code", "path", "message", "surfaceId")}}) + (f"  fix: {e['fix']}" if e.get("fix") else "")
@@ -81,8 +92,12 @@ TOOL = {
                    "your answer's data. Pass A2UI v1.0 messages built from the project's Smart UI catalog "
                    "(resource od://smart-ui/catalog). Use it only when a part does a job text cannot; a short answer stays text. "
                    "It checks the answer first and returns errors you can fix. Buttons the person presses come back as "
-                   "'OD:action <name> <context>' messages; nothing happens on its own.",
-    "inputSchema": {"type": "object", "additionalProperties": False, "required": ["answer"], "properties": {
+                   "'OD:action <name> <context>' messages; nothing happens on its own. Faster and surer: pass template (one of "
+                   "the parts made ahead of time, named by the app action whose data it shows) and data (that action's result): "
+                   "the part is filled by code, and you write only your sentence.",
+    "inputSchema": {"type": "object", "additionalProperties": False, "properties": {
+        "template": {"type": "string", "description": "a part made ahead of time: the app action it shows (see opendesigner/smart-ui/templates.json)"},
+        "data": {"type": "object", "description": "with template: that action's result, as the data agent fetched it"},
         "answer": {"type": "array", "minItems": 1, "maxItems": 8, "description": "A2UI v1.0 messages: createSurface (and updateComponents)"},
         "source": {"type": "object", "description": "the data you were given; every number shown must come from it (the server can only check against what you pass)"},
         "max_parts": {"type": "integer", "minimum": 1, "maximum": 4, "description": "more than one part, only when the person asked for more"},

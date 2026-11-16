@@ -1,0 +1,147 @@
+{
+ "product": "A billing and subscription tool for small teams: invoices, usage, plans and seats, with an assistant that answers billing questions in the app",
+ "kind": "work-tool",
+ "answer_types": [
+  {
+   "type": "ask before a change",
+   "for": "pay, book, send or delete, after a yes",
+   "score": 9,
+   "reasons": [
+    "change_plan changes data",
+    "pay_invoice changes data",
+    "add_seats changes data"
+   ],
+   "evidence": [
+    "action add_seats",
+    "action change_plan",
+    "action pay_invoice"
+   ],
+   "part": "ApprovalPrompt",
+   "missing": null
+  },
+  {
+   "type": "table",
+   "for": "rows of records to scan and sort",
+   "score": 8,
+   "reasons": [
+    "common in work tool assistants",
+    "list_invoices returns 7 invoices with 8 fields each",
+    "list_plans returns 3 plans with 6 fields each"
+   ],
+   "evidence": [
+    "data from list_invoices",
+    "data from list_plans",
+    "product: A billing and subscription tool for small teams: invoices, usage, plans and seat"
+   ],
+   "part": "DataTable",
+   "missing": null
+  },
+  {
+   "type": "record details",
+   "for": "one thing with its facts",
+   "score": 8,
+   "reasons": [
+    "common in work tool assistants",
+    "get_invoice returns one invoice with 7 facts",
+    "get_subscription returns one subscription with 7 facts"
+   ],
+   "evidence": [
+    "data from get_invoice",
+    "data from get_subscription",
+    "product: A billing and subscription tool for small teams: invoices, usage, plans and seat"
+   ],
+   "part": "KeyFacts",
+   "missing": null
+  },
+  {
+   "type": "chart over time",
+   "for": "a number changing month by month",
+   "score": 5,
+   "reasons": [
+    "common in work tool assistants",
+    "get_usage returns usage by month with numbers"
+   ],
+   "evidence": [
+    "data from get_usage",
+    "product: A billing and subscription tool for small teams: invoices, usage, plans and seat"
+   ],
+   "part": "LineChart",
+   "missing": null
+  },
+  {
+   "type": "headline numbers",
+   "for": "three or four numbers at a glance",
+   "score": 5,
+   "reasons": [
+    "common in work tool assistants",
+    "get_subscription returns 3 numbers for subscription"
+   ],
+   "evidence": [
+    "data from get_subscription",
+    "product: A billing and subscription tool for small teams: invoices, usage, plans and seat"
+   ],
+   "part": "KpiStrip",
+   "missing": null
+  },
+  {
+   "type": "file",
+   "for": "a document to open or download",
+   "score": 5,
+   "reasons": [
+    "common in work tool assistants",
+    "get_invoice returns a file"
+   ],
+   "evidence": [
+    "data from get_invoice",
+    "product: A billing and subscription tool for small teams: invoices, usage, plans and seat"
+   ],
+   "part": "FileCard",
+   "missing": null
+  },
+  {
+   "type": "compare options",
+   "for": "two to four options side by side",
+   "score": 3,
+   "reasons": [
+    "list_plans returns 3 plans to compare"
+   ],
+   "evidence": [
+    "data from list_plans"
+   ],
+   "part": "Comparison",
+   "missing": null
+  },
+  {
+   "type": "what happened",
+   "for": "the result of a change",
+   "score": 3,
+   "reasons": [
+    "change_plan has a result to show",
+    "pay_invoice has a result to show",
+    "add_seats has a result to show"
+   ],
+   "evidence": [
+    "action add_seats",
+    "action change_plan",
+    "action pay_invoice"
+   ],
+   "part": "Receipt",
+   "missing": null
+  }
+ ],
+ "gaps": [
+  "refund_status could not be run to see its data (refund_status() missing 1 required positional argument: 'inv)",
+  "no research on this product's users or on what assistants in its industry show: run `engine.py research plan --brief \"what answers do assistants for <this product> show, and which do people use\"`"
+ ],
+ "confirmed": [
+  "ask before a change",
+  "table",
+  "record details",
+  "chart over time",
+  "headline numbers",
+  "file",
+  "compare options",
+  "what happened"
+ ],
+ "confirmed_on": "2026-11-14"
+}

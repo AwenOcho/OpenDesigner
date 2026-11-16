@@ -1,0 +1,548 @@
+{
+ "about": "Answers made by check_templates.py --record from this app's real data and its templates, with sentences written by code, not by a model, so the page works with no model key. Replace them with real model answers with live.py record.",
+ "turns": {
+  "Review my pricing page": {
+   "text": "3 of 7 checks pass. 3 are broken, starting with text contrast.",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "components": [
+       {
+        "component": "KeyFacts",
+        "title": "Pricing page, checked against your system",
+        "subtitle": "7 checks: 3 pass, 1 to look at, 3 broken",
+        "facts": [
+         {
+          "label": "Text contrast",
+          "value": "Broken: 3.1 to 1",
+          "tone": "danger",
+          "note": "Text on .badge is under the 4.5 to 1 floor"
+         },
+         {
+          "label": "Labels can wrap",
+          "value": "Broken: Cut off below 369px wide",
+          "tone": "danger",
+          "note": "“Most popular with…” can't wrap, so it spills out of its card on a phone"
+         },
+         {
+          "label": "Colours come from tokens",
+          "value": "Broken: #ff5a1f typed by hand",
+          "tone": "danger",
+          "note": "Not one of your colours (found by engine.py review in pricing.css)"
+         },
+         {
+          "label": "Spacing is on the scale",
+          "value": "Look at this: 14px is off the scale",
+          "tone": "warning",
+          "note": "A gap the scale doesn't have; the nearest step is 12px"
+         },
+         {
+          "label": "Corners come from tokens",
+          "value": "Passes: 3 of 3 corners",
+          "tone": "success",
+          "note": "Every corner uses a radius token"
+         },
+         {
+          "label": "Type comes from tokens",
+          "value": "Passes: 8 of 8 text styles",
+          "tone": "success",
+          "note": "Every text style uses a type token"
+         },
+         {
+          "label": "Focus is visible",
+          "value": "Passes: A ring on links and buttons",
+          "tone": "success",
+          "note": "The ring's width, offset and colour come from your tokens"
+         }
+        ],
+        "action": {
+         "label": "Let it wrap",
+         "a11y_label": "Fix: Labels can wrap",
+         "event": {
+          "name": "fix_check",
+          "context": {
+           "id": "label-wrap"
+          }
+         }
+        },
+        "id": "root"
+       }
+      ]
+     }
+    }
+   ],
+   "data": {
+    "review_page": {
+     "page": "pricing",
+     "page_name": "Pricing",
+     "file": "pricing.html",
+     "checks": [
+      {
+       "id": "contrast",
+       "status": "broken",
+       "verdict": "Broken",
+       "title": "Text contrast",
+       "result": "3.1 to 1",
+       "detail": "Text on .badge is under the 4.5 to 1 floor",
+       "fix": null,
+       "where": "pricing.css:20"
+      },
+      {
+       "id": "label-wrap",
+       "status": "broken",
+       "verdict": "Broken",
+       "title": "Labels can wrap",
+       "result": "Cut off below 369px wide",
+       "detail": "“Most popular with…” can't wrap, so it spills out of its card on a phone",
+       "fix": "Let it wrap",
+       "where": "pricing.css:21"
+      },
+      {
+       "id": "colour-tokens",
+       "status": "broken",
+       "verdict": "Broken",
+       "title": "Colours come from tokens",
+       "result": "#ff5a1f typed by hand",
+       "detail": "Not one of your colours (found by engine.py review in pricing.css)",
+       "fix": "Use the accent token",
+       "where": "pricing.css:21"
+      },
+      {
+       "id": "spacing-scale",
+       "status": "look",
+       "verdict": "Look at this",
+       "title": "Spacing is on the scale",
+       "result": "14px is off the scale",
+       "detail": "A gap the scale doesn't have; the nearest step is 12px",
+       "fix": "Use 12px from the scale",
+       "where": "pricing.css:11"
+      },
+      {
+       "id": "corners",
+       "status": "pass",
+       "verdict": "Passes",
+       "title": "Corners come from tokens",
+       "result": "3 of 3 corners",
+       "detail": "Every corner uses a radius token",
+       "fix": null,
+       "where": null
+      },
+      {
+       "id": "type",
+       "status": "pass",
+       "verdict": "Passes",
+       "title": "Type comes from tokens",
+       "result": "8 of 8 text styles",
+       "detail": "Every text style uses a type token",
+       "fix": null,
+       "where": null
+      },
+      {
+       "id": "focus",
+       "status": "pass",
+       "verdict": "Passes",
+       "title": "Focus is visible",
+       "result": "A ring on links and buttons",
+       "detail": "The ring's width, offset and colour come from your tokens",
+       "fix": null,
+       "where": null
+      }
+     ],
+     "counts": {
+      "pass": 3,
+      "look": 1,
+      "broken": 3
+     },
+     "done": true,
+     "summary": "7 checks: 3 pass, 1 to look at, 3 broken",
+     "next_fix": {
+      "id": "label-wrap",
+      "label": "Let it wrap",
+      "title": "Labels can wrap"
+     }
+    }
+   },
+   "model": null
+  },
+  "Which parts fit a settings page?": {
+   "text": "4 library parts fit a settings page, and all of them use only your tokens.",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "components": [
+       {
+        "component": "ResultList",
+        "title": "Parts for a settings page",
+        "note": "4 of 123 library parts fit a settings page",
+        "results": [
+         {
+          "title": "Settings switches",
+          "meta": "Form part, quiet style",
+          "detail": "A group of on and off settings, each with a plain explanation.",
+          "badge": "Tokens only",
+          "action": {
+           "label": "Add to kit",
+           "a11y_label": "Add Settings switches to your kit",
+           "event": {
+            "name": "add_part",
+            "context": {
+             "id": "settings-toggles"
+            }
+           }
+          }
+         },
+         {
+          "title": "Member list",
+          "meta": "Data part, quiet style",
+          "detail": "A workspace's members with their email, a role picker per person, last active time.",
+          "badge": "Tokens only",
+          "action": {
+           "label": "Add to kit",
+           "a11y_label": "Add Member list to your kit",
+           "event": {
+            "name": "add_part",
+            "context": {
+             "id": "member-list"
+            }
+           }
+          }
+         },
+         {
+          "title": "Invite members",
+          "meta": "Form part, quiet style",
+          "detail": "Invite several people at once: emails become removable chips.",
+          "badge": "Tokens only",
+          "action": {
+           "label": "Add to kit",
+           "a11y_label": "Add Invite members to your kit",
+           "event": {
+            "name": "add_part",
+            "context": {
+             "id": "invite-members"
+            }
+           }
+          }
+         },
+         {
+          "title": "Audit log",
+          "meta": "Data part, technical style",
+          "detail": "Who changed what, from where and when.",
+          "badge": "Tokens only",
+          "action": {
+           "label": "Add to kit",
+           "a11y_label": "Add Audit log to your kit",
+           "event": {
+            "name": "add_part",
+            "context": {
+             "id": "audit-log"
+            }
+           }
+          }
+         }
+        ],
+        "id": "root"
+       }
+      ]
+     }
+    }
+   ],
+   "data": {
+    "suggest_parts": {
+     "page": "settings",
+     "searched": 123,
+     "parts": [
+      {
+       "id": "settings-toggles",
+       "name": "Settings switches",
+       "for": "A group of on and off settings, each with a plain explanation.",
+       "kind": "Form part, quiet style",
+       "tokens_used": 34,
+       "tokens_only": true,
+       "missing_tokens": [],
+       "fit": 17
+      },
+      {
+       "id": "member-list",
+       "name": "Member list",
+       "for": "A workspace's members with their email, a role picker per person, last active time.",
+       "kind": "Data part, quiet style",
+       "tokens_used": 55,
+       "tokens_only": true,
+       "missing_tokens": [],
+       "fit": 15
+      },
+      {
+       "id": "invite-members",
+       "name": "Invite members",
+       "for": "Invite several people at once: emails become removable chips.",
+       "kind": "Form part, quiet style",
+       "tokens_used": 60,
+       "tokens_only": true,
+       "missing_tokens": [],
+       "fit": 11
+      },
+      {
+       "id": "audit-log",
+       "name": "Audit log",
+       "for": "Who changed what, from where and when.",
+       "kind": "Data part, technical style",
+       "tokens_used": 47,
+       "tokens_only": true,
+       "missing_tokens": [],
+       "fit": 8
+      }
+     ],
+     "note": "4 of 123 library parts fit a settings page"
+    }
+   },
+   "model": null
+  },
+  "How much of my code uses the tokens?": {
+   "text": "95% of the values in your CSS come from tokens. Spacing is the weakest, at 90%.",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "components": [
+       {
+        "component": "KpiStrip",
+        "label": "How much of your CSS uses tokens",
+        "stats": [
+         {
+          "label": "All values",
+          "value": "95%",
+          "share": 95,
+          "note": "35 of 37 from tokens"
+         },
+         {
+          "label": "Spacing",
+          "value": "90%",
+          "share": 90,
+          "warning": "1 typed by hand",
+          "note": "9 of 10 from tokens"
+         },
+         {
+          "label": "Colour",
+          "value": "93%",
+          "share": 93,
+          "warning": "1 typed by hand",
+          "note": "14 of 15 from tokens"
+         },
+         {
+          "label": "Type",
+          "value": "100%",
+          "share": 100,
+          "note": "8 of 8 from tokens"
+         }
+        ],
+        "id": "root"
+       }
+      ]
+     }
+    }
+   ],
+   "data": {
+    "token_use": {
+     "files": [
+      "pricing.css"
+     ],
+     "total": {
+      "values": 37,
+      "from_tokens": 35,
+      "by_hand": 2,
+      "share": 95
+     },
+     "kinds": [
+      {
+       "kind": "Spacing",
+       "values": 10,
+       "from_tokens": 9,
+       "by_hand": 1,
+       "share": 90
+      },
+      {
+       "kind": "Colour",
+       "values": 15,
+       "from_tokens": 14,
+       "by_hand": 1,
+       "share": 93
+      },
+      {
+       "kind": "Type",
+       "values": 8,
+       "from_tokens": 8,
+       "by_hand": 0,
+       "share": 100
+      },
+      {
+       "kind": "Corners",
+       "values": 3,
+       "from_tokens": 3,
+       "by_hand": 0,
+       "share": 100
+      },
+      {
+       "kind": "Shadows",
+       "values": 1,
+       "from_tokens": 1,
+       "by_hand": 0,
+       "share": 100
+      }
+     ],
+     "by_hand_values": [
+      {
+       "kind": "Spacing",
+       "value": "14px",
+       "property": "gap",
+       "file": "pricing.css",
+       "line": 11
+      },
+      {
+       "kind": "Colour",
+       "value": "#ff5a1f",
+       "property": "background",
+       "file": "pricing.css",
+       "line": 21
+      }
+     ],
+     "weakest": "Spacing"
+    }
+   },
+   "model": null
+  },
+  "What is a design token?": {
+   "text": "A color, size or other choice with a name, kept in one place for the whole app. Change it in that one place, and every screen that uses it changes too.",
+   "answer": null,
+   "data": {
+    "define": {
+     "term": "design token",
+     "plain": "A color, size or other choice with a name, kept in one place for the whole app.",
+     "also_called": [
+      "token"
+     ],
+     "designers_say": "named decision, like brand blue",
+     "in_code": "DTCG token with $value and $type",
+     "from": "OpenDesigner's glossary",
+     "terms_in_glossary": 422
+    }
+   },
+   "model": null
+  },
+  "Make the corners rounder": {
+   "text": "I can make the corners one step rounder. It changes your system, so it needs your yes.",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "components": [
+       {
+        "component": "ApprovalPrompt",
+        "title": "Make the corners rounder",
+        "summary": "Roundness goes from 75 to 85. 463 places use these tokens.",
+        "details": [
+         {
+          "label": "Small details",
+          "value": "6px to 8px"
+         },
+         {
+          "label": "Small buttons",
+          "value": "8px to 12px"
+         },
+         {
+          "label": "Buttons and fields",
+          "value": "12px to 16px"
+         },
+         {
+          "label": "Cards and panels",
+          "value": "16px to 24px"
+         },
+         {
+          "label": "Dialogs and menus",
+          "value": "24px to 32px"
+         }
+        ],
+        "warning": "This changes every screen that uses these radius tokens.",
+        "cancel": {
+         "label": "Keep them",
+         "event": {
+          "name": "cancel"
+         }
+        },
+        "approve": {
+         "label": "Change corners",
+         "event": {
+          "name": "change_corners",
+          "context": {
+           "step": "up"
+          }
+         }
+        },
+        "id": "root"
+       }
+      ]
+     }
+    }
+   ],
+   "data": {
+    "preview_corners": {
+     "step": "up",
+     "dial": {
+      "name": "roundness",
+      "from": 75,
+      "to": 85
+     },
+     "radius": [
+      {
+       "token": "--ds-radius-detail",
+       "role": "Small details",
+       "before": "6px",
+       "after": "8px",
+       "change": "6px to 8px"
+      },
+      {
+       "token": "--ds-radius-control-sm",
+       "role": "Small buttons",
+       "before": "8px",
+       "after": "12px",
+       "change": "8px to 12px"
+      },
+      {
+       "token": "--ds-radius-control",
+       "role": "Buttons and fields",
+       "before": "12px",
+       "after": "16px",
+       "change": "12px to 16px"
+      },
+      {
+       "token": "--ds-radius-container",
+       "role": "Cards and panels",
+       "before": "16px",
+       "after": "24px",
+       "change": "16px to 24px"
+      },
+      {
+       "token": "--ds-radius-overlay",
+       "role": "Dialogs and menus",
+       "before": "24px",
+       "after": "32px",
+       "change": "24px to 32px"
+      }
+     ],
+     "places": {
+      "total": 463,
+      "in_sample_app": 3,
+      "in_library": 460,
+      "library_parts": 122
+     }
+    }
+   },
+   "model": null
+  }
+ }
+}

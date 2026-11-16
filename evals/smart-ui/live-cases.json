@@ -243,6 +243,37 @@
     "How many seats do we have?"
    ],
    "expect": []
+  },
+  {
+   "id": "edit-biggest-first",
+   "turns": [
+    "List my invoices, biggest first"
+   ],
+   "expect": [
+    "DataTable"
+   ],
+   "checks": [
+    {
+     "mode": "edit"
+    }
+   ]
+  },
+  {
+   "id": "edit-top-two",
+   "turns": [
+    "Just the two biggest invoices"
+   ],
+   "expect": [
+    "DataTable"
+   ],
+   "checks": [
+    {
+     "mode": "edit"
+    },
+    {
+     "rows": 2
+    }
+   ]
   }
  ]
 }

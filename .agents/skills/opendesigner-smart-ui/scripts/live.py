@@ -23,6 +23,8 @@ Standard library only.
 import argparse
 import importlib.util
 import inspect
+import queue
+import threading
 import json
 import os
 import pathlib
@@ -288,6 +290,8 @@ Reply with JSON only: {{"calls": [{{"action": "<name>", "args": {{...}}}}]}}. Us
 class Conversation:
     """One person's chat: the turns so far, and every piece of data the app returned (what later answers may use)."""
 
+    USE_TEMPLATES = True  # parts made ahead of time; tests of the model-written path turn this off
+
     def __init__(self, app, provider, catalog=None):
         self.app, self.provider = app, provider
         self.catalog = catalog or json.loads(pathlib.Path(app.CATALOG).read_text())
@@ -306,6 +310,13 @@ class Conversation:
         self.log = []          # per turn: calls, first errors, repaired, ui
         self.offered = []      # the changes an answer offered as buttons: (name, context); a press must match one (R3)
         self.case_fixed, self.first_case_errors, self.routed_by_model, self.last_calls = 0, [], False, []
+        sj = pathlib.Path(app.CATALOG).resolve().parents[1] / "build" / "status.json"  # the system's status words (engine.py build)
+        self.status = json.loads(sj.read_text()) if sj.is_file() else None
+        self.prepared_offers = set()  # buttons a prepared part or a toast showed: the only ones a reversible change may run from
+        tp = pathlib.Path(app.CATALOG).parent / "templates.json"  # parts made ahead of time for the app's read actions
+        self.templates = (json.loads(tp.read_text()).get("templates", []) if tp.is_file() and self.USE_TEMPLATES else [])
+        self.matcher = smartui.Matcher(self.templates, app.ACTIONS, self.scope)  # finds the prepared part for a question
+        self.matched = ([], 0.0)
 
     # -- routing: which read actions to run
     def fast_route(self, message):
@@ -314,6 +325,14 @@ class Conversation:
         parameter's listed choices ("Hollow Lane", "visitor") fills a parameter. Returns (calls, sure). Not sure when
         nothing clearly matches before any data was fetched, or when the best match needs a value the message doesn't
         give ("the refunded one"): then a model routes."""
+        m = re.match(r"\s*(?:what is|what's|what are|define|what does)\s+(?:an?\s+|the\s+)?(.+?)(?:\s+mean)?\s*\??\s*$", message, re.I)
+        if m and len(smartui.words(m.group(1))) <= 4 and not re.search(r"\b(my|our|your|this|that|status|state|price|cost|due)\b", m.group(1).lower()):
+            # "what is a design token?": the app's own definition, when it has an action for one (never "what's my status")
+            for name, a in self.app.ACTIONS.items():
+                if not a.get("changes") and re.search(r"defin|glossar|meaning", (a.get("description", "") + name).lower()):
+                    k = next((k for k in a.get("params", {}) if k in ("term", "word", "phrase", "query")), None)
+                    if k:
+                        return [(name, {k: m.group(1).strip()})], True
         # words that say nothing about which data ("did I get", "do I need") don't count as a match
         msg = set(smartui.words(message)) - {"get", "got", "did", "need", "have", "has", "want", "know", "see", "tell"}
         ids = re.findall(r"\b[A-Z]{1,5}[- ]?\d{2,}[A-Z0-9]*\b", message)
@@ -379,12 +398,42 @@ class Conversation:
         return bool(self.CHANGE_WORDS.search(message)) or any(
             (set(smartui.words(a["fn"].__name__.replace("_", " "))) - verbs) <= msg for a in self.app.ACTIONS.values() if a.get("changes"))
 
+    def _args(self, name, message):
+        """The values one action needs, from the message (an id in the action's own shape, a listed choice), or None."""
+        a = self.app.ACTIONS[name]
+        msg = set(smartui.words(message))
+        ids = re.findall(r"\b[A-Z]{1,5}[- ]?\d{2,}[A-Z0-9]*\b", message)
+        negated = bool(re.search(r"\b(not|no|never|without)\b|n't\b|\bun[a-z]+", message.lower()))
+        sig = inspect.signature(a["fn"]).parameters
+        args = {}
+        for k, desc in a.get("params", {}).items():
+            hit = None if negated else next((o for o in _choices(desc) if o.lower() not in {"all", "any", "none", "both", "default"}
+                                             and smartui.words(o.replace("-", " ")) and set(smartui.words(o.replace("-", " "))) <= msg), None)
+            if k in sig and hit:
+                args[k] = hit
+        for k, v in sig.items():
+            if v.default is inspect.Parameter.empty and k not in args:
+                if len(ids) == 1 and _fits(ids[0], a.get("params", {}).get(k, "")):
+                    args[k] = ids[0]
+                else:
+                    return None
+        return args
+
     def route(self, message):
         if self.provider == "recorded":
             return []
         calls, sure = self.fast_route(message)
+        self.matched = self.matcher.match(message)
         if sure:
             return calls
+        # the prepared parts know this product's questions too: a clear winner runs its action, still with no model
+        best, _ = self.matched
+        if best and not self.names_a_change(message):
+            top, t = best[0]
+            second = next((sc for sc, t2 in best[1:] if t2.get("action") != t.get("action")), 0)
+            args = self._args(t["action"], message) if top >= 2.0 and top >= 1.3 * second else None
+            if args is not None:
+                return [(t["action"], args)]
         self.routed_by_model = True
         system = ROUTE.format(reads=actions_text(self.app.ACTIONS, False), changes=actions_text(self.app.ACTIONS, True))
         schema = {"type": "object", "required": ["calls"], "properties": {"calls": {"type": "array", "items": {
@@ -423,11 +472,61 @@ class Conversation:
         t0 = time.perf_counter()
         ms = {}
         emit = on_event or (lambda e: None)
+        clock = lambda: round((time.perf_counter() - t0) * 1000)
+        lane = lambda name, step, status: emit({"type": "lane", "lane": name, "step": step, "status": status, "ms": clock()})
         self.routed_by_model = False
-        calls = self.route(message)
-        fresh = self.run(calls)
-        data = {**self.data, **fresh}
         surface = f"s{self.surfaces + 1}"
+        lane("data", "Find the data", "run")
+        calls = self.route(message)  # by its words, in a few milliseconds; a model only when it is unclear
+        lane("data", "Find the data", "done")
+        # The UI lane: the part made ahead of time for this question (templates.json), announced and drawn at once
+        planned = self._planned(calls)
+        if planned and self.names_a_change(message) and planned[0]["part"].get("component") != "ApprovalPrompt":
+            planned = None  # a change gets its approval: a prepared one (the before and after, from the data), or the model's
+        if planned:  # R1 first: a short fact ("when does my permit run out?") stays a sentence, template or not
+            early = {}
+            for name, _ in calls:
+                for i, part in enumerate(self.route_parts.get(name, [])):
+                    early[part] = early.get(part, 0) + (3 if i == 0 else 2)
+            pre = smartui.select(message, self.catalog, 3, self.scope, None, early)
+            planned = self._planned(calls, pre["candidates"])  # the part the question wants most, among those made ahead
+            mapped = set(self.route_parts.get(planned[1], []))
+            comp = planned[0]["part"].get("component")
+            # a prepared part is the owner's own answer for that action: used unless the question is a short fact, or
+            # the scope maps the action to a different part the question wants (usage as a chart, not the drafted table)
+            wants_other = bool(mapped) and comp not in mapped and comp != (pre["candidates"] or [None])[0]
+            fits = mapped | set(pre["candidates"]) | {comp}
+            if pre.get("short_fact") or wants_other:
+                planned = None  # a template only for a part this question wants (usage as a chart, not the table drafted)
+            else:
+                variants = [t for t in self.templates if t.get("action") == planned[1] and t["part"].get("component") in fits]
+        if planned:
+            t, act = planned
+            comp = t["part"].get("component")
+            emit({"type": "call", "name": "show_ui", "intent": t.get("intent") or act, "part": comp})
+            lane("ui", f"Pick part: {comp}", "done")
+            emit({"type": "shell", "part": comp})
+            ms["shell"] = clock()
+            lane("ui", "Draw the outline", "done")
+        # The data lane runs beside it; each chunk of data that lands fills the part further
+        fresh, view = {}, None
+        ms["match"] = self.matched[1]
+        for name, value, final in self.stream(calls, lane):
+            fresh[name] = value
+            if planned and name == planned[1]:
+                hit = smartui.pick_template(variants, name, value)  # the variant the data fits (one unpaid fine: its card)
+                if hit:
+                    msgs = smartui.wrap(hit[1], surface)
+                    if smartui.validate(msgs, self.catalog, {"source": {**self.data, **fresh}, "copy": True})["ok"]:
+                        view = msgs
+                        ms.setdefault("first_data", clock())
+                        emit({"type": "part", "answer": msgs, "data": {**self.data, **fresh}, "final": final})
+        self.data.update(fresh)  # written here, on the turn's own thread, not by the data worker
+        data = {**self.data, **fresh}
+        if calls and isinstance(fresh.get(calls[0][0]), dict) and "error" in fresh[calls[0][0]]:
+            view = None  # the main lookup failed: the answer says so (ErrorRetry), not another action's table
+        if planned and view:
+            lane("ui", "Fill from the data and check it", "done")
         history = "\n".join(f"{'Person' if t['role'] == 'user' else 'You'}: {t['text'][:400]}" for t in self.turns[-6:])
         boost = {}
         for name, _ in calls or self.last_calls:  # the parts this repo's scope tied to the actions run (a follow-up: last turn's)
@@ -446,24 +545,47 @@ class Conversation:
         if not self.names_a_change(message):  # a question never gets an approval prompt (R3): the record answers it
             sel["candidates"] = [c for c in sel["candidates"] if c != "ApprovalPrompt"]
             sel["ui"] = sel["ui"] and bool(sel["candidates"])
-        view = None if self.names_a_change(message) else self._view(calls, fresh, source, surface)
-        if view:  # the app builds this part from its data: shown now, checked; the model writes only the sentence
-            ms["skeleton"] = (time.perf_counter() - t0) * 1000
-            emit({"type": "part", "answer": view, "data": data})
-            sel = {"ui": False, "candidates": [], "scores": {}, "why": "the app's own view of the data"}
+        if not view and not self.names_a_change(message):
+            view = self._view(calls, fresh, source, surface)  # an app's code view (@shows), when it has one
+            if view:
+                ms.setdefault("first_data", clock())
+                emit({"type": "part", "answer": view, "data": data, "final": True})
+        if view:  # the part is the app's, filled from its data and checked; the model writes only the sentence
+            ms.setdefault("skeleton", ms.get("shell", ms["first_data"]))
+            sel = {"ui": False, "candidates": [], "scores": {}, "why": "a part made ahead of time, filled from the data"}
         elif sel["ui"] and sel["candidates"]:
-            ms["skeleton"] = (time.perf_counter() - t0) * 1000
+            ms["skeleton"] = clock()
+            emit({"type": "call", "name": "show_ui", "intent": "chosen by the model", "part": sel["candidates"][0]})
             emit({"type": "skeleton", "part": sel["candidates"][0]})
+            lane("ui", "Model writes the part", "run")
+        lane("text", "Write the sentence", "run")
         system, sel = smartui.build_prompt(message, self.catalog, 3, self.scope, data, boost, always, structured=True, sel=sel)
+        alts = []
         if view:
-            system += ("\n\nThe person already sees this part, built by the app from the data:\n"
-                       + json.dumps(view[0]["createSurface"]["components"][0], ensure_ascii=False)
+            part0 = view[0]["createSurface"]["components"][0]
+            # another prepared variant is on offer only when the question asks for another shape ("as a table", "all of them")
+            if planned and planned[1] in fresh and re.search(r"\b(table|list|all|every|each|chart|graph|card|summary|details)\b", message.lower()):
+                for t in variants:
+                    if not t.get("when") or smartui._holds(t["when"], fresh[planned[1]]):
+                        b = smartui.bind(t["part"], fresh[planned[1]])
+                        if isinstance(b, dict) and b.get("component") and b not in alts:
+                            alts.append({**b, "id": "root"})
+            numbered = {k: [{"#": i, **x} for i, x in enumerate(v)] for k, v in part0.items() if k in smartui._lists(part0)}
+            system += ("\n\nThe person already sees this part, built by the app from the data (rows numbered from 0):\n"
+                       + json.dumps({**part0, **numbered}, ensure_ascii=False)
                        + "\nWrite only the text: one or two plain sentences with what matters most (for a fine: the amount to pay "
-                         "now and the day that ends). Don't list every detail and don't add a part.")
+                         "now and the day that ends). Don't list every detail and never write a part. If the question asks for only "
+                         "some rows, an order, fewer details or another way to show it, send an edit (keep: the row numbers to show, "
+                         "in order; hide; set; variant); otherwise edit is null."
+                       + (" Nothing has happened yet: say what would change and that it waits for their yes. Never say it is done."
+                          if part0.get("component") == "ApprovalPrompt" else ""))
         names = (list(sel["candidates"]) + [a for a in always if a not in sel["candidates"] and a in self.catalog["components"]]) if sel["ui"] else []
         smaller = [names, names[:2] + [a for a in always if a in names[2:]], names[:1] + [a for a in always if a in names[1:]]]
         schema = [smartui.response_schema(self.catalog, n) for i, n in enumerate(smaller) if n and n not in smaller[:i]] \
             or smartui.response_schema(self.catalog, [])
+        if view:  # a prepared part: the reply is the sentence and, at most, a small edit to that part
+            schema = {"type": "object", "additionalProperties": False, "required": ["text", "edit"], "properties": {
+                "text": {"type": "string"}, "edit": smartui.edit_schema(part0, self.catalog, alts)}}
         shown = [""]
 
         def on_text(raw):
@@ -497,7 +619,23 @@ class Conversation:
                        "its event context, filled from the data (for example {\"name\": \"pay_invoice\", \"context\": {\"number\": \"TH-1047\"}}):\n"
                        + actions_text(self.app.ACTIONS, True))
         turns = self.turns[-4:] + [{"role": "user", "text": message}]
-        reply = self._structured(ask(self.provider, system, turns, schema, on_text))
+        raw = ask(self.provider, system, turns, schema, on_text)
+        edited = []
+        if view:
+            try:
+                ed = (json.loads(raw) or {}).get("edit")
+            except (ValueError, AttributeError):
+                ed = None
+            if ed:
+                new, edited = smartui.apply_edit(part0, ed, self.catalog, alts)
+                if edited:
+                    msgs = smartui.wrap({**new, "id": "root"}, surface)
+                    if smartui.validate(msgs, self.catalog, {"source": source, "copy": True, "status": self.status})["ok"]:
+                        view = msgs
+                        emit({"type": "part", "answer": view, "data": data, "final": True})
+                    else:
+                        edited = ["refused: " + ", ".join(edited)]
+        reply = self._structured(raw)
         self.first_case_errors = []
         result = self._check(reply, source, surface, max_parts)
         first_errors = self.first_case_errors + result["errors"]  # what the model's first answer got wrong, fixed here or not
@@ -520,17 +658,62 @@ class Conversation:
                        {"role": "assistant", "text": text + (f" [showed {result['part']}]" if result["answer"] else "")}]
         if result["answer"]:
             self.surfaces += 1
-            self._remember_offers(result["answer"])
+            self._remember_offers(result["answer"], prepared=bool(view))
+        lane("text", "Write the sentence", "done")
         ms["full"] = (time.perf_counter() - t0) * 1000
         ms.setdefault("skeleton", ms["full"])
         ms.setdefault("first_text", ms["full"])
+        ms.setdefault("first_data", ms["full"] if result["answer"] else ms["first_text"])
         entry = {"message": message, "calls": calls, "routed_by_model": self.routed_by_model, "ms": {k: round(v) for k, v in ms.items()},
-                 "view": bool(view),
+                 "view": bool(view), "template": bool(planned and view),
+                 "mode": ("edit" if view and edited and not edited[0].startswith("refused") else "fill" if view else
+                          "generate" if result["answer"] else "text"), "edit": edited,
                  "case_fixed": case_fixed, "selector": sel["candidates"], "ui": bool(result["answer"]),
                  "part": result["part"], "first_errors": [f"{e['rule']} {e['path']}" for e in first_errors], "repaired": repaired,
                  "final_errors": [f"{e['rule']} {e['path']}" for e in result["errors"]]}
         self.log.append(entry)
         return {"text": text, "answer": result["answer"], "data": data, "log": entry}
+
+    def _planned(self, calls, rank=()):
+        """The template made ahead of time (templates.json) for an action this turn runs: (template, action). The
+        matcher's score for the question comes first; then rank (the selector's parts, best first)."""
+        score = {id(t): sc for sc, t in self.matched[0]}
+        found = [(t, name) for name, _ in calls for t in self.templates if t.get("action") == name]
+        top = list(rank)[:1]
+        # the part the question wants most comes first ("what do the different permits cost?": the price table), then
+        # the first action's own template, then the matcher's score
+        found.sort(key=lambda tn: (0 if tn[0]["part"].get("component") in top else 1,
+                                   0 if set(top) & set(self.route_parts.get(tn[1], [])) else 1,  # the action that answers it
+                                   0 if calls and tn[1] == calls[0][0] else 1, -score.get(id(tn[0]), 0),
+                                   list(rank).index(tn[0]["part"].get("component")) if tn[0]["part"].get("component") in rank else 99))
+        return found[0] if found else None
+
+    def stream(self, calls, lane=lambda *a: None):
+        """The data lane: run the read actions on a worker thread, yielding (action, value, final) as data lands. An
+        action that is a generator yields its result as it grows (one check, one row at a time)."""
+        q = queue.Queue()
+
+        def work():
+            for name, args in calls:
+                lane("data", f"Run {name}", "run")
+                try:
+                    out = self.app.ACTIONS[name]["fn"](**args)
+                    if inspect.isgenerator(out):
+                        last = None
+                        for last in out:
+                            q.put((name, last, False))
+                        out = last
+                except Exception as e:  # an action's own failure is data too: the answer can show it (ErrorRetry)
+                    out = {"error": {"message": str(e)[:200]}}
+                q.put((name, out, True))
+                lane("data", f"Run {name}", "done")
+            q.put(None)
+        threading.Thread(target=work, daemon=True).start()
+        while True:
+            item = q.get()
+            if item is None:
+                return
+            yield item
 
     def _view(self, calls, fresh, source, surface):
         """The part an action's own view builds from its data (the app's @shows), when it passes every check; else None."""
@@ -582,7 +765,7 @@ class Conversation:
             for k in ("createSurface", "updateComponents", "updateDataModel", "deleteSurface"):
                 if isinstance(m, dict) and isinstance(m.get(k), dict):
                     m[k]["surfaceId"] = surface
-        opts = {"source": data, "limits": {"leaves": max_parts}, "copy": True,
+        opts = {"source": data, "limits": {"leaves": max_parts}, "copy": True, "status": self.status,
                 "consequences": {n: a["consequences"] for n, a in self.app.ACTIONS.items() if a.get("changes") and a.get("consequences")}}
         r = smartui.validate(msgs, self.catalog, opts)
         self.case_fixed = 0
@@ -601,12 +784,14 @@ class Conversation:
         return {"text": text, "answer": msgs if not errors else None, "errors": errors, "part": part,
                 "draft": msgs if only_copy else None}
 
-    def _remember_offers(self, answer):
+    def _remember_offers(self, answer, prepared=False):
         def walk(v):
             if isinstance(v, dict):
                 ev = v.get("event")
                 if isinstance(ev, dict) and self.app.ACTIONS.get(ev.get("name"), {}).get("changes"):
                     self.offered.append((ev["name"], json.dumps(ev.get("context") or {}, sort_keys=True)))
+                    if prepared:
+                        self.prepared_offers.add(self.offered[-1])
                 for x in v.values():
                     walk(x)
             elif isinstance(v, list):
@@ -621,6 +806,14 @@ class Conversation:
         if a and a.get("changes"):
             approved = ctx.pop("approved", None) is True
             offer = (name, json.dumps(ctx, sort_keys=True))
+            if self._one_press(name, a) and offer in self.offered and offer in self.prepared_offers:
+                # a change that can be undone, with nothing the person must read first, on a button a prepared part or a
+                # toast showed ("Fix", "Undo"): it runs on the press, with a toast and Undo instead of a question first
+                # (R3, as the house standard says: confirm only what cannot be undone). A model-written part never counts.
+                self.offered.remove(offer)
+                self.prepared_offers.discard(offer)
+                result = self._run_change(a, name, ctx)
+                return {"text": "", "answer": None, "data": {name: result}, "toast": self._toast(name, result), "log": {"ran": name}}
             if not approved:
                 # a "Pay this fine" button on a record: a request for the change, answered with its approval prompt
                 said = ", ".join(f"{k.replace('_', ' ')} {v}" for k, v in ctx.items())
@@ -628,16 +821,49 @@ class Conversation:
             if not approved or offer not in self.offered:  # only a change this conversation showed, after the prompt said yes
                 return {"text": "That needs your confirmation first.", "answer": None, "log": {"refused": name}}
             self.offered.remove(offer)
-            args = {k: v for k, v in ctx.items() if k in a.get("params", {})}
-            try:
-                result = a["fn"](**args)
-            except Exception as e:
-                result = {"error": {"message": str(e)[:200]}}
-            self.data[name] = result
-            return self.answer(f"(I confirmed {name.replace('_', ' ')}. The app returned the result; tell me what happened.)", on_event=on_event)
+            result = self._run_change(a, name, ctx)
+            r = self.answer(f"(I confirmed {name.replace('_', ' ')}. The app returned the result; tell me what happened.)", on_event=on_event)
+            if self._toast(name, result):
+                r["toast"] = self._toast(name, result)
+            return r
         # not a change: what the person picked becomes their next message
         said = ", ".join(f"{k.replace('_', ' ')} {v}" for k, v in ctx.items())
         return self.answer(f"I picked {name.replace('_', ' ')}" + (f": {said}" if said else "") + ".", on_event=on_event)
+
+    NEVER_ONE_PRESS = re.compile(r"\b(pay|paid|payment|charge|refund|purchase|buy|order|checkout|transfer|withdraw|deposit|price|"
+                                 r"delete|remove|erase|destroy|wipe|purge|drop|close account|"
+                                 r"send|email|message|post|publish|share|invite|submit|"
+                                 r"book|booking|reserve|schedule|cancel)\b", re.I)
+
+    def _one_press(self, name, a):
+        """A change may run on one press (toast and Undo, no approval prompt) only when the app marks it reversible, it
+        declares no consequences, and nothing in its name or description touches money, deletion, sending or booking."""
+        said = name.replace("_", " ") + " " + a.get("description", "")
+        return bool(a.get("reversible")) and not a.get("consequences") and not self.NEVER_ONE_PRESS.search(said)
+
+    def _run_change(self, a, name, ctx):
+        args = {k: v for k, v in ctx.items() if k in a.get("params", {})}
+        try:
+            result = a["fn"](**args)
+        except Exception as e:
+            result = {"error": {"message": str(e)[:200]}}
+        self.data[name] = result
+        return result
+
+    def _toast(self, name, result):
+        """Feedback for a change, in the app's words (result["toast"]), with Undo when the app returns one."""
+        if not isinstance(result, dict):
+            return None
+        if "error" in result:
+            return {"text": (result["error"] or {}).get("message") or "That didn't work. Nothing was changed.", "tone": "danger"}
+        if not result.get("toast"):
+            return None
+        undo = result.get("undo")
+        if isinstance(undo, dict) and undo.get("name") in self.app.ACTIONS:
+            self.offered.append((undo["name"], json.dumps(undo.get("context") or {}, sort_keys=True)))  # Undo may run once
+            self.prepared_offers.add(self.offered[-1])
+        tone = result.get("tone") if result.get("tone") in ("success", "warning", "danger", "info") else "success"  # the app's word
+        return {"text": result["toast"], "tone": tone, "undo": undo if isinstance(undo, dict) else None}
 
     def _recorded(self, message):
         rec = getattr(self.app, "RECORDED", None)
@@ -741,9 +967,12 @@ def serve(app_path, port, provider):
             self.send_header("cache-control", "no-store")
             self.end_headers()
 
+            lock = threading.Lock()  # the data worker and the turn both send lines: one at a time
+
             def line(obj):
-                self.wfile.write((json.dumps(obj, ensure_ascii=False) + "\n").encode())
-                self.wfile.flush()
+                with lock:
+                    self.wfile.write((json.dumps(obj, ensure_ascii=False) + "\n").encode())
+                    self.wfile.flush()
             try:
                 if self.path == "/api/chat":
                     r = conv.answer(str(body.get("message") or "")[:2000], on_event=line)

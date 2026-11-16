@@ -8,6 +8,9 @@ All notable changes to OpenDesigner are recorded here. The format follows [Keep 
 
 ### Added
 
+- **Smart UI prepares its answers ahead of time** (2026-11-16). `smartui.py usecases` works out which answers a product needs from its own data, description, research and screens. `templates` then prepares a part for each, bound to the app's data. A question is matched to a prepared part without a model, the part fills as data lands, and the model writes only the sentence.
+- **Smart UI colours and feedback follow the data** (2026-11-16). A value that says "Unpaid" or "Failed" can't be shown as good: the check refuses it. An approval states what a change will do before its button. A change that can be undone gives a toast with Undo, using the system's own toast part.
+- **Plug your own agents into Smart UI** (2026-11-16). `references/your-agents.md` shows how a data agent or a document search sits beside the UI step, and how `show_ui` fills a prepared part over MCP. Smart UI ships no orchestrator.
 - **Review notices status colours typed by hand** (2026-11-16). A hex in a status's hue, or a Tailwind class such as `text-red-600`, is listed for a person to judge with the status token to use. The default feedback rule now allows a toast for a low-stakes confirmation with Undo, and an action that cannot be undone still asks first.
 
 - **Status colours and feedback are rules** (2026-11-14). DESIGN.md gets a Status and Feedback section: what success, warning, danger, info and discovery mean, their tokens, never colour alone, and how an action is confirmed (Q-form-04, Q-form-05). `build/status.json` holds the same map for tools. `review` lists status colours off their meaning, colour-only status and forms with no feedback for a person to judge.

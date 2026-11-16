@@ -7299,6 +7299,24 @@
   ]
  },
  {
+  "id": "deliver.prepared-part",
+  "term": "Prepared part",
+  "layer": "deliver",
+  "plain": "A screen part made ahead of time for one kind of question, filled with real data when someone asks.",
+  "designer": "The answer's layout is decided in advance from your system; at run time only the facts change, so it looks right every time.",
+  "engineer": "A template in opendesigner/smart-ui/templates.json bound to a read action's data ({path}, each, when, tone maps), found by smartui.Matcher and filled by pick_template, then validated.",
+  "designer_says": "answer template",
+  "code_name": "templates.json",
+  "source": [
+   "skills/opendesigner-smart-ui/references/your-agents.md",
+   "skills/opendesigner-smart-ui/scripts/smartui.py"
+  ],
+  "aliases": [
+   "answer template",
+   "bound template"
+  ]
+ },
+ {
   "id": "deliver.records",
   "term": "Durable records for later sessions and the team",
   "plain": "Files saved in your project, so the next chat or your team knows what you chose and why.",

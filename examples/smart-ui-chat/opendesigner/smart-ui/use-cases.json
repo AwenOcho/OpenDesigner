@@ -1,0 +1,156 @@
+{
+ "product": "A travel booking app: search flights and stays, book, and manage trips, with an assistant in the app",
+ "kind": "travel",
+ "answer_types": [
+  {
+   "type": "ask before a change",
+   "for": "pay, book, send or delete, after a yes",
+   "score": 8,
+   "reasons": [
+    "common in travel assistants",
+    "book_flight changes data",
+    "book_transfer changes data"
+   ],
+   "evidence": [
+    "action book_flight",
+    "action book_transfer",
+    "product: A travel booking app: search flights and stays, book, and manage trips, with an "
+   ],
+   "part": "ApprovalPrompt",
+   "missing": null
+  },
+  {
+   "type": "table",
+   "for": "rows of records to scan and sort",
+   "score": 6,
+   "reasons": [
+    "search_flights returns 3 flights with 7 fields each",
+    "get_fares returns 3 fares with 6 fields each"
+   ],
+   "evidence": [
+    "data from get_fares",
+    "data from search_flights"
+   ],
+   "part": "DataTable",
+   "missing": null
+  },
+  {
+   "type": "record details",
+   "for": "one thing with its facts",
+   "score": 6,
+   "reasons": [
+    "get_hotel returns one hotel with 5 facts",
+    "get_booking returns one booking with 7 facts"
+   ],
+   "evidence": [
+    "data from get_booking",
+    "data from get_hotel"
+   ],
+   "part": "KeyFacts",
+   "missing": null
+  },
+  {
+   "type": "compare options",
+   "for": "two to four options side by side",
+   "score": 5,
+   "reasons": [
+    "common in travel assistants",
+    "get_fares returns 3 fares to compare"
+   ],
+   "evidence": [
+    "data from get_fares",
+    "product: A travel booking app: search flights and stays, book, and manage trips, with an "
+   ],
+   "part": "Comparison",
+   "missing": null
+  },
+  {
+   "type": "results to pick from",
+   "for": "a short list to choose one",
+   "score": 5,
+   "reasons": [
+    "common in travel assistants",
+    "search_flights returns 3 flights to choose from, each with a price"
+   ],
+   "evidence": [
+    "data from search_flights",
+    "product: A travel booking app: search flights and stays, book, and manage trips, with an "
+   ],
+   "part": "FlightResults",
+   "missing": null
+  },
+  {
+   "type": "pictures",
+   "for": "a photo, a gallery",
+   "score": 5,
+   "reasons": [
+    "common in travel assistants",
+    "photos in get_hotel have pictures"
+   ],
+   "evidence": [
+    "data from get_hotel",
+    "product: A travel booking app: search flights and stays, book, and manage trips, with an "
+   ],
+   "part": "ImageCard",
+   "missing": null
+  },
+  {
+   "type": "place",
+   "for": "an address on a map",
+   "score": 5,
+   "reasons": [
+    "common in travel assistants",
+    "get_hotel returns a place with an address"
+   ],
+   "evidence": [
+    "data from get_hotel",
+    "product: A travel booking app: search flights and stays, book, and manage trips, with an "
+   ],
+   "part": "LocationCard",
+   "missing": null
+  },
+  {
+   "type": "pick a time",
+   "for": "free times to book",
+   "score": 2,
+   "reasons": [
+    "common in travel assistants"
+   ],
+   "evidence": [
+    "product: A travel booking app: search flights and stays, book, and manage trips, with an "
+   ],
+   "part": "TimeSlots",
+   "missing": null
+  },
+  {
+   "type": "what happened",
+   "for": "the result of a change",
+   "score": 2,
+   "reasons": [
+    "book_flight has a result to show",
+    "book_transfer has a result to show"
+   ],
+   "evidence": [
+    "action book_flight",
+    "action book_transfer"
+   ],
+   "part": "Receipt",
+   "missing": null
+  }
+ ],
+ "gaps": [
+  "no research on this product's users or on what assistants in its industry show: run `engine.py research plan --brief \"what answers do assistants for <this product> show, and which do people use\"`"
+ ],
+ "confirmed": [
+  "ask before a change",
+  "table",
+  "record details",
+  "compare options",
+  "results to pick from",
+  "pictures",
+  "place",
+  "pick a time",
+  "what happened"
+ ],
+ "confirmed_on": "2026-11-14"
+}
