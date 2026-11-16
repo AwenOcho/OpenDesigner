@@ -479,6 +479,8 @@
     if (!b.hasAttribute("data-label")) b.setAttribute("data-label", b.textContent);
     b.textContent = open ? "Show fewer" : b.getAttribute("data-label");
     fit();
+    // folding away: bring the section's top back, so the visitor isn't left in the space the parts took
+    if (!open) list.closest("section").scrollIntoView({ block: "start", behavior: reduce.matches ? "auto" : "smooth" });
   });  // (capture: the event does not bubble) a review copy's variant picker mounts new markup
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
 })();
