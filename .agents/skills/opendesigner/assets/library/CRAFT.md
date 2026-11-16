@@ -72,6 +72,11 @@ become one scrolling row or a full-width stack. Long labels wrap whole or trunca
   unless only one column fits (4 go 4 or 2 x 2, never 3 + 1).
 - **Nested corners.** A photo flush with a bordered card rounds only the corners it shares with the card, at the card's
   radius minus its border; a photo inset by padding takes the outer radius minus the padding (`--ds-radius-nested`).
+- **Tiles and inner panels** (owner review, 2026-11-17: "somewhere it is square elements, somewhere it is round"). An icon
+  tile, a mark, or a band of details set in from the card's edge by its padding is not nested in the card's corner: it takes
+  `min(var(--ds-radius-control), var(--ds-radius-container))`, the same shape as the buttons beside it and never rounder
+  than the card. `--ds-radius-nested` is only for something set close inside a corner. Tags and badges take
+  `--ds-radius-control-sm`, all of them, so one answer never mixes pills and rounded rectangles.
 
 ## 7. Our own shapes and words
 A part may follow a common pattern (a progress bar, a week strip, a product card), never one product's signature. Don't

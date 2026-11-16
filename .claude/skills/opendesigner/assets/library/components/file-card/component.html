@@ -6,7 +6,7 @@
   padding: var(--ds-space-inset-lg) var(--ds-space-inset-xl); background: var(--ds-color-surface-raised); border: var(--ds-border-width-default) solid var(--ds-color-border-subtle);
   border-radius: var(--ds-radius-container); box-shadow: var(--ds-elevation-raised); }
 .odl-file-card svg { flex: none; fill: none; stroke: currentColor; stroke-width: var(--ds-icon-stroke-md); }
-.odl-file-card .odl-icon { display: grid; place-items: center; inline-size: var(--ds-size-control-lg); block-size: var(--ds-size-control-lg); border-radius: var(--ds-radius-nested);
+.odl-file-card .odl-icon { display: grid; place-items: center; inline-size: var(--ds-size-control-lg); block-size: var(--ds-size-control-lg); border-radius: min(var(--ds-radius-control), var(--ds-radius-container));
   background: var(--ds-color-surface-sunken); border: var(--ds-border-width-default) solid var(--ds-color-border-subtle); color: var(--ds-color-icon-default); }
 .odl-file-card .odl-icon svg { display: none; inline-size: var(--ds-size-icon-md); block-size: var(--ds-size-icon-md); }
 /* One icon per kind of file; anything else gets the plain page. */

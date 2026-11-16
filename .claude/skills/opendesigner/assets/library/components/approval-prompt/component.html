@@ -7,19 +7,19 @@
 .odl-approval-prompt *, .odl-approval-prompt *::before { box-sizing: border-box; }
 .odl-approval-prompt svg { flex: none; fill: none; stroke: currentColor; stroke-width: var(--ds-icon-stroke-md); }
 .odl-approval-prompt .odl-head { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--ds-space-inline-md); align-items: start; }
-.odl-approval-prompt .odl-icon { display: grid; place-items: center; inline-size: var(--ds-size-control-md); block-size: var(--ds-size-control-md); border-radius: var(--ds-radius-nested);
+.odl-approval-prompt .odl-icon { display: grid; place-items: center; inline-size: var(--ds-size-control-md); block-size: var(--ds-size-control-md); border-radius: min(var(--ds-radius-control), var(--ds-radius-container));
   background: var(--ds-color-surface-sunken); border: var(--ds-border-width-default) solid var(--ds-color-border-subtle); color: var(--ds-color-icon-default); }
 .odl-approval-prompt .odl-icon svg { inline-size: var(--ds-size-icon-md); block-size: var(--ds-size-icon-md); }
 .odl-approval-prompt h3 { margin: 0; font: var(--ds-text-title-md); overflow-wrap: anywhere; text-wrap: balance; }
 .odl-approval-prompt .odl-summary { margin: var(--ds-space-stack-xs) 0 0; color: var(--ds-color-text-secondary); overflow-wrap: anywhere; }
-.odl-approval-prompt dl { display: grid; gap: var(--ds-space-stack-sm); margin: 0; padding: var(--ds-space-inset-md) var(--ds-space-inset-lg); border-radius: var(--ds-radius-nested);
+.odl-approval-prompt dl { display: grid; gap: var(--ds-space-stack-sm); margin: 0; padding: var(--ds-space-inset-md) var(--ds-space-inset-lg); border-radius: min(var(--ds-radius-control), var(--ds-radius-container));
   background: var(--ds-color-surface-sunken); font-variant-numeric: tabular-nums; }
-.odl-approval-prompt dl > div { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: var(--ds-space-inline-md); align-items: baseline; }
+.odl-approval-prompt dl > div { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: var(--ds-space-inline-md); align-items: baseline; }
 .odl-approval-prompt dt { color: var(--ds-color-text-secondary); overflow-wrap: anywhere; }
 .odl-approval-prompt dd { margin: 0; overflow-wrap: anywhere; }
 /* No details to show: the box goes, rather than an empty panel or a "nothing here" line. */
 .odl-approval-prompt dl:not(:has(dt:not(:empty))) { display: none; }
-.odl-approval-prompt .odl-warning { display: flex; gap: var(--ds-space-inline-md); margin: 0; padding: var(--ds-space-inset-md) var(--ds-space-inset-lg); border-radius: var(--ds-radius-nested);
+.odl-approval-prompt .odl-warning { display: flex; gap: var(--ds-space-inline-md); margin: 0; padding: var(--ds-space-inset-md) var(--ds-space-inset-lg); border-radius: min(var(--ds-radius-control), var(--ds-radius-container));
   background: var(--ds-color-bg-warning-subtle); color: var(--ds-color-text-primary); overflow-wrap: anywhere; }
 .odl-approval-prompt .odl-warning svg { inline-size: var(--ds-size-icon-sm); block-size: var(--ds-size-icon-sm); margin-block-start: calc((1lh - var(--ds-size-icon-sm)) / 2); color: var(--ds-color-text-warning); }
 .odl-approval-prompt .odl-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--ds-space-inline-sm); padding-block-start: var(--ds-space-stack-xs); }

@@ -27,14 +27,17 @@
 .odl-flight-results .odl-code { color: var(--ds-color-text-secondary); font: var(--ds-text-label-md); letter-spacing: var(--ds-text-label-md-tracking); }
 .odl-flight-results .odl-path { display: grid; gap: var(--ds-space-stack-xs); justify-items: center; text-align: center; min-inline-size: 0; }
 .odl-flight-results .odl-dur { color: var(--ds-color-text-secondary); font: var(--ds-text-label-md); font-variant-numeric: tabular-nums; }
-.odl-flight-results .odl-line { position: relative; display: flex; justify-content: space-evenly; align-items: center; inline-size: 100%; block-size: var(--ds-space-12); }
-.odl-flight-results .odl-line::before { content: ""; position: absolute; inset-inline: 0; inset-block-start: 50%; block-size: var(--ds-border-width-emphasis); border-radius: var(--ds-radius-full); background: var(--ds-color-border-default); transform: translateY(-50%); }
-.odl-flight-results .odl-line::after { content: ""; position: absolute; inset-inline-end: 0; inset-block-start: 50%; inline-size: var(--ds-space-8); block-size: var(--ds-space-8); border-radius: var(--ds-radius-full); background: var(--ds-color-icon-default); transform: translateY(-50%); }
+/* the route: a line with a filled dot at each end, and a ringed dot per stop between them */
+.odl-flight-results .odl-line { position: relative; display: flex; justify-content: space-evenly; align-items: center; inline-size: 100%; block-size: var(--ds-space-12);
+  background: linear-gradient(var(--ds-color-border-default), var(--ds-color-border-default)) center / 100% var(--ds-border-width-emphasis) no-repeat; }
+.odl-flight-results .odl-line::before, .odl-flight-results .odl-line::after { content: ""; position: absolute; inset-block-start: 50%; inline-size: var(--ds-space-8); block-size: var(--ds-space-8); border-radius: var(--ds-radius-full); background: var(--ds-color-icon-default); transform: translateY(-50%); }
+.odl-flight-results .odl-line::before { inset-inline-start: 0; }
+.odl-flight-results .odl-line::after { inset-inline-end: 0; }
 .odl-flight-results .odl-line i { position: relative; inline-size: var(--ds-space-8); block-size: var(--ds-space-8); border-radius: var(--ds-radius-full); background: var(--ds-color-surface-raised); border: var(--ds-border-width-emphasis) solid var(--ds-color-icon-default); }
 .odl-flight-results .odl-stops { color: var(--ds-color-text-secondary); font: var(--ds-text-label-md); }
 .odl-flight-results .odl-stops.is-direct { color: var(--ds-color-text-success); }
 .odl-flight-results .odl-carrier { display: flex; align-items: center; gap: var(--ds-space-inline-md); min-inline-size: 0; }
-.odl-flight-results .odl-mark { flex: none; inline-size: var(--ds-size-control-md); block-size: var(--ds-size-control-md); border-radius: var(--ds-radius-nested); overflow: hidden;
+.odl-flight-results .odl-mark { flex: none; inline-size: var(--ds-size-control-md); block-size: var(--ds-size-control-md); border-radius: min(var(--ds-radius-control), var(--ds-radius-container)); overflow: hidden;
   background: var(--ds-color-surface-sunken); border: var(--ds-border-width-default) solid var(--ds-color-border-subtle); }
 .odl-flight-results .odl-mark svg { display: block; inline-size: 100%; block-size: 100%; }
 .odl-flight-results .odl-mark .odl-fin { fill: var(--ds-color-icon-default); }
