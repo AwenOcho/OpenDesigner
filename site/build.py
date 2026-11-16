@@ -1348,7 +1348,7 @@ def home(pages, facts, faq):
     pid, author, page_id = SCENES["blue-waves"]
     cta_bg = f"background-image:url(https://images.unsplash.com/{pid}?auto=format&fit=crop&w=1600&q=70)"
     ba_html, ba_credit = before_after()
-    su_stage, _ = smart_ui_page.preview(sys.modules[__name__])
+    su_stage, su_credit = smart_ui_page.preview(sys.modules[__name__])
     craft = [c for c in CRAFT if any(p["slug"] == c[0] for p in pages)]
     craft_html = "".join(f'<a class="craft-card {v}" href="/docs/{s}/"><span class="vg" aria-hidden="true"><i></i><i></i><i></i></span><h3>{t}</h3><p>{d}</p><span class="more">Open the guide {CHEVRON}</span></a>' for s, t, d, v in craft)
     craft_sec = f"""
@@ -1423,7 +1423,7 @@ def home(pages, facts, faq):
 <div><div class="h-head">{idx("08", "Smart UI")}<h2 class="h-h2">Answers made of your own components.</h2>
 <p class="h-lede">Ask a council's assistant about a fine and get the fine, with a Pay button that asks first. The parts are made ahead of time from your library and filled from your data.</p>
 <p class="h-more"><a class="h-link" href="{smart_ui_page.PATH}">Watch the recorded demo {ARROW}</a></p></div></div>
-<figure class="su-preview">{su_stage}<figcaption class="h-fine">Recorded answer. No model runs here.</figcaption></figure>
+<figure class="su-preview">{su_stage}<figcaption class="h-fine">Recorded answer. No model runs here. Photo: {su_credit} on Unsplash.</figcaption></figure>
 </div>
 </section>
 

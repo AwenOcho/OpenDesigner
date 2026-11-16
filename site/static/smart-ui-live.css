@@ -4,7 +4,7 @@
    fade and a 2 px blur, 60 ms stagger, presses scale to .97; with reduced motion only opacity changes. Corners nest: a box
    set inside another takes the outer radius minus the gap (check_layout.py check 14). */
 .sl { --ease-out: cubic-bezier(.23, 1, .32, 1); text-align: left; }
-.sl-grid { display: grid; grid-template-columns: minmax(0, 680px) minmax(0, 300px); gap: 24px; align-items: start; justify-content: center; }
+.sl-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 320px); gap: 16px; align-items: start; }
 .sl-app { position: relative; display: flex; flex-direction: column; height: 560px; overflow: hidden; border: 1px solid var(--line); border-radius: var(--r-card); background: var(--surface-raised); color: var(--ink); }
 .sl .vh { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; margin: 0; }
 
@@ -138,7 +138,7 @@
 
 /* narrow: the lanes go under the chat */
 @media (max-width: 1100px) {
-  .sl-grid { grid-template-columns: minmax(0, 680px); }
+  .sl-grid { grid-template-columns: minmax(0, 1fr); }
   .sl-lanes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px; }
 }
 @media (max-width: 640px) {
@@ -160,8 +160,6 @@
 .sl[data-mini] .sl-app { height: 520px; }
 .sl-replay { flex: none; align-self: flex-start; margin: 12px 24px 16px; }
 .sl[data-mini][data-state="busy"] .sl-replay { visibility: hidden; }
-.sl:not([data-mini]) { max-width: 1004px; margin-inline: auto; }
-.sl:not([data-mini]) .sl-grid { justify-content: start; }
 .sl-call { font: 500 12px/18px "Hanken Grotesk", system-ui, sans-serif; letter-spacing: 0; }
 
 /* one corner scale with the page: the cards' radius, continuous where the browser draws it */
@@ -170,6 +168,10 @@
 .sl-log:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: -2px; }
 /* the newest answer can always scroll to the top of the chat, even while it is still short */
 .sl-turn:last-child { min-height: 100%; }
-@media (min-width: 1101px) { .sl:not([data-mini]) .sl-behind { box-sizing: border-box; height: 560px; } }
-@media (max-width: 1100px) { .sl:not([data-mini]) .sl-behind { min-height: 400px; } }
 @media (max-width: 640px) { .sl:not([data-mini]) .sl-behind { min-height: 0; } .sl-lanes { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 0 12px !important; } .sl-step { font-size: 13px; line-height: 18px; } }
+/* on the photo stage: the demo fills the stage's glass, corners nest inside it (inner = the glass radius minus its rim) */
+.stage-in .sl { --sl-in: max(2px, calc(var(--in-r) - var(--rim))); }
+.stage-in .sl-app, .stage-in .sl-behind { border-radius: var(--sl-in); border-color: rgb(0 0 0 / .08); }
+.stage-in .sl-switch { margin: 0 0 6px; background: rgb(255 255 255 / .7); }
+.stage-in .sl-behind { background: var(--surface-raised); }
+@supports (corner-shape: superellipse(1.35)) { .stage-in .sl-app, .stage-in .sl-behind { corner-shape: superellipse(1.35); } }

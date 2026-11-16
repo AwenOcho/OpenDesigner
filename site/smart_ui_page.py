@@ -237,8 +237,9 @@ def assets_html():
 
 
 def preview(b):
-    """The home page's compact demo: the Fernhollow chat alone, played once when it comes into view, with a replay button."""
-    return assets_html() + f'<div class="su-frame-calm su-mini">{demo_html([fernhollow()], mini=True)}</div>', ""
+    """The home page's compact demo on the same photo stage: the Fernhollow chat alone, played once in view, with a replay button."""
+    st, credit = b.stage("blue-soft", demo_html([fernhollow()], mini=True), "su-stage su-mini")
+    return assets_html() + st, credit
 
 
 # ---------------------------------------------------------------- page sections
@@ -249,7 +250,7 @@ def hero(b, f):
 <h1 class="su-title">{esc(H1)}</h1>
 <p class="h-lede su-lede">Answers drawn from your own components, filled from your data, checked before they show.</p>
 <p class="su-act"><a class="btn primary" href="/docs/smart-ui-quickstart/">Add it to your assistant</a></p>
-<div class="su-demo">{demo_html([fernhollow(), design_review()])}</div>
+<div class="su-demo">{b.stage("blue-soft", demo_html([fernhollow(), design_review()]), "su-stage")[0]}</div>
 </section>
 """
 
@@ -413,32 +414,19 @@ def parts_css(f):
 
 
 def built_section(b, f, n):
-    t = f["templates"]
-    # plain words for each prepared part (the action and component names stay in templates.json and the docs)
-    rows = "".join(f'<li><span>{a}</span><b>{c}</b></li>' for a, c in (("Your fines", "Fine card"), ("Your application", "Progress card"), ("Renewal prices", "Table")))
-    vis = [
-        f'<div class="sb-file"><ul>{rows}</ul><p class="sb-more">{len(t)} ready-made cards for the council example</p></div>',
-        '<div class="sb-match"><div class="sl-me">Do I have any fines?</div><p class="sl-call done"><span class="sl-dot"></span><span>Fine card, ready-made</span></p></div>',
-        '<div class="sl-part sb-fill"><div class="sl-fact"><dt>Full amount</dt><dd>£70.00</dd></div><div class="sl-fact"><dt>Status</dt><dd><span class="sl-tag warn">Unpaid</span></dd></div><div class="sl-fact"><dt>Challenge by</dt><dd><span class="sl-sk" style="width:70%"></span></dd></div></div>',
-        '<ul class="sb-checks"><li>Every value is in the data</li><li>Every colour is yours</li><li>The colour agrees with the data</li><li>A change asks first</li></ul>',
-        '<div class="sb-draw"><div class="sl-part"><p class="sl-pt">Unpaid parking fine</p><span class="sl-btn primary">Pay £35.00</span></div><p>In your page, in your colours</p></div>',
-    ]
-    who = ["Once, with you", "Smart UI", "As the data lands", "Smart UI", "Your page"]
+    """The five steps in one row, a line each, then your agents beside the UI step. The full steps are on /docs/smart-ui/."""
     lines = ["Finds the answers your product needs and makes a card for each. You check them.",
              "Finds the ready-made card for the question at once, with no model.",
              "Fills the card as your agent's data arrives. The data picks the colours.",
              "Checks every card before it shows, including one the model wrote.",
              "Draws it with your components and colours, in any framework."]
-    cols = "".join(f'<li class="sb-step"><span class="sb-n num">0{i + 1}</span><h3>{esc(title)}</h3><p class="sb-who">{who[i]}</p><div class="sb-vis" aria-hidden="true">{vis[i]}</div><p>{b.inline(lines[i])}</p></li>'
-                   for i, (title, _desc) in enumerate(f["steps"]))
+    when = ["Once, with you", "Every question", "Every question", "Every question", "Every question"]
+    steps = "".join(f'<li><span class="bs-n num">0{i + 1}</span><h3>{esc(title)}</h3><p class="bs-when">{when[i]}</p><p>{esc(lines[i])}</p></li>'
+                    for i, (title, _d) in enumerate(f["steps"]))
     return f"""
 <section class="h-sec" id="built">
-<div class="h-head">{b.idx(n, "How it's built")}<h2 class="h-h2">Prepare once. Then match, fill, check and draw.</h2>
-<p class="h-lede">The model writes the sentence. The interface comes from parts you approved, so it can't drift from your system.</p></div>
-<div class="sb">
-<div class="sb-bands" aria-hidden="true"><span class="sb-band sb-ahead">Ahead of time</span><span class="sb-band sb-now">For every question, while your agent fetches the data</span></div>
-<ol class="sb-steps">{cols}</ol>
-</div>
+<div class="h-head">{b.idx(n, "How it's built")}<h2 class="h-h2">Prepare once. Then match, fill, check and draw.</h2></div>
+<ol class="bs">{steps}</ol>
 <div class="sb-agents"><h3 class="h-h3">Your agents, your model</h3>
 <ol class="flow3"><li><b>Your data agent</b><span>Your API, documents or database</span></li><li><b>Smart UI</b><span>Matches, fills and checks the part</span></li><li><b>The screen</b><span>Your components, your tokens</span></li></ol>
 <a class="h-link" href="/docs/smart-ui-quickstart/#use-your-own-agents">Use your own agents {b.ARROW}</a></div>
@@ -599,7 +587,8 @@ def add(b, files, mds, paths):
     css = b.minify_css(b.corners_match_levers(b.apple_tracking((STATIC / "smart-ui.css").read_text())))
     VER = hashlib.sha256(css.encode()).hexdigest()[:10]
     # six sections (Kunal, 2026-11-16: "about 5 or 6"); the rules, where it runs and the questions live on the docs pages
-    secs = [lambda n: parts_section(b, f, n), lambda n: real_section(b, n), lambda n: compare_section(b, n), lambda n: built_section(b, f, n)]
+    # four sections under the hero (2026-11-16: about 5.5 screens with the footer); the example apps' screens are in the README
+    secs = [lambda n: parts_section(b, f, n), lambda n: compare_section(b, n), lambda n: built_section(b, f, n)]
     body, i = hero(b, f), 1
     for s in secs:
         h = s(f"{i:02d}")

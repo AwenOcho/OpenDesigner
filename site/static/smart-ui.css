@@ -196,8 +196,7 @@
   .rs { flex: 0 0 78%; scroll-snap-align: start; }
 }
 
-/* the home page's compact demo in a calm frame */
-.su-frame-calm .sl-app { max-width: 560px; }
+
 .sys { display: flex; flex-direction: column; }
 .sys .su-shot { flex: 1; }
 .tones .sl-tag { font-family: "Hanken Grotesk", system-ui, sans-serif; font-size: 13px; }
@@ -224,3 +223,14 @@
   .sb-step { flex: 0 0 82%; scroll-snap-align: start; }
   .sb-step:last-child { grid-column: auto; }
 }
+
+/* how it's built: five steps in one row, a line each */
+.bs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
+.bs li { min-width: 0; padding: 20px; border: 1px solid var(--line); border-radius: var(--r-card); background: var(--surface); }
+.bs-n { font: 500 12px/16px "Source Code Pro", ui-monospace, monospace; color: var(--accent-text); }
+.bs h3 { margin: 8px 0 0; font-size: 20px; line-height: 26px; font-weight: 500; letter-spacing: -0.023em; }
+.bs-when { margin: 2px 0 0; font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+.bs li > p:last-child { margin: 10px 0 0; font-size: 14px; line-height: 21px; color: var(--ink-muted); text-wrap: pretty; }
+@media (max-width: 1100px) { .bs { grid-template-columns: repeat(2, minmax(0, 1fr)); } .bs li:last-child { grid-column: 1 / -1; } }
+@media (max-width: 640px) { .bs { grid-template-columns: minmax(0, 1fr); gap: 8px; } .bs li { padding: 14px 16px; } .bs li > p:last-child { margin-top: 4px; } }
+@supports (corner-shape: superellipse(1.35)) { .bs li { corner-shape: superellipse(1.35); --corner-k: 1.22; } }
