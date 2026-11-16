@@ -2,7 +2,7 @@
 <style>
 .odl-receipt { box-sizing: border-box; inline-size: 100%; max-inline-size: 30rem; margin-inline: auto; container-type: inline-size; color: var(--ds-color-text-primary); font: var(--ds-text-body-md); text-wrap: pretty; }
 .odl-receipt .odl-card { box-sizing: border-box; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--ds-space-stack-lg);
-  padding: var(--ds-space-inset-xl); background: var(--ds-color-surface-raised); color: var(--ds-color-text-primary); border: var(--ds-border-width-default) solid var(--ds-color-border-subtle);
+  padding: var(--ds-space-inset-lg); background: var(--ds-color-surface-raised); color: var(--ds-color-text-primary); border: var(--ds-border-width-default) solid var(--ds-color-border-subtle);
   border-radius: var(--ds-radius-container); box-shadow: var(--ds-elevation-raised); font: var(--ds-text-body-md); text-wrap: pretty; }
 .odl-receipt *, .odl-receipt *::before { box-sizing: border-box; }
 .odl-receipt svg { flex: none; fill: none; stroke: currentColor; stroke-width: var(--ds-icon-stroke-md); }
@@ -18,13 +18,16 @@
 .odl-receipt .odl-head { display: grid; gap: var(--ds-space-stack-sm); }
 .odl-receipt h3 { margin: 0; font: var(--ds-text-title-lg); overflow-wrap: anywhere; text-wrap: balance; }
 .odl-receipt .odl-ref { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--ds-space-inline-xs); margin: 0; color: var(--ds-color-text-secondary); font: var(--ds-text-label-md); }
-.odl-receipt .odl-ref span { color: var(--ds-color-text-primary); font: var(--ds-text-code-md); letter-spacing: var(--ds-text-label-md-tracking); overflow-wrap: anywhere; }
+/* the reference stays in the answer's one typeface, its figures lined up, so the window never gains a second font */
+.odl-receipt .odl-ref span { color: var(--ds-color-text-primary); font: var(--ds-text-label-lg); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+/* details read the same as in the approval before it: a sunken panel, the label in the first third, the value after it.
+   The one deliberate difference is the total, the money that moved: its own line under the panel, in the heading weight. */
 .odl-receipt dl { margin: 0; display: grid; gap: var(--ds-space-stack-sm); font-variant-numeric: tabular-nums; }
-.odl-receipt .odl-lines { padding-block-start: var(--ds-space-stack-lg); border-block-start: var(--ds-border-width-default) solid var(--ds-color-border-subtle); }
-.odl-receipt dl > div { display: flex; justify-content: space-between; align-items: baseline; gap: var(--ds-space-inline-md); }
-.odl-receipt dt { min-inline-size: 0; color: var(--ds-color-text-secondary); overflow-wrap: anywhere; }
-.odl-receipt dd { margin: 0; flex: none; max-inline-size: 60%; text-align: end; overflow-wrap: anywhere; }
-.odl-receipt .odl-total { padding-block-start: var(--ds-space-stack-md); border-block-start: var(--ds-border-width-default) solid var(--ds-color-border-subtle); font-weight: var(--ds-font-weight-heading); }
+.odl-receipt .odl-lines { padding: var(--ds-space-inset-md) var(--ds-space-inset-lg); border-radius: min(var(--ds-radius-control), var(--ds-radius-container)); background: var(--ds-color-surface-sunken); }
+.odl-receipt dl > div { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: var(--ds-space-inline-md); align-items: baseline; }
+.odl-receipt dt { color: var(--ds-color-text-secondary); overflow-wrap: anywhere; }
+.odl-receipt dd { margin: 0; overflow-wrap: anywhere; }
+.odl-receipt .odl-total { padding-inline: var(--ds-space-inset-lg); font-weight: var(--ds-font-weight-heading); }
 .odl-receipt .odl-total dt { color: var(--ds-color-text-primary); }
 .odl-receipt .odl-total dd { font: var(--ds-text-title-md); }
 .odl-receipt .odl-note { margin: 0; color: var(--ds-color-text-secondary); overflow-wrap: anywhere; }
@@ -41,8 +44,10 @@
 .odl-receipt .odl-secondary:hover { background: var(--ds-color-bg-neutral-subtle); }
 .odl-receipt button:focus-visible { outline: var(--ds-focus-ring-width) solid var(--ds-color-border-focus); outline-offset: var(--ds-focus-ring-offset); }
 @container (max-width: 26rem) {
-  .odl-receipt .odl-card { padding: var(--ds-space-inset-lg); }
   .odl-receipt h3 { font: var(--ds-text-title-md); }
+  .odl-receipt .odl-lines { padding: var(--ds-space-inset-md); }
+  .odl-receipt .odl-total { padding-inline: var(--ds-space-inset-md); }
+  .odl-receipt dl > div { grid-template-columns: minmax(0, 1fr); gap: var(--ds-space-2); }
 }
 /* Disabled or still loading: quiet but readable (AA), never the faint disabled pair. */
 .odl-receipt button:disabled { cursor: not-allowed; background: var(--ds-color-bg-neutral-subtle); border-color: var(--ds-color-border-subtle); color: var(--ds-color-text-secondary); }
