@@ -1,7 +1,8 @@
 /* The Smart UI page's answer demo (site/smart_ui_page.py, answers_*; smart-ui-answers.js), ported from the approved prototype
    (_coordination/plans/smart-ui-demo-variants/page.html) onto the site's tokens and fonts. A tinted stage of one fixed height on
-   wide screens, and every view is built to fill it: the answer's pictures (photos, the map, the page sketch) take the room that
-   is left, so no panel shows an empty band. On phones (820 px or less) every layout is the window with the rail below, sized by
+   wide screens, and every view is built to fill it: only pictures (photos, the map, the page sketch) take the room that is left,
+   and only beside a text card in two columns; text cards keep their natural height. The island under the panels shows the steps
+   behind each answer. A scrolling panel keeps its bottom space on a spacer (::after), never on its own padding. On phones (820 px or less) every layout is the window with the rail below, sized by
    the script to the tallest answer so nothing below moves on a click. Nested corners: the stage is 24 px with 32 px of padding
    (wider than the corner, so the window takes the container radius); on phones 24 px with 12 px, so the window takes 12. */
 
@@ -13,8 +14,9 @@
 .sd img { display: block; max-width: 100%; }
 
 /* the stage: page width, tinted, one height */
-.sd-stage { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 24px; height: 792px; padding: var(--sd-pad);
+.sd-stage { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; gap: 20px; height: 792px; padding: var(--sd-pad);
   border-radius: var(--sd-stage-r); background: var(--sd-stage-bg); }
+.sd .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .sd-stage > * { min-width: 0; }
 .sd-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 44px; }
 .sd-seg { display: inline-flex; gap: 4px; max-width: 100%; padding: 4px; overflow-x: auto; scrollbar-width: none; border: 1px solid var(--sd-soft); border-radius: var(--r-pill);
@@ -41,18 +43,34 @@
 .sd-av::after { content: ""; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); }
 .sd-winhead b { display: block; font-size: 15px; line-height: 20px; font-weight: 500; }
 .sd-winhead div span { display: block; font-size: 13px; line-height: 16px; color: var(--ink-muted); }
-.sd-body { flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: auto; padding: 20px 24px 24px; scrollbar-width: thin; }
-.sd-q { flex: none; width: fit-content; max-width: 80%; margin-left: auto; padding: 10px 16px; border-radius: 16px 16px 4px 16px; background: var(--accent-soft);
+.sd-body { flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: auto; padding: 20px 24px 0; scrollbar-width: thin; }
+.sd-body::after { content: ""; flex: none; height: 24px; }
+.sd-qrow { flex: none; display: flex; align-items: center; justify-content: flex-end; gap: 12px; min-width: 0; }
+.sd-match { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; line-height: 16px; color: var(--ink-muted); }
+.sd-q { flex: none; width: fit-content; max-width: 80%; padding: 10px 16px; border-radius: 16px 16px 4px 16px; background: var(--accent-soft);
   color: var(--accent-text); font-size: 15px; line-height: 22px; }
 .sd-a { flex: none; max-width: 62ch; margin-top: 16px !important; font-size: 16px; line-height: 25px; text-wrap: pretty; }
-.sd-part { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; margin-top: 12px; }
+/* the answer area never shrinks below its content: when an answer is taller than its panel, the panel scrolls and the
+   spacer after it keeps the bottom space (an area squeezed smaller lets its content run past the spacer) */
+.sd-part { flex: 1 1 auto; display: flex; flex-direction: column; min-height: auto; margin-top: 12px; }
 .sd-part > * { flex: 1 1 auto; min-height: 0; }
-/* text cards never stretch: the council and review pair take the height of their text card, and the map or the sketch beside it flexes to match */
-.sd-part > .sd-duo { flex: none; align-items: start; }
-.sd-duo > .sd-opts, .sd-duo > .sd-sk { align-self: stretch; }
-.sd-compose { display: flex; gap: 8px; padding: 12px 16px; overflow-x: auto; scrollbar-width: none; border-top: 1px solid var(--sd-soft); }
+/* text cards never stretch, in any layout: a text card, a pair with a text card, a note or a state card keeps its natural height.
+   Photo grids and place cards may fill (their photos take the room). */
+.sd-part > .sd-duo, .sd-part > .sd-tcard, .sd-part > .sd-note { flex: none; }
+.sd-duo { align-items: start; }
+.sd-duo > .sd-side2 { align-self: stretch; }
+.sd-foot { flex: none; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-top: 1px solid var(--sd-soft); }
+.sd-ask { flex: 0 0 260px; display: flex; align-items: center; gap: 4px; min-width: 0; padding: 3px 3px 3px 14px; border: 1px solid var(--line); border-radius: var(--r-pill); background: var(--surface-raised); }
+.sd-ask:focus-within { border-color: var(--accent); }
+.sd-ask input { flex: 1; min-width: 0; padding: 6px 0; border: 0; outline: 0; background: none; color: var(--ink); font: inherit; font-size: 14px; line-height: 20px; }
+.sd-ask input::placeholder { color: var(--ink-muted); }
+.sd-ask button { display: grid; place-items: center; flex: none; width: 30px; height: 30px; border: 0; border-radius: 50%; background: var(--accent); color: var(--on-accent); cursor: pointer; }
+.sd-ask button:focus-visible, .sd-chip:focus-visible, .sd-btn:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.sd-compose { flex: 1 1 auto; display: flex; gap: 8px; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.sd-chatcol .sd-ask { flex: 1 1 auto; }
 .sd-compose::-webkit-scrollbar { display: none; }
-.sd-chip { flex: none; padding: 8px 14px; border: 1px solid var(--line); border-radius: var(--r-pill); background: var(--surface-raised); font-size: 14px; line-height: 20px; white-space: nowrap; }
+.sd-chip { flex: none; padding: 7px 14px; border: 1px solid var(--line); border-radius: var(--r-pill); background: var(--surface-raised); color: var(--ink); font: inherit; font-size: 14px; line-height: 20px; white-space: nowrap; cursor: pointer; }
+.sd-chip:hover { border-color: var(--accent); color: var(--accent-text); }
 
 /* status: one map, never colour alone */
 .sd-st { display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px; border-radius: var(--r-pill); font-size: 12px; line-height: 16px; font-weight: 500; white-space: nowrap; }
@@ -63,12 +81,16 @@
 .sd-st.info { color: var(--accent-text); background: var(--accent-soft); }
 
 /* products: the photo takes the room; the name has a two-line slot, so prices sit on one line across the row */
-.sd-pgrid, .sd-places, .sd-plist, .sd-checks, .sd-steps { list-style: none; margin: 0; padding: 0; }
-.sd-pgrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
-.sd-pcard { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-.sd-ph { position: relative; flex: 1 1 auto; overflow: hidden; aspect-ratio: var(--ratio, 3/4); border-radius: var(--sd-card-r); background: var(--surface-sunken); }
+.sd-pgrid, .sd-places, .sd-plist, .sd-checks, .sd-steps, .sd-isteps, .sd-rows, .sd-track, .sd-bars { list-style: none; margin: 0; padding: 0; }
+.sd-pgrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); gap: 16px; --ratio: 5/4; }
+.sd-v1 .sd-pgrid { --ratio: 4/5; }
+.sd-canvas .sd-pgrid.sd-n6 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.sd-pcard { display: flex; flex-direction: column; gap: 10px; min-width: 0; min-height: 0; }
+.sd-ph { position: relative; flex: 1 1 auto; min-height: 96px; overflow: hidden; aspect-ratio: var(--ratio, 3/4); border-radius: var(--sd-card-r); background: var(--surface-sunken); }
 .sd-ph img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .sd-ph .sd-st { position: absolute; left: 8px; top: 8px; background: rgb(255 255 255 / .92); }
+.sd-ph .sd-st.info { background: var(--accent); color: var(--on-accent); }
+.sd-hi .sd-ph, .sd-place.sd-hi { box-shadow: 0 0 0 2px var(--accent); }
 .sd-pname { display: -webkit-box; height: 40px; overflow: hidden; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-size: 14px; line-height: 20px; font-weight: 500; text-wrap: balance; }
 .sd-prow { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 14px; line-height: 20px; white-space: nowrap; }
 .sd-price { font-weight: 500; font-variant-numeric: tabular-nums; }
@@ -102,20 +124,18 @@
 .sd-kv dt { color: var(--ink-muted); }
 .sd-kv dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .sd-kv b { font-weight: 600; }
-.sd-btn { align-self: flex-start; display: inline-flex; margin-top: 14px; padding: 10px 18px; border-radius: var(--r-pill); background: var(--accent); color: var(--on-accent); font-size: 14px; line-height: 20px; font-weight: 500; }
-.sd-map { position: relative; flex: 1 1 auto; min-height: 40px; overflow: hidden; border: 1px solid var(--sd-soft); border-radius: 8px; }
-.sd-map svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-.sd-map .m-bg { fill: var(--surface-raised); }
-.sd-map .m-blk { fill: var(--surface-sunken); }
-.sd-map .m-rd { fill: none; stroke: var(--line); stroke-width: 1; stroke-dasharray: 6 6; }
-.sd-map .m-park { fill: none; stroke: var(--line-strong); stroke-width: 1; }
-.sd-map .m-bay { fill: var(--warn-soft); stroke: var(--warn); stroke-width: 1; }
-.sd-map .m-pin { fill: var(--accent); stroke: var(--surface-raised); stroke-width: 2.5; }
-.sd-maplbl { position: absolute; left: 8px; bottom: 8px; padding: 2px 8px; border-radius: var(--r-pill); background: var(--surface-raised); box-shadow: 0 0 0 1px var(--sd-soft);
-  font-size: 12px; line-height: 16px; color: var(--ink-muted); }
-.sd-opts { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-.sd-opts > .kicker { margin-top: 6px; }
-.sd-opts > .kicker, .sd-sk > .kicker { line-height: 16px; }
+.sd-btn { align-self: flex-start; display: inline-flex; margin-top: 14px; padding: 10px 18px; border: 0; border-radius: var(--r-pill); background: var(--accent); color: var(--on-accent); font: inherit; font-size: 14px; line-height: 20px; font-weight: 500; cursor: pointer; }
+.sd-btn.sd-ghost { background: var(--surface-sunken); color: var(--ink-muted); cursor: default; }
+.sd-btn.sd-sec { background: none; color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+.sd-btn[aria-busy="true"] { opacity: .7; cursor: progress; }
+.sd-map { position: relative; flex: none; aspect-ratio: 16/9; min-height: 160px; overflow: hidden; border: 1px solid var(--sd-soft); border-radius: 8px; }
+.sd-map { background: var(--surface-sunken); }
+.sd-map img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 55% 72%; filter: brightness(1.08); }
+.sd-maplbl { position: absolute; left: 8px; bottom: 8px; padding: 3px 10px; border-radius: var(--r-pill); background: rgb(255 255 255 / .88);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); font-size: 12px; line-height: 16px; color: #222428; }
+.sd-side2 { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.sd-side2 > .kicker { margin-top: 6px; line-height: 16px; }
+.sd-side2 > .kicker:first-child { margin-top: 0; }
 .sd-opt { flex: none; padding: 12px 16px; border: 1px solid var(--sd-soft); border-radius: var(--sd-card-r); background: var(--surface-raised); }
 .sd-opt b { display: block; font-size: 15px; line-height: 20px; font-weight: 500; }
 .sd-opt span { font-size: 13px; line-height: 18px; color: var(--ink-muted); }
@@ -124,30 +144,41 @@
 .sd-checks .sd-st { flex: none; justify-content: center; width: 72px; }
 .sd-checks small { display: none; font-size: 13px; line-height: 18px; color: var(--ink-muted); }
 
-/* text cards keep their natural height; where the answer has more room (the tall canvas, the window) their rows grow roomier,
-   so the card, not an empty band, meets the picture beside it. Wide screens only: phones size the window from the content. */
+/* two columns (a window 760 px or wider): the picture beside a text card flexes to end on the card's line; where the answer has
+   more room (the tall canvas, the window), the text cards' rows grow roomier, so no empty band is left under them. Wide screens
+   only: on phones the window is sized from the content. In one column every picture keeps its aspect ratio (see below). */
 @media (min-width: 821px) {
-  .sd-part { container: sd-part / size; }
-  @container sd-part (max-height: 339px) { .sd-mini { gap: 8px; padding: 10px; } .sd-mhero { padding: 0; } .sd-pl { gap: 5px; padding: 8px; } }
-  @container sd-part (min-height: 340px) {
-    .sd-kv { row-gap: 10px; }
-    .sd-checks li { padding: 11px 0; }
+  @container sd-win (min-width: 760px) {
+    .sd-part { container: sd-part / size; }
+    .sd-duo .sd-pic { flex: 1 1 auto; aspect-ratio: auto; min-height: 40px; max-height: none; }
   }
-  @container sd-part (min-height: 520px) {
-    .sd-fine, .sd-findings { padding: 22px 24px; }
-    .sd-kv { row-gap: 0; margin-top: 18px; }
-    .sd-kv dt, .sd-kv dd { padding: 16px 0; border-top: 1px solid var(--sd-soft); }
-    .sd-fine .sd-ct, .sd-findings .sd-ct { font-size: 20px; line-height: 28px; }
-    .sd-fine .sd-btn { margin-top: 22px; padding: 12px 20px; }
+  @container sd-part (max-height: 339px) { .sd-mini { gap: 8px; padding: 10px; } .sd-mhero { padding: 0; } .sd-pl { gap: 5px; padding: 8px; } }
+  @container sd-part (max-height: 300px) {
+    .sd-duo .sd-tcard { padding: 12px 16px; }
+    .sd-duo .sd-sub { display: none; }
+    .sd-duo .sd-ct { font-size: 15px; line-height: 20px; }
+    .sd-checks { margin-top: 8px; }
+    .sd-checks li { padding: 5px 0; }
+    .sd-kv { margin-top: 8px; row-gap: 2px; }
+    .sd-duo .sd-btn { margin-top: 8px; padding: 6px 14px; }
+    .sd-side2 { gap: 6px; }
+    .sd-opt { padding: 7px 12px; }
+  }
+  @container sd-part (min-height: 340px) { .sd-kv { row-gap: 10px; } }
+  @container sd-part (min-height: 480px) {
+    .sd-duo .sd-tcard { padding: 22px 24px; }
+    .sd-duo .sd-kv { row-gap: 0; margin-top: 18px; }
+    .sd-duo .sd-kv dt, .sd-duo .sd-kv dd { padding: 13px 0; border-top: 1px solid var(--sd-soft); }
+    .sd-duo .sd-ct { font-size: 20px; line-height: 28px; }
+    .sd-duo .sd-btn { margin-top: 22px; padding: 12px 20px; }
     .sd-checks { margin-top: 18px; }
-    .sd-checks li { padding: 18px 0; }
+    .sd-checks li { padding: 12px 0; }
     .sd-checks small { display: block; }
     .sd-checks li > span:last-child { display: grid; gap: 4px; }
   }
 }
 
-.sd-sk { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.sd-mini { flex: 1 1 auto; display: flex; flex-direction: column; gap: 12px; min-height: 0; padding: 12px; border: 1px solid var(--sd-soft); border-radius: var(--sd-card-r); background: var(--surface-sunken); }
+.sd-mini { position: relative; flex: none; aspect-ratio: 4/3; max-height: 260px; display: flex; flex-direction: column; gap: 12px; min-height: 0; padding: 12px; border: 1px solid var(--sd-soft); border-radius: var(--sd-card-r); background: var(--surface-sunken); }
 .sd-mini i, .sd-mini span { display: block; }
 .sd-mnav { display: flex; align-items: center; gap: 8px; }
 .sd-mnav i { width: 22px; height: 5px; border-radius: 3px; background: var(--line); }
@@ -182,7 +213,11 @@
 .sd-lane .kicker { font-size: 10px; }
 .sd-steps { display: grid; gap: 8px; font-size: 14px; line-height: 20px; }
 .sd-steps li { display: flex; align-items: baseline; gap: 10px; }
-.sd-steps li::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--ok); transform: translateY(-1px); }
+.sd-steps li::before, .sd-isteps li::before, .sd-idot { content: ""; flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--line); transform: translateY(-1px); transition: background-color 150ms ease-out; }
+.sd-step.on::before, .sd-island.sd-done .sd-idot { background: var(--ok); }
+.sd-step.bad::before, .sd-island.sd-failed .sd-idot { background: var(--bad); }
+[data-ready] { transition: opacity 150ms ease-out; }
+.sd-wait [data-ready] { opacity: 0; }
 .sd-ready { display: flex; justify-content: space-between; align-items: baseline; padding-top: 12px; border-top: 1px solid var(--sd-soft); font-size: 14px; line-height: 20px; color: var(--ink-muted); }
 .sd-ready b { font: 500 15px/20px "Source Code Pro", ui-monospace, monospace; color: var(--ink); font-variant-numeric: tabular-nums; }
 
@@ -191,32 +226,100 @@
 .sd-rail { display: flex; flex-direction: column; justify-content: space-between; gap: 24px; padding: 8px 0 12px; }
 .sd-rtop { display: grid; gap: 24px; }
 
-/* 2 chat column and answer canvas: question, reply, next questions, then the steps, "Ready in" at the foot */
+/* 2 chat column and answer canvas: question, reply and the next questions, the field at the foot */
 .sd-v2 { grid-template-columns: 340px minmax(0, 1fr); gap: 16px; }
-.sd-v2 .sd-canvas .sd-body { padding: 24px; }
+.sd-canvas .sd-body { padding: 24px 24px 0; }
 .sd-ctitle { flex: none; display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
 .sd-canvas .sd-part { margin-top: 16px; }
 .sd-ctitle b { font-size: 17px; line-height: 24px; font-weight: 500; }
 .sd-chatcol .sd-a { font-size: 15px; line-height: 23px; }
-.sd-qlist { flex: none; display: grid; gap: 6px; margin-top: 12px; }
-.sd-qlist .sd-chip { justify-self: start; padding: 6px 12px; white-space: normal; }
-.sd-behind { flex: 1 1 auto; display: flex; flex-direction: column; gap: 12px; margin-top: 12px; padding-top: 14px; border-top: 1px solid var(--sd-soft); }
-.sd-behind .sd-steps { gap: 6px; font-size: 13px; line-height: 18px; }
-.sd-behind .sd-ready { margin-top: auto; padding-top: 10px; }
+.sd-qlist { flex: none; display: grid; gap: 6px; margin-top: 14px; }
+.sd-qlist .sd-chip { justify-self: start; padding: 6px 12px; white-space: normal; text-align: left; }
 
-/* 3 one window, centred, the trace under it */
-.sd-v3 { grid-template-rows: minmax(0, 1fr) auto; justify-items: center; gap: 24px; }
-.sd-v3 > .sd-win, .sd-tracebar { width: min(100%, 920px); }
-.sd-tracebar { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 20px; font: 400 12px/16px "Source Code Pro", ui-monospace, monospace; color: var(--ink-muted); }
-.sd-tracebar span { display: inline-flex; align-items: center; gap: 6px; }
-.sd-tracebar span::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--ok); }
-.sd-tracebar b { color: var(--ink); font-weight: 500; }
+/* 3 one window, centred */
+.sd-v3 { justify-items: center; }
+.sd-v3 > .sd-win { width: min(100%, 920px); }
+
+/* the island: the steps behind the answer, one line under the panels, one size on every answer */
+.sd-island { justify-self: center; display: flex; align-items: center; gap: 12px; width: min(100%, 1000px); height: 46px; padding: 0 22px; overflow: hidden; white-space: nowrap;
+  border: 1px solid var(--sd-soft); border-radius: var(--r-pill); background: var(--surface-raised); box-shadow: var(--sd-shadow); font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+.sd-island .kicker { flex: none; font-size: 10px; }
+.sd-isteps { display: flex; gap: 14px; min-width: 0; }
+.sd-isteps li { display: flex; align-items: center; gap: 7px; }
+.sd-idiv { flex: none; width: 1px; height: 18px; background: var(--sd-soft); }
+.sd-iready { flex: none; margin-left: auto; }
+.sd-iready b, .sd-iphone b { font: 500 13px/18px "Source Code Pro", ui-monospace, monospace; color: var(--ink); font-variant-numeric: tabular-nums; }
+.sd-iphone { display: none; align-items: center; gap: 8px; }
+.sd-lay-1 .sd-island { display: none; }
+
+/* toasts: inside the stage, never over the page; they leave on their own */
+.sd-toasts { position: absolute; top: calc(var(--sd-pad) + 64px); right: calc(var(--sd-pad) + 16px); z-index: 3; display: grid; gap: 8px; justify-items: end; pointer-events: none; }
+.sd-toast { display: flex; align-items: center; gap: 10px; max-width: 360px; padding: 10px 16px; border-radius: var(--r-pill); background: var(--ink); color: var(--surface-raised);
+  font-size: 14px; line-height: 20px; box-shadow: 0 8px 24px rgb(20 24 40 / .18); animation: sd-toast 200ms cubic-bezier(.23, 1, .32, 1); }
+.sd-toast::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
+@keyframes sd-toast { from { opacity: 0; transform: translateY(-6px); } }
+
+/* the build: an outline first, then the card; states you can try */
+.sd-skel { flex: none; display: grid; gap: 12px; padding: 16px 20px; border: 1px solid var(--sd-soft); border-radius: var(--sd-card-r); }
+.sd-skel i { display: block; height: 10px; border-radius: 5px; background: var(--surface-sunken); }
+.sd-skel i:nth-child(1) { width: 40%; height: 14px; }
+.sd-skel i:nth-child(3) { width: 85%; }
+.sd-skel i:nth-child(4) { width: 60%; }
+.sd-skel .sd-blocks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.sd-skel .sd-blocks i { width: auto; height: 72px; border-radius: 8px; }
+.sd-slow { font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+.sd-a.sd-hide { visibility: hidden; }
+@media (prefers-reduced-motion: no-preference) {
+  .sd-skel i { animation: sd-pulse 1.2s ease-in-out infinite; }
+  .sd-fill { animation: sd-in 220ms cubic-bezier(.23, 1, .32, 1); }
+}
+@keyframes sd-pulse { 50% { opacity: .55; } }
+.sd-note { flex: none; align-self: flex-start; padding: 10px 14px; border-radius: var(--sd-card-r); background: var(--surface-sunken); font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+.sd-state .sd-sub { margin-top: 6px !important; }
+/* a state card or a text-only note sits in the middle of a tall answer area, like an empty state in an app */
+.sd-canvas .sd-part > .sd-state, .sd-canvas .sd-part > .sd-note { margin-block: auto; align-self: center; width: min(100%, 440px); }
+.sd-canvas .sd-part > .sd-tcard:not(.sd-state) { margin-block: auto; align-self: center; width: min(100%, 560px); }
+.sd-state .sd-acts, .sd-approve .sd-acts { display: flex; flex-wrap: wrap; gap: 8px; }
+.sd-approve .sd-warnl { margin-top: 12px !important; font-size: 13px; line-height: 18px; color: var(--warn); }
+.sd-under { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 16px; }
+.sd-under .sd-seg { background: var(--surface-sunken); }
+
+/* follow-up parts */
+.sd-rows { margin-top: 12px; border-top: 1px solid var(--sd-soft); }
+.sd-rows li { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--sd-soft); }
+.sd-thumb { flex: none; width: 40px; height: 40px; overflow: hidden; border-radius: 8px; background: var(--surface-sunken); }
+.sd-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.sd-dn { flex: 1; min-width: 0; display: grid; font-size: 14px; line-height: 20px; font-weight: 500; }
+.sd-dn small { font-size: 13px; line-height: 18px; font-weight: 400; color: var(--ink-muted); }
+.sd-track { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin-top: 16px; }
+.sd-track li { display: grid; align-content: start; gap: 2px; padding-top: 12px; border-top: 3px solid var(--surface-sunken); font-size: 13px; line-height: 18px; }
+.sd-track li.sd-done { border-top-color: var(--ok); }
+.sd-track li.sd-now { border-top-color: var(--warn); }
+.sd-track b { font-weight: 500; }
+.sd-track small { font-size: 12px; line-height: 16px; color: var(--ink-muted); }
+.sd-meter { display: flex; align-items: baseline; gap: 12px; }
+.sd-meter b { font: 300 40px/44px "Hanken Grotesk", system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+.sd-meter span { font-size: 14px; line-height: 20px; color: var(--ink-muted); }
+.sd-bar { display: block; height: 8px; overflow: hidden; border-radius: 4px; background: var(--surface-sunken); }
+.sd-bar > i { display: block; height: 100%; border-radius: 4px; background: var(--accent); }
+.sd-bar.bad > i { background: var(--bad); }
+.sd-bar.big { height: 12px; margin-top: 12px; border-radius: 6px; }
+.sd-bars { display: grid; gap: 10px; margin-top: 18px; }
+.sd-bars li { display: grid; grid-template-columns: 96px minmax(0, 1fr) 40px; align-items: center; gap: 12px; font-size: 13px; line-height: 18px; }
+.sd-bars b { font-weight: 500; text-align: right; font-variant-numeric: tabular-nums; }
+.sd-bas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.sd-ba { margin: 0; display: grid; gap: 8px; }
+.sd-bacard { display: grid; gap: 8px; padding: 16px; border: 1px solid var(--sd-soft); border-radius: var(--rb); background: var(--surface-sunken); }
+.sd-bacard i { display: block; height: 8px; border-radius: 4px; background: var(--line); }
+.sd-bacard i.t { width: 50%; height: 10px; background: var(--line-strong); }
+.sd-bacard i:nth-child(3) { width: 75%; }
+.sd-babtn { justify-self: start; margin-top: 6px; padding: 6px 14px; border-radius: var(--ra); background: var(--accent); color: var(--on-accent); font-size: 13px; line-height: 18px; }
 
 /* a window under 760 px stacks the two columns; a narrow canvas shows six products, three a row */
 @container sd-win (max-width: 759px) { .sd-duo { grid-template-columns: minmax(0, 1fr); } }
 @container sd-win (max-width: 640px) {
-  .sd-canvas .sd-pgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .sd-canvas .sd-pgrid > li:nth-child(n+7) { display: none; }
+  .sd-canvas .sd-pgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sd-canvas .sd-pgrid > li:nth-child(n+5) { display: none; }
 }
 
 /* the hero shows chat and canvas on wide screens, the window and rail on phones */
@@ -242,9 +345,10 @@
 .su-credits { max-width: var(--shell); margin: 96px auto 0; padding-inline: 24px; font-size: 12px; line-height: 18px; color: var(--ink-muted); }
 .su-credits a { color: inherit; }
 
-.sd-swap > .sd-win, .sd-swap > .sd-rail, .sd-swap > .sd-tracebar { animation: sd-in 180ms cubic-bezier(.23, 1, .32, 1); }
+.sd-swap > .sd-win, .sd-swap > .sd-rail { animation: sd-in 180ms cubic-bezier(.23, 1, .32, 1); }
 @keyframes sd-in { from { opacity: .4; } to { opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .sd-swap > * { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .sd-swap > *, .sd-toast, .sd-fill { animation: none !important; } .sd-steps li::before, .sd-isteps li::before, [data-ready] { transition: none !important; } }
+@media (max-width: 1180px) and (min-width: 821px) { .sd-island { width: auto; } .sd-island > :not(.sd-iphone) { display: none; } .sd-iphone { display: flex; } }
 
 /* phones: every layout is the window with the rail below; the script sets one height for every answer, and the pictures fill it */
 @media (max-width: 820px) {
@@ -258,20 +362,30 @@
   .sd-hero .sd-desk { display: none; }
   .sd-hero .sd-phone { display: grid; }
   .sd-laywrap { display: none; }
-  .sd-v1 { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto; gap: 16px; height: var(--sd-view-h, auto); align-content: start; }
+  .sd-v1 { grid-template-columns: minmax(0, 1fr); }
   .sd-v1 > .sd-win { height: var(--sd-win-h, auto); }
-  .sd-rail { gap: 16px; padding: 4px 8px 8px; }
-  .sd-rtop { gap: 16px; }
-  .sd-rail .sd-lane:nth-of-type(1), .sd-rail .sd-lane-x { display: none; }
-  .sd-body { padding: 16px; }
+  .sd-rail { display: none; }
+  .sd-lay-1 .sd-island, .sd-island { display: flex; justify-self: center; width: auto; height: 40px; padding: 0 16px; }
+  .sd-island > :not(.sd-iphone) { display: none; }
+  .sd-iphone { display: flex; }
+  .sd-body { padding: 16px 16px 0; }
+  .sd-body::after { height: 16px; }
+  .sd-foot { flex-wrap: wrap; gap: 10px; padding: 12px; }
+  .sd-ask { flex: 1 1 100%; }
+  .sd-toasts { top: auto; bottom: calc(var(--sd-pad) + 52px); right: var(--sd-pad); left: var(--sd-pad); justify-items: center; }
+  .sd-track { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .sd-track li { grid-template-columns: auto 1fr; padding: 6px 0 6px 12px; border-top: 0; border-left: 3px solid var(--surface-sunken); }
+  .sd-track li.sd-done { border-left-color: var(--ok); }
+  .sd-track li.sd-now { border-left-color: var(--warn); }
+  .sd-track small { grid-column: 2; }
   .sd-winhead { padding: 12px 16px; }
-  .sd-pgrid { --ratio: 1/1 !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 12px; }
+  .sd-pgrid { --ratio: 1/1 !important; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: auto; gap: 16px 12px; }
+  .sd-pgrid > li:nth-child(n+5) { display: none; }
   .sd-places { grid-template-columns: minmax(0, 1fr); gap: 12px; }
   .sd-places .sd-place { flex-direction: row; }
   .sd-places .sd-ph { flex: none; width: 38%; aspect-ratio: auto; }
   .sd-places .sd-plb { flex: 1 1 0; min-width: 0; align-content: center; }
   .sd-plt { flex-direction: column; gap: 2px; }
   .sd-a { font-size: 15px; line-height: 23px; }
-  .sd-plans { min-height: 120px; }
   .su-credits { margin-top: 64px; padding-inline: 16px; }
 }
