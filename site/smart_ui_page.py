@@ -1,5 +1,8 @@
 """The Smart UI page (/smart-ui/), its scripted demo, the home page's compact demo, and the renderer demo (/smart-ui/demo/).
 
+The page itself (2026-11-16): the hero's answer demo and "One answer. Any layout, any look." (answers_*, smart-ui-answers.css
+and .js), then how it's built. The scripted live demo below is now only the home page's compact one.
+
 Owner direction, 2026-11-14 (_coordination/plans/2026-11-13-smart-ui-spec.md, sections 10 and 11): a page that shows every kind
 of answer and how it is built, with a demo that is scripted visuals only (no backend), ported from the approved sketch onto the
 site's brand system. It must feel built live: the tool-call chip, the outline, values filling as the data lands, the sentence,
@@ -34,8 +37,8 @@ DEMO = PATH + "demo/"
 TITLE = "Smart UI"
 H1 = "Generative UI for your chatbot, in your own design system"
 SEO_TITLE = H1
-DESCRIPTION = ("Add generative UI to your chatbot with your own design system. Watch a recorded answer build: the outline first, "
-               "then values as the data lands.")
+DESCRIPTION = ("Add generative UI to your chatbot with your own design system: products, places, a fine or a review, drawn from "
+               "your own components and checked first.")
 # the questions on /docs/faq/ this page repeats (word for word, so the two never disagree)
 FAQ = ["What is generative UI, and how do I make it match my design system?", "How do I add generative UI to a chatbot I already have?",
        "Does the model write the interface code for every answer?", "Can my chatbot answer with my own components instead of text?"]
@@ -242,6 +245,184 @@ def preview(b):
     return assets_html() + st, credit
 
 
+# ---------------------------------------------------------------- the answer demo (owner-approved prototype, 2026-11-16:
+# _coordination/plans/smart-ui-demo-variants/page.html): a chat and an answer canvas on a tinted stage, four example assistants
+# answering with picture-based parts, then the same answer in three layouts and three looks. Every view is written here as a
+# <template>; smart-ui-answers.js only swaps them, so the first paint is already a finished answer. Shops, cafés and names are
+# invented; the photos are Unsplash (credit at the page foot).
+def unsplash(pid, w, h):
+    return f"https://images.unsplash.com/{pid}?w={w}&h={h}&q=70&auto=format&fit=crop&crop=entropy"
+
+
+COATS = [("photo-1539533113208-f6df8cc8b543", "Camel single-breasted coat", 189, None, ["#b08a5e", "#2b2b2b"], ("ok", "In stock")),
+         ("photo-1591900947067-851789555ef3", "Red wool wrap coat", 149, 199, ["#a8322d", "#1f2a44"], ("warn", "2 left in M")),
+         ("photo-1550872199-63f4382fe925", "Belted brown coat", 172, None, ["#7a5a3c", "#c9b79c"], ("ok", "In stock")),
+         ("photo-1707303294967-d0ccd0809cf2", "Black tailored coat", 195, None, ["#1d1d1f", "#6b6f78"], ("ok", "In stock")),
+         ("photo-1565532070333-43edd7d75c90", "Mustard car coat", 119, 159, ["#d4a017", "#2f4a3a"], ("warn", "Low stock")),
+         ("photo-1586081493946-c75071ee57c0", "Grey funnel-neck coat", 165, None, ["#9a9ea6", "#222222"], ("ok", "In stock")),
+         ("photo-1608635680046-aebf91c1a9c8", "Long tan overcoat", 184, None, ["#a07850"], ("ok", "In stock")),
+         ("photo-1637102146291-c408b298e22b", "Classic trench", 158, None, ["#c8b18e", "#1f2a44"], ("info", "Ships Friday"))]
+CAFES = [("photo-1567880905822-56f8e06fe630", "The Reading Room", "4.8", "£", "6 min walk", "Quiet · sockets at every table", "Open until 20:00", ("ok", "Open now")),
+         ("photo-1511081692775-05d0f180a065", "Kiln Coffee", "4.6", "£", "9 min walk", "Long tables · fast Wi-Fi", "Busy after 12:00", ("warn", "Busy soon")),
+         ("photo-1770739539412-d9e1021429cf", "Hollow Bean", "4.7", "££", "4 min walk", "Soft seating · no music", "Open until 18:00", ("ok", "Open now"))]
+ASSISTANTS = {
+    "shop": {"tab": "Shopping", "who": "Wren & Loom assistant", "q": "Warm wool coats under £200, size M?",
+             "a": "Eight coats fit. The camel single-breasted is the warmest under £200, and two are on sale this week.",
+             "title": "Wool coats under £200 · size M", "count": "8 results",
+             "agent": ["Searching 412 coats", "Filtering size M, under £200", "Writing a sentence"],
+             "ui": ["Matched the product grid", "Filled 8 products", "Checked prices and stock"],
+             "checks": ["Every photo has alt text", "Prices carry the £ sign", "Stock uses the status colours"], "ms": "1.2 s",
+             "chips": ["Warm wool coats under £200, size M?", "Which is warmest?", "Show only sale coats", "Will it arrive by Friday?"]},
+    "places": {"tab": "Places", "who": "Fernhollow guide", "q": "A quiet café to work from near me?",
+               "a": "Three cafés within ten minutes are quiet and have sockets. The Reading Room stays open latest.",
+               "title": "Quiet cafés near Mill Street", "count": "3 places",
+               "agent": ["Finding cafés within 1 km", "Reading opening hours", "Writing a sentence"],
+               "ui": ["Matched place cards", "Filled 3 places", "Checked open-now status"],
+               "checks": ["Every photo has alt text", "Open now comes from live hours", "Ratings show one decimal"], "ms": "0.9 s",
+               "chips": ["A quiet café to work from near me?", "Somewhere open after 18:00?", "Which has the best Wi-Fi?", "Directions to The Reading Room"]},
+    "council": {"tab": "Council", "who": "Fernhollow council", "q": "Do I have any fines?",
+                "a": "You have one unpaid fine. Pay by Thursday 19 November and it costs £35.00 instead of £70.00.",
+                "title": "Your fines", "count": "1 unpaid",
+                "agent": ["Fetching your fines", "Checking the payment deadline", "Writing a sentence"],
+                "ui": ["Matched the fine card", "Filled it in", "Checked dates and amounts"],
+                "checks": ["Dates in plain words", "Amounts carry the £ sign", "The pay button names the amount"], "ms": "1.1 s",
+                "chips": ["Do I have any fines?", "Where is my application?", "Renew my parking permit", "When is the office open?"]},
+    "review": {"tab": "Design review", "who": "Design review assistant", "q": "Review my pricing page",
+               "a": "Your pricing page follows the system in most places. Two things break it, and one is worth a look.",
+               "title": "Pricing page review", "count": "5 checks",
+               "agent": ["Reading 14 files", "Measuring colours and spacing", "Writing a sentence"],
+               "ui": ["Matched the findings card", "Filled 5 checks", "Checked it"],
+               "checks": ["Every finding has a status", "Colours come from your tokens", "The sentence matches the card"], "ms": "1.7 s",
+               "chips": ["Review my pricing page", "How much of my code uses tokens?", "Make the corners rounder", "What is a design token?"]}}
+LAYOUTS = [("canvas", "Canvas", 2), ("window", "Window and rail", 1), ("single", "Single window", 3)]
+LOOKS = [("blue", "Your blue"), ("warm", "Warm"), ("dark", "Dark")]
+
+
+def a_status(tone, text):
+    return f'<span class="sd-st {tone}">{esc(text)}</span>'
+
+
+def a_products(n, ratio):
+    w, h = (480, 480) if ratio == "1/1" else (480, 600)
+    cells = "".join(
+        f'<li class="sd-pcard"><div class="sd-ph"><img src="{unsplash(pid, w, h)}" width="{w}" height="{h}" alt="{esc(name)}" loading="lazy" decoding="async">{a_status(*st)}</div>'
+        f'<div><p class="sd-pname">{esc(name)}</p><p class="sd-prow"><span class="sd-price">£{p}' + (f'<s aria-label="was £{was}">£{was}</s>' if was else "") + "</span>"
+        f'<span class="sd-sw" role="img" aria-label="{len(sw)} colour{"s" if len(sw) > 1 else ""}">' + "".join(f'<i style="background:{c}"></i>' for c in sw) + "</span></p></div></li>"
+        for pid, name, p, was, sw, st in COATS[:n])
+    return f'<ul class="sd-pgrid" style="--ratio:{ratio}">{cells}</ul>'
+
+
+def a_place(c, w=560, h=420):
+    pid, n, r, pr, walk, why, hrs, st = c
+    return (f'<li class="sd-place"><div class="sd-ph"><img src="{unsplash(pid, w, h)}" width="{w}" height="{h}" alt="Inside {esc(n)}" loading="lazy" decoding="async"></div>'
+            f'<div class="sd-plb"><p class="sd-plt">{esc(n)}<span aria-label="rated {r} out of 5">★ {r}</span></p><p class="sd-plm">{pr} · {walk} · {hrs}</p>'
+            f'<p class="sd-plw">{esc(why)}</p><p>{a_status(*st)}</p></div></li>')
+
+
+def a_fine():
+    rows = [("Reference", "FH40018273"), ("Date", "Fri 6 Nov 2026, 10:42"), ("Place", "Mill Street"), ("Full amount", "£70.00")]
+    kv = "".join(f"<dt>{k}</dt><dd>{v}</dd>" for k, v in rows) + "<dt>Pay by Thu 19 Nov</dt><dd><b>£35.00</b></dd>"
+    return (f'<div class="sd-card"><div class="sd-cardh"><div><p class="sd-ct">Unpaid parking fine</p><p class="sd-sub">Vehicle AB12 CDE</p></div>{a_status("warn", "Unpaid")}</div>'
+            f'<dl class="sd-kv">{kv}</dl><span class="sd-btn">Pay £35.00</span></div>')
+
+
+def a_checks():
+    rows = [("ok", "Pass", "Colours all come from tokens"), ("ok", "Pass", "Body text contrast is 7.2 to 1"), ("ok", "Pass", "Spacing follows the 8 px scale"),
+            ("warn", "Look", "Two buttons use a 10 px radius, the system says 12"), ("bad", "Broken", "Plan names are cut off at 375 px")]
+    return ('<div class="sd-card sd-wide"><p class="sd-ct">Pricing page, checked against your system</p><p class="sd-sub">5 checks: 3 pass, 1 to look at, 1 broken</p><ul class="sd-checks">'
+            + "".join(f"<li>{a_status(t, l)}{esc(x)}</li>" for t, l, x in rows) + "</ul></div>")
+
+
+def a_part(k, v):
+    if v == 2 and k == "places":
+        return f'<div class="sd-feat"><ul class="sd-plist">{a_place(CAFES[0], 720, 540)}</ul><ul class="sd-plist sd-side">{"".join(a_place(c) for c in CAFES[1:])}</ul></div>'
+    if v != 3 and k == "council":
+        opts = [("Pay £35.00 today", "The lower amount ends Thursday 19 November"), ("Challenge the fine", "Send photos or a permit within 28 days"),
+                ("Ask for more time", "Up to 14 days if you ask before the 19th")]
+        return (f'<div class="sd-duo">{a_fine()}<div class="sd-opts"><p class="kicker">What you can do</p>'
+                + "".join(f'<div class="sd-opt"><b>{t}</b><span>{d}</span></div>' for t, d in opts) + "</div></div>")
+    if v != 3 and k == "review":
+        pl = lambda w: f'<div class="sd-pl{" w" if w else ""}"><i class="nm"></i><i></i><i></i><i class="bt"></i></div>'
+        return (f'<div class="sd-duo sd-duo-sk">{a_checks()}<div class="sd-sk"><p class="kicker">Where on the page</p>'
+                f'<div class="sd-mini" role="img" aria-label="Sketch of the pricing page: finding 1, the button radius, on the middle plan; finding 2, the cut-off plan name, on the first plan">'
+                f'<div class="sd-mbar"></div><div class="sd-plans">{pl(0)}{pl(1)}{pl(0)}</div>'
+                '<span class="sd-pin warn" style="left:50%;bottom:22px">1</span><span class="sd-pin bad" style="left:16%;top:44px">2</span></div></div></div>')
+    if k == "shop":
+        return a_products(8, "1/1") if v == 2 else a_products(4, "1/1") if v == 3 else a_products(4, "4/5")
+    if k == "places":
+        return f'<ul class="sd-places">{"".join(a_place(c) for c in CAFES)}</ul>'
+    return a_fine() if k == "council" else a_checks()
+
+
+def a_head(s):
+    return f'<div class="sd-winhead"><span class="sd-av" aria-hidden="true"></span><div><b>{esc(s["who"])}</b><span>Answers in your design system</span></div></div>'
+
+
+def a_trace(s, cls):
+    return f'<p class="{cls}">' + "".join(f"<span>{esc(x)}</span>" for x in (s["agent"][0], s["ui"][0], s["ui"][2])) + f'<b>Ready in {s["ms"]}</b></p>'
+
+
+def a_view(k, v):
+    """One assistant's answer in one layout: 1 window and rail, 2 chat and canvas, 3 single window."""
+    s = ASSISTANTS[k]
+    chips = '<div class="sd-compose" aria-label="Other questions">' + "".join(f'<span class="sd-chip">{esc(c)}</span>' for c in s["chips"][1:]) + "</div>"
+    if v == 1:
+        steps = lambda xs: '<ul class="sd-steps">' + "".join(f"<li>{esc(x)}</li>" for x in xs) + "</ul>"
+        rail = (f'<aside class="sd-rail" aria-label="Behind the answer"><p class="kicker">Behind the answer</p>'
+                f'<div class="sd-lane"><p class="kicker">Your agent</p>{steps(s["agent"])}</div><div class="sd-lane"><p class="kicker">Smart UI</p>{steps(s["ui"])}</div>'
+                f'<div class="sd-lane sd-lane-x"><p class="kicker">Checked before it shows</p>{steps(s["checks"])}</div><hr><p class="sd-ready">Ready in <b>{s["ms"]}</b></p></aside>')
+        return (f'<div class="sd-win">{a_head(s)}<div class="sd-body"><div class="sd-q">{esc(s["q"])}</div><p class="sd-a">{esc(s["a"])}</p>'
+                f'<div class="sd-part">{a_part(k, 1)}</div></div>{chips}</div>{rail}')
+    if v == 2:
+        qs = '<div class="sd-qlist" aria-label="Other questions">' + "".join(f'<span class="sd-chip">{esc(c)}</span>' for c in s["chips"][1:]) + "</div>"
+        return (f'<div class="sd-win sd-chatcol">{a_head(s)}<div class="sd-body"><div class="sd-q">{esc(s["q"])}</div><p class="sd-a">{esc(s["a"])}</p>{qs}</div></div>'
+                f'<div class="sd-win sd-canvas"><div class="sd-body"><div class="sd-ctitle"><b>{esc(s["title"])}</b><span class="kicker">{s["count"]}</span></div>{a_part(k, 2)}</div>'
+                f'{a_trace(s, "sd-trace")}</div>')
+    return (f'<div class="sd-win">{a_head(s)}<div class="sd-body"><div class="sd-q">{esc(s["q"])}</div><p class="sd-a">{esc(s["a"])}</p>'
+            f'<div class="sd-part">{a_part(k, 3)}</div></div>{chips}</div>{a_trace(s, "sd-tracebar")}')
+
+
+def a_tabs(on):
+    return ('<div class="sd-seg" role="group" aria-label="Example assistants">'
+            + "".join(f'<button type="button" data-k="{k}" aria-pressed="{str(k == on).lower()}">{esc(s["tab"])}</button>' for k, s in ASSISTANTS.items()) + "</div>")
+
+
+def a_templates():
+    return "".join(f'<template data-sd-t="{k}-{v}">{a_view(k, v)}</template>' for k in ASSISTANTS for v in (1, 2, 3))
+
+
+def a_stage(name, tab, views, cls):
+    return (f'<div class="sd {cls}" data-sd="{name}" data-tab="{tab}"><div class="sd-stage">'
+            f'<div class="sd-bar">{a_tabs(tab)}<span class="sd-rec">Recorded answers</span></div>{views}</div></div>')
+
+
+def answers_hero():
+    """The hero's stage: chat and canvas on wide screens, the window with the rail below on phones (both drawn; CSS shows one)."""
+    views = (f'<div class="sd-view sd-v2 sd-desk" data-v="2">{a_view("shop", 2)}</div>'
+             f'<div class="sd-view sd-v1 sd-phone" data-v="1">{a_view("shop", 1)}</div>')
+    return a_stage("hero", "shop", views, "sd-hero")
+
+
+def answers_section(b, n):
+    seg = lambda label, attr, items, on: (f'<span class="sd-ctl{" sd-laywrap" if attr == "l" else ""}"><span class="sd-lbl" id="sd-lbl-{attr}">{label}</span>'
+                                          f'<span class="sd-seg" role="group" aria-labelledby="sd-lbl-{attr}">'
+                                          + "".join(f'<button type="button" data-{attr}="{k}" aria-pressed="{str(k == on).lower()}">{t}</button>' for k, t, *_ in items) + "</span></span>")
+    stage = a_stage("any", "places", f'<div class="sd-view sd-v1" data-v="1">{a_view("places", 1)}</div>', "sd-any sd-lay-1 sd-look-blue")
+    return f"""
+<section class="h-sec" id="any-look">
+<div class="h-head">{b.idx(n, "Layouts and looks")}<h2 class="h-h2">One answer. Any layout, any look.</h2></div>
+<div class="sd-ctrls">{seg("Layout", "l", LAYOUTS, "window")}{seg("Look", "o", LOOKS, "blue")}</div>
+{stage}
+<div hidden>{a_templates()}</div>
+</section>
+"""
+
+
+def answers_assets():
+    v = hashlib.sha256((STATIC / "smart-ui-answers.css").read_bytes() + (STATIC / "smart-ui-answers.js").read_bytes()).hexdigest()[:10]
+    return f'<link rel="stylesheet" href="/smart-ui-answers.css?v={v}">\n<script src="/smart-ui-answers.js?v={v}" defer></script>\n'
+
+
 # ---------------------------------------------------------------- page sections
 def hero(b, f):
     return f"""
@@ -250,7 +431,7 @@ def hero(b, f):
 <h1 class="su-title">{esc(H1)}</h1>
 <p class="h-lede su-lede">Answers drawn from your own components, filled from your data, checked before they show.</p>
 <p class="su-act"><a class="btn primary" href="/docs/smart-ui-quickstart/">Add it to your assistant</a></p>
-<div class="su-demo">{b.stage("blue-soft", demo_html([fernhollow(), design_review()]), "su-stage")[0]}</div>
+<div class="su-demo">{answers_hero()}</div>
 </section>
 """
 
@@ -513,7 +694,7 @@ def markdown(b, f, faq):
 
 Your assistant answers with your own components: a fine with a Pay button, an application's progress, a table you can sort. The parts are made ahead of time from your library, filled from your data and checked before they show. It comes with OpenDesigner and stays off until you ask for it. You keep your own model and agents.
 
-The page has a recorded demo, drawn live from scripted answers (no model runs on the page): a council assistant built on the Fernhollow example, and a design-review assistant. Each answer builds in the order a real one does: the tool call, the part's outline, values as the data lands, then the sentence, with the data agent, Smart UI and the model working side by side. A hosted playground comes later.
+The page has recorded answers from four example assistants (no model runs on the page; the shops, cafés and names are invented): a shop answers with a product grid, a city guide with place cards, a council with the fine and what you can do about it, and a design-review assistant with its findings marked on a sketch of the page. A second demo draws the same answer in three layouts (a chat beside an answer canvas, a window with the steps beside it, a single window) and three looks. A hosted playground comes later.
 
 In numbers, read from the repository: {f["parts"]} parts in {len(f["groups"])} jobs ({", ".join(f["groups"])}); {len(f["templates"])} parts prepared ahead of time for the Fernhollow example; {f["cases"]} test cases the Python and browser checks must answer the same way. Measured on the examples: the outline is on screen 1 to 3 ms after the question, and a whole Fernhollow answer takes about 1.5 to 2 seconds with Gemini Flash Lite.
 
@@ -588,7 +769,9 @@ def add(b, files, mds, paths):
     VER = hashlib.sha256(css.encode()).hexdigest()[:10]
     # six sections (Kunal, 2026-11-16: "about 5 or 6"); the rules, where it runs and the questions live on the docs pages
     # four sections under the hero (2026-11-16: about 5.5 screens with the footer); the example apps' screens are in the README
-    secs = [lambda n: parts_section(b, f, n), lambda n: compare_section(b, n), lambda n: built_section(b, f, n)]
+    # 2026-11-16, the approved demo prototype: the demo shows the parts and the looks now, so "Every part" and "Before and after"
+    # left the page; the layouts and looks section replaces them
+    secs = [lambda n: answers_section(b, n), lambda n: built_section(b, f, n)]
     body, i = hero(b, f), 1
     for s in secs:
         h = s(f"{i:02d}")
@@ -608,10 +791,8 @@ def add(b, files, mds, paths):
            "hasPart": [{"@type": "TechArticle", "name": t, "url": b.SITE_URL + u} for t, u in
                        (("Smart UI: answers that show your interface", "/docs/smart-ui/"), ("Add Smart UI to your assistant", "/docs/smart-ui-quickstart/"),
                         ("Where Smart UI runs", "/docs/smart-ui-adapters/"))]}]
-    pv = hashlib.sha256(parts_css(f).encode()).hexdigest()[:10]
-    pv = hashlib.sha256((parts_css(f) + parts_js(f)).encode()).hexdigest()[:10]
-    body = (f'<link rel="stylesheet" href="/smart-ui-parts.css?v={pv}">\n<link rel="stylesheet" href="/smart-ui.css?v={VER}">\n'
-            f'<script src="/smart-ui-parts.js?v={pv}" defer></script>\n' + assets_html() + body)
+    body = (f'<link rel="stylesheet" href="/smart-ui.css?v={VER}">\n' + answers_assets() + body
+            + '<p class="su-credits">Photos: <a href="https://unsplash.com/">Unsplash</a></p>\n')
     og = "/og/smart-ui.jpg" if (b.CACHE / "og" / "smart-ui.jpg").exists() else "/og/home.jpg"
     files["smart-ui/index.html"] = b.shell(PATH, SEO_TITLE, DESCRIPTION, body, b.load_docs(), ld, og=og, home=True,
                                           og_alt=f"Smart UI: {H1}")
@@ -620,8 +801,8 @@ def add(b, files, mds, paths):
     (b.DIST / "smart-ui.css").write_text(css)
     (b.DIST / "smart-ui-live.css").write_text(b.minify_css(b.corners_match_levers(b.apple_tracking((STATIC / "smart-ui-live.css").read_text()))))
     (b.DIST / "smart-ui-live.js").write_text((STATIC / "smart-ui-live.js").read_text())
-    (b.DIST / "smart-ui-parts.css").write_text(b.minify_css(parts_css(f)))
-    (b.DIST / "smart-ui-parts.js").write_text(parts_js(f))
+    (b.DIST / "smart-ui-answers.css").write_text(b.minify_css(b.apple_tracking((STATIC / "smart-ui-answers.css").read_text())))
+    (b.DIST / "smart-ui-answers.js").write_text((STATIC / "smart-ui-answers.js").read_text())
     (b.DIST / "img" / "smart-ui").mkdir(parents=True, exist_ok=True)
     for img in (STATIC / "smart-ui").glob("*.webp"):  # screens of the example apps, captured from their recorded answers
         shutil.copy(img, b.DIST / "img" / "smart-ui" / img.name)

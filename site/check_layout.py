@@ -36,7 +36,7 @@ NOT_CARDS = ["a.btn", "button", "[role=tab]", "input", "select", "textarea", ".c
              ".odl-acts > a", ".odl-actions > a"]  # controls, also when drawn in figures; a link in a library actions row is drawn as a button
 PANELS = [".fig", ".fig-panel", ".fig-scene", ".demo-stage", ".h-end-photo", ".h-end-card", ".starts", ".tree"]  # check 2 looks inside these too
 GALLERIES = [".pieces", ".ex-grid", ".bento"]  # named in a partly filled last row warning
-SCROLL_OK = [".prose .code pre", ".prose .table-wrap", ".sl-track", ".filters", ".rss", ".sl-log", ".sl-chips", ".ths", ".cmp", ".sb-steps"]  # may scroll sideways on purpose (a carousel; tag filters on phones; the Smart UI page's screen strip)
+SCROLL_OK = [".prose .code pre", ".prose .table-wrap", ".sl-track", ".filters", ".rss", ".sl-log", ".sl-chips", ".ths", ".cmp", ".sb-steps", ".sd-seg", ".sd-compose"]  # may scroll sideways on purpose (a carousel; tag filters on phones; the Smart UI page's screen strip, its demo's tabs and question chips)
 STUCK_OK = [".sticker", ".piece-stuck", ".a-stamp", ".a-rstamp"]  # sit on corners on purpose: never an overlap
 MARKS_OK = [".a-call", ".a-dim", ".a-crop", ".a-reg", ".a-stamp"]  # proof marks drawn outside a box on purpose: their text may pass its edge
 # Scaled previews (the component library): a live component laid out at its design width and zoomed down to a card, an aisle
