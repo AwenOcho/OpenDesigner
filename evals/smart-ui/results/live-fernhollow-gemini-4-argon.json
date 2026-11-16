@@ -1,0 +1,2220 @@
+{
+ "model": "gemini-4-argon",
+ "provider": "gemini",
+ "date": "2026-11-16",
+ "runs_per_case": 3,
+ "summary": {
+  "runs": 99,
+  "selector_recall_pct": 29.6,
+  "picked_right_pct": 100.0,
+  "valid_first_pct": 91.7,
+  "valid_after_repair_pct": 100.0,
+  "held_back_pct": 100.0,
+  "over_trigger_pct": 0.0,
+  "changes_run_by_model": 0,
+  "approval_shown_pct": 100.0,
+  "rendered": 77,
+  "floor_findings": 6,
+  "errors": 0,
+  "copy_problems_first": 14,
+  "copy_problems_left": 0,
+  "speed": {
+   "turns": 108,
+   "skeleton_ms_p50": 3,
+   "skeleton_ms_p95": 8185,
+   "full_ms_p50": 5971,
+   "full_ms_p95": 14907,
+   "shell_ms_p50": 3,
+   "shell_ms_p95": 4,
+   "first_data_ms_p50": 4,
+   "first_data_ms_p95": 11938,
+   "parts_shown": 90,
+   "template_share_pct": 70.0,
+   "modes_pct": {
+    "fill": 50.0,
+    "edit": 8.3,
+    "generate": 25.0,
+    "text": 16.7
+   },
+   "calls_per_turn": 1.09,
+   "tokens_per_turn": 2392
+  },
+  "tokens": {
+   "calls": 118,
+   "input": 239678,
+   "output": 18640
+  }
+ },
+ "rows": [
+  {
+   "id": "fh-fines",
+   "run": 1,
+   "expect": [
+    "KeyFacts",
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines",
+   "run": 2,
+   "expect": [
+    "KeyFacts",
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines",
+   "run": 3,
+   "expect": [
+    "KeyFacts",
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fine-one",
+   "run": 1,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fine-one",
+   "run": 2,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fine-one",
+   "run": 3,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fine-unknown",
+   "run": 1,
+   "expect": [
+    "ErrorRetry",
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "ErrorRetry"
+   ],
+   "selector": [
+    "KeyFacts",
+    "ErrorRetry"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fine-unknown",
+   "run": 2,
+   "expect": [
+    "ErrorRetry",
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "ErrorRetry"
+   ],
+   "selector": [
+    "KeyFacts",
+    "ErrorRetry"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fine-unknown",
+   "run": 3,
+   "expect": [
+    "ErrorRetry",
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "ErrorRetry"
+   ],
+   "selector": [
+    "KeyFacts",
+    "ErrorRetry"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fine-pay",
+   "run": 1,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "ApprovalPrompt",
+    "Receipt",
+    "KeyFacts"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fine-pay",
+   "run": 2,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "ApprovalPrompt",
+    "Receipt",
+    "KeyFacts"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fine-pay",
+   "run": 3,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "ApprovalPrompt",
+    "Receipt",
+    "KeyFacts"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-renew",
+   "run": 1,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "KeyFacts",
+    "ApprovalPrompt"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-renew",
+   "run": 2,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "KeyFacts",
+    "ApprovalPrompt"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-renew",
+   "run": 3,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "KeyFacts",
+    "ApprovalPrompt"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-permit",
+   "run": 1,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "fh-permit",
+   "run": 2,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "fh-permit",
+   "run": 3,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "fh-prices",
+   "run": 1,
+   "expect": [
+    "Comparison",
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "Comparison"
+   ],
+   "selector": [
+    "Comparison",
+    "KeyFacts"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 2,
+   "floors": [
+    "craft MS-15 (desktop)",
+    "craft MS-15 (phone)"
+   ]
+  },
+  {
+   "id": "fh-prices",
+   "run": 2,
+   "expect": [
+    "Comparison",
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "Comparison"
+   ],
+   "selector": [
+    "Comparison",
+    "KeyFacts"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 2,
+   "floors": [
+    "craft MS-15 (desktop)",
+    "craft MS-15 (phone)"
+   ]
+  },
+  {
+   "id": "fh-prices",
+   "run": 3,
+   "expect": [
+    "Comparison",
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "Comparison"
+   ],
+   "selector": [
+    "Comparison",
+    "KeyFacts"
+   ],
+   "first_errors": [
+    "length /0/createSurface/components/0/options/1/price_note"
+   ],
+   "repaired": true,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": false,
+   "rendered": true,
+   "floor_findings": 2,
+   "floors": [
+    "craft MS-15 (desktop)",
+    "craft MS-15 (phone)"
+   ]
+  },
+  {
+   "id": "fh-visitor",
+   "run": 1,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-visitor",
+   "run": 2,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-visitor",
+   "run": 3,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "noui-fh-office",
+   "run": 1,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [
+    "copy-word text"
+   ],
+   "repaired": true,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": false
+  },
+  {
+   "id": "noui-fh-office",
+   "run": 2,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [
+    "copy-word text"
+   ],
+   "repaired": true,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": false
+  },
+  {
+   "id": "noui-fh-office",
+   "run": 3,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [
+    "copy-word text"
+   ],
+   "repaired": true,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": false
+  },
+  {
+   "id": "fh-offices",
+   "run": 1,
+   "expect": [
+    "DataTable",
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-offices",
+   "run": 2,
+   "expect": [
+    "DataTable",
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-offices",
+   "run": 3,
+   "expect": [
+    "DataTable",
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-slots",
+   "run": 1,
+   "expect": [
+    "TimeSlots"
+   ],
+   "ui": true,
+   "parts": [
+    "TimeSlots"
+   ],
+   "selector": [
+    "TimeSlots",
+    "KeyFacts"
+   ],
+   "first_errors": [
+    "copy-case /0/createSurface/components/0/days/0/label",
+    "copy-case /0/createSurface/components/0/days/1/label",
+    "copy-case /0/createSurface/components/0/days/2/label",
+    "copy-case /0/createSurface/components/0/days/3/label",
+    "copy-case /0/createSurface/components/0/days/4/label"
+   ],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": false,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-slots",
+   "run": 2,
+   "expect": [
+    "TimeSlots"
+   ],
+   "ui": true,
+   "parts": [
+    "TimeSlots"
+   ],
+   "selector": [
+    "TimeSlots",
+    "KeyFacts"
+   ],
+   "first_errors": [
+    "copy-case /0/createSurface/components/0/days/2/label"
+   ],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": false,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-slots",
+   "run": 3,
+   "expect": [
+    "TimeSlots"
+   ],
+   "ui": true,
+   "parts": [
+    "TimeSlots"
+   ],
+   "selector": [
+    "TimeSlots",
+    "KeyFacts"
+   ],
+   "first_errors": [
+    "copy-case /0/createSurface/components/0/days/0/label",
+    "copy-case /0/createSurface/components/0/days/1/label",
+    "copy-case /0/createSurface/components/0/days/2/label",
+    "copy-case /0/createSurface/components/0/days/3/label",
+    "copy-case /0/createSurface/components/0/days/4/label"
+   ],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": false,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-slots-empty",
+   "run": 1,
+   "expect": [
+    "EmptyState",
+    "TimeSlots"
+   ],
+   "ui": true,
+   "parts": [
+    "EmptyState"
+   ],
+   "selector": [
+    "TimeSlots",
+    "ApprovalPrompt",
+    "EmptyState"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-slots-empty",
+   "run": 2,
+   "expect": [
+    "EmptyState",
+    "TimeSlots"
+   ],
+   "ui": true,
+   "parts": [
+    "EmptyState"
+   ],
+   "selector": [
+    "TimeSlots",
+    "ApprovalPrompt",
+    "EmptyState"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-slots-empty",
+   "run": 3,
+   "expect": [
+    "EmptyState",
+    "TimeSlots"
+   ],
+   "ui": true,
+   "parts": [
+    "EmptyState"
+   ],
+   "selector": [
+    "TimeSlots",
+    "ApprovalPrompt",
+    "EmptyState"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-book",
+   "run": 1,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "ApprovalPrompt",
+    "KeyFacts",
+    "DataTable"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-book",
+   "run": 2,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "ApprovalPrompt",
+    "KeyFacts",
+    "DataTable"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-book",
+   "run": 3,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "ApprovalPrompt",
+    "KeyFacts",
+    "DataTable"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-status",
+   "run": 1,
+   "expect": [
+    "ProgressStatus"
+   ],
+   "ui": true,
+   "parts": [
+    "ProgressStatus"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-status",
+   "run": 2,
+   "expect": [
+    "ProgressStatus"
+   ],
+   "ui": true,
+   "parts": [
+    "ProgressStatus"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-status",
+   "run": 3,
+   "expect": [
+    "ProgressStatus"
+   ],
+   "ui": true,
+   "parts": [
+    "ProgressStatus"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-docs",
+   "run": 1,
+   "expect": [
+    "DataTable",
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-docs",
+   "run": 2,
+   "expect": [
+    "DataTable",
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-docs",
+   "run": 3,
+   "expect": [
+    "DataTable",
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-upload",
+   "run": 1,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "ApprovalPrompt",
+    "DataTable"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-upload",
+   "run": 2,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "ApprovalPrompt",
+    "DataTable"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-upload",
+   "run": 3,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "ApprovalPrompt",
+    "DataTable"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "noui-fh-thanks",
+   "run": 1,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-fh-thanks",
+   "run": 2,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-fh-thanks",
+   "run": 3,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-fh-zone",
+   "run": 1,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-fh-zone",
+   "run": 2,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-fh-zone",
+   "run": 3,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-fh-phone",
+   "run": 1,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-fh-phone",
+   "run": 2,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-fh-phone",
+   "run": 3,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-fh-step-free",
+   "run": 1,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-fh-step-free",
+   "run": 2,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-fh-step-free",
+   "run": 3,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "fh-fines-w01",
+   "run": 1,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w01",
+   "run": 2,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w01",
+   "run": 3,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w02",
+   "run": 1,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w02",
+   "run": 2,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w02",
+   "run": 3,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w03",
+   "run": 1,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w03",
+   "run": 2,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w03",
+   "run": 3,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w04",
+   "run": 1,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w04",
+   "run": 2,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w04",
+   "run": 3,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w05",
+   "run": 1,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w05",
+   "run": 2,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w05",
+   "run": 3,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w06",
+   "run": 1,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w06",
+   "run": 2,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w06",
+   "run": 3,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w07",
+   "run": 1,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w07",
+   "run": 2,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w07",
+   "run": 3,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w08",
+   "run": 1,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w08",
+   "run": 2,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w08",
+   "run": 3,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w09",
+   "run": 1,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w09",
+   "run": 2,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w09",
+   "run": 3,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w10",
+   "run": 1,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w10",
+   "run": 2,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-fines-w10",
+   "run": 3,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-edit-saturday",
+   "run": 1,
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-edit-saturday",
+   "run": 2,
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true
+  },
+  {
+   "id": "fh-edit-saturday",
+   "run": 3,
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true
+  },
+  {
+   "id": "fh-edit-missing-doc",
+   "run": 1,
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-edit-missing-doc",
+   "run": 2,
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true
+  },
+  {
+   "id": "fh-edit-missing-doc",
+   "run": 3,
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true
+  },
+  {
+   "id": "fh-edit-table",
+   "run": 1,
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-edit-table",
+   "run": 2,
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "fh-edit-table",
+   "run": 3,
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  }
+ ]
+}

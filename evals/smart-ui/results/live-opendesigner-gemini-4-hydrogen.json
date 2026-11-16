@@ -1,0 +1,326 @@
+{
+ "model": "gemini-4-hydrogen",
+ "provider": "gemini",
+ "date": "2026-11-16",
+ "runs_per_case": 3,
+ "summary": {
+  "runs": 15,
+  "selector_recall_pct": 0.0,
+  "picked_right_pct": 100.0,
+  "valid_first_pct": 100.0,
+  "valid_after_repair_pct": 100.0,
+  "held_back_pct": 100.0,
+  "over_trigger_pct": 0.0,
+  "changes_run_by_model": 0,
+  "approval_shown_pct": 100.0,
+  "rendered": 0,
+  "floor_findings": 0,
+  "errors": 0,
+  "copy_problems_first": 0,
+  "copy_problems_left": 0,
+  "speed": {
+   "turns": 15,
+   "skeleton_ms_p50": 3,
+   "skeleton_ms_p95": 2395,
+   "full_ms_p50": 3398,
+   "full_ms_p95": 4164,
+   "shell_ms_p50": 2,
+   "shell_ms_p95": 4,
+   "first_data_ms_p50": 21,
+   "first_data_ms_p95": 941,
+   "parts_shown": 12,
+   "template_share_pct": 100.0,
+   "modes_pct": {
+    "fill": 80.0,
+    "edit": 0.0,
+    "generate": 0.0,
+    "text": 20.0
+   },
+   "calls_per_turn": 1.0,
+   "tokens_per_turn": 1986
+  },
+  "tokens": {
+   "calls": 15,
+   "input": 25497,
+   "output": 4294
+  }
+ },
+ "rows": [
+  {
+   "id": "od-review",
+   "run": 1,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true
+  },
+  {
+   "id": "od-review",
+   "run": 2,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true
+  },
+  {
+   "id": "od-review",
+   "run": 3,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true
+  },
+  {
+   "id": "od-parts",
+   "run": 1,
+   "expect": [
+    "ResultList"
+   ],
+   "ui": true,
+   "parts": [
+    "ResultList"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true
+  },
+  {
+   "id": "od-parts",
+   "run": 2,
+   "expect": [
+    "ResultList"
+   ],
+   "ui": true,
+   "parts": [
+    "ResultList"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true
+  },
+  {
+   "id": "od-parts",
+   "run": 3,
+   "expect": [
+    "ResultList"
+   ],
+   "ui": true,
+   "parts": [
+    "ResultList"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true
+  },
+  {
+   "id": "od-tokens",
+   "run": 1,
+   "expect": [
+    "KpiStrip",
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "KpiStrip"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true
+  },
+  {
+   "id": "od-tokens",
+   "run": 2,
+   "expect": [
+    "KpiStrip",
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "KpiStrip"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true
+  },
+  {
+   "id": "od-tokens",
+   "run": 3,
+   "expect": [
+    "KpiStrip",
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "KpiStrip"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true
+  },
+  {
+   "id": "noui-od-define",
+   "run": 1,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-od-define",
+   "run": 2,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-od-define",
+   "run": 3,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "od-corners",
+   "run": 1,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true
+  },
+  {
+   "id": "od-corners",
+   "run": 2,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true
+  },
+  {
+   "id": "od-corners",
+   "run": 3,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true
+  }
+ ]
+}

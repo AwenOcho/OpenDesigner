@@ -1,36 +1,48 @@
 {
  "model": "gemini-3.1-pro-preview",
  "provider": "gemini",
- "date": "2026-11-14",
+ "date": "2026-11-16",
  "runs_per_case": 3,
  "summary": {
-  "runs": 78,
-  "selector_recall_pct": 100.0,
-  "picked_right_pct": 93.7,
-  "valid_first_pct": 50.8,
+  "runs": 84,
+  "selector_recall_pct": 69.6,
+  "picked_right_pct": 89.9,
+  "valid_first_pct": 95.4,
   "valid_after_repair_pct": 100.0,
   "held_back_pct": 100.0,
   "over_trigger_pct": 0.0,
   "changes_run_by_model": 0,
   "approval_shown_pct": 100.0,
-  "rendered": 59,
-  "floor_findings": 4,
+  "rendered": 63,
+  "floor_findings": 3,
   "errors": 0,
-  "copy_problems_first": 56,
+  "copy_problems_first": 0,
   "copy_problems_left": 0,
   "speed": {
-   "turns": 93,
-   "skeleton_ms_p50": 4,
-   "skeleton_ms_p95": 7833,
-   "full_ms_p50": 7855,
-   "full_ms_p95": 16078,
-   "calls_per_turn": 1.29,
-   "tokens_per_turn": 2274
+   "turns": 99,
+   "skeleton_ms_p50": 5,
+   "skeleton_ms_p95": 7440,
+   "full_ms_p50": 7266,
+   "full_ms_p95": 14486,
+   "shell_ms_p50": 3,
+   "shell_ms_p95": 6,
+   "first_data_ms_p50": 7266,
+   "first_data_ms_p95": 14486,
+   "parts_shown": 80,
+   "template_share_pct": 37.5,
+   "modes_pct": {
+    "fill": 21.2,
+    "edit": 9.1,
+    "generate": 50.5,
+    "text": 19.2
+   },
+   "calls_per_turn": 1.21,
+   "tokens_per_turn": 2152
   },
   "tokens": {
    "calls": 120,
-   "input": 140905,
-   "output": 70544
+   "input": 143961,
+   "output": 69053
   }
  },
  "rows": [
@@ -44,22 +56,14 @@
    "parts": [
     "DataTable"
    ],
-   "selector": [
-    "DataTable",
-    "KeyFacts",
-    "FileCard"
-   ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title",
-    "copy-case /0/createSurface/components/0/columns/0/label",
-    "copy-case /0/createSurface/components/0/columns/2/label"
-   ],
+   "selector": [],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -74,22 +78,14 @@
    "parts": [
     "DataTable"
    ],
-   "selector": [
-    "DataTable",
-    "KeyFacts",
-    "FileCard"
-   ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title",
-    "copy-case /0/createSurface/components/0/columns/0/label",
-    "copy-case /0/createSurface/components/0/columns/2/label"
-   ],
+   "selector": [],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -104,22 +100,14 @@
    "parts": [
     "DataTable"
    ],
-   "selector": [
-    "DataTable",
-    "KeyFacts",
-    "FileCard"
-   ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title",
-    "copy-case /0/createSurface/components/0/columns/0/label",
-    "copy-case /0/createSurface/components/0/columns/2/label"
-   ],
+   "selector": [],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -134,16 +122,12 @@
    "parts": [
     "DataTable"
    ],
-   "selector": [
-    "FileCard",
-    "DataTable",
-    "KeyFacts"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
    "valid": true,
    "rendered": true,
@@ -160,16 +144,12 @@
    "parts": [
     "DataTable"
    ],
-   "selector": [
-    "FileCard",
-    "DataTable",
-    "KeyFacts"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
    "valid": true,
    "rendered": true,
@@ -186,16 +166,12 @@
    "parts": [
     "DataTable"
    ],
-   "selector": [
-    "FileCard",
-    "DataTable",
-    "KeyFacts"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
    "valid": true,
    "rendered": true,
@@ -212,22 +188,14 @@
    "parts": [
     "DataTable"
    ],
-   "selector": [
-    "DataTable",
-    "FileCard",
-    "KeyFacts"
-   ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title",
-    "copy-case /0/createSurface/components/0/columns/0/label",
-    "copy-case /0/createSurface/components/0/columns/2/label"
-   ],
+   "selector": [],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
-   "valid": false,
+   "valid": true,
    "headers_ok": true,
    "rendered": true,
    "floor_findings": 0,
@@ -243,20 +211,14 @@
    "parts": [
     "DataTable"
    ],
-   "selector": [
-    "DataTable",
-    "FileCard",
-    "KeyFacts"
-   ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title"
-   ],
+   "selector": [],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
-   "valid": false,
+   "valid": true,
    "headers_ok": true,
    "rendered": true,
    "floor_findings": 0,
@@ -272,21 +234,14 @@
    "parts": [
     "DataTable"
    ],
-   "selector": [
-    "DataTable",
-    "FileCard",
-    "KeyFacts"
-   ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title",
-    "copy-case /0/createSurface/components/0/columns/2/label"
-   ],
+   "selector": [],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
-   "valid": false,
+   "valid": true,
    "headers_ok": true,
    "rendered": true,
    "floor_findings": 0,
@@ -301,18 +256,14 @@
    ],
    "ui": true,
    "parts": [
-    "FileCard"
+    "KeyFacts"
    ],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "DataTable"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
    "valid": true,
    "rendered": true,
@@ -328,18 +279,14 @@
    ],
    "ui": true,
    "parts": [
-    "FileCard"
+    "KeyFacts"
    ],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "DataTable"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
    "valid": true,
    "rendered": true,
@@ -355,18 +302,14 @@
    ],
    "ui": true,
    "parts": [
-    "FileCard"
+    "KeyFacts"
    ],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "DataTable"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
    "valid": true,
    "rendered": true,
@@ -412,7 +355,7 @@
    "selector": [
     "ApprovalPrompt",
     "FileCard",
-    "DataTable"
+    "ErrorRetry"
    ],
    "first_errors": [],
    "repaired": false,
@@ -466,15 +409,13 @@
     "LineChart",
     "BarChart"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/series"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -494,15 +435,13 @@
     "LineChart",
     "BarChart"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/series"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -550,15 +489,13 @@
     "Comparison",
     "LineChart"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -580,15 +517,13 @@
     "Comparison",
     "LineChart"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -610,15 +545,13 @@
     "Comparison",
     "LineChart"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/series"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -640,11 +573,6 @@
     "LineChart"
    ],
    "first_errors": [
-    "copy-case /0/createSurface/components/0/label",
-    "copy-case /0/createSurface/components/0/stats/0/label",
-    "copy-case /0/createSurface/components/0/stats/1/label",
-    "copy-case /0/createSurface/components/0/stats/1/note",
-    "copy-case /0/createSurface/components/0/stats/2/label",
     "R6-number /0/createSurface/components/0/stats/0/share"
    ],
    "repaired": true,
@@ -703,10 +631,6 @@
     "LineChart"
    ],
    "first_errors": [
-    "copy-case /0/createSurface/components/0/label",
-    "copy-case /0/createSurface/components/0/stats/0/label",
-    "copy-case /0/createSurface/components/0/stats/1/label",
-    "copy-case /0/createSurface/components/0/stats/2/label",
     "R6-number /0/createSurface/components/0/stats/0/share"
    ],
    "repaired": true,
@@ -732,16 +656,13 @@
    "selector": [
     "Comparison"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title",
-    "copy-case /0/createSurface/components/0/options/1/choose/label"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 1,
    "floors": [
@@ -787,15 +708,13 @@
    "selector": [
     "Comparison"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 1,
    "floors": [
@@ -815,21 +734,16 @@
    "selector": [
     "Comparison"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title",
-    "copy-case /0/createSurface/components/0/options/1/choose/label"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
-   "floor_findings": 1,
-   "floors": [
-    "craft MS-15 (phone)"
-   ]
+   "floor_findings": 0,
+   "floors": []
   },
   {
    "id": "plans-followup",
@@ -891,20 +805,15 @@
    ],
    "selector": [
     "Comparison",
-    "ApprovalPrompt",
     "KeyFacts"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title",
-    "copy-case /0/createSurface/components/0/facts/1/label",
-    "copy-case /0/createSurface/components/0/facts/2/label"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -915,11 +824,12 @@
    "expect": [
     "KeyFacts"
    ],
-   "ui": false,
-   "parts": [],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
    "selector": [
     "Comparison",
-    "ApprovalPrompt",
     "KeyFacts"
    ],
    "first_errors": [],
@@ -927,58 +837,54 @@
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "subscription",
+   "run": 3,
+   "expect": [
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [
+    "Comparison",
+    "KeyFacts"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "refund",
+   "run": 1,
+   "expect": [
+    "ProgressStatus"
+   ],
+   "ui": true,
+   "parts": [
+    "KeyFacts"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
    "right": false,
-   "valid": null
-  },
-  {
-   "id": "subscription",
-   "run": 3,
-   "expect": [
-    "KeyFacts"
-   ],
-   "ui": true,
-   "parts": [
-    "KeyFacts"
-   ],
-   "selector": [
-    "Comparison",
-    "ApprovalPrompt",
-    "KeyFacts"
-   ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title"
-   ],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": false,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
-  },
-  {
-   "id": "refund",
-   "run": 1,
-   "expect": [
-    "ProgressStatus"
-   ],
-   "ui": true,
-   "parts": [
-    "ProgressStatus"
-   ],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "ProgressStatus"
-   ],
-   "first_errors": [],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
    "valid": true,
    "rendered": true,
    "floor_findings": 0,
@@ -992,19 +898,15 @@
    ],
    "ui": true,
    "parts": [
-    "ProgressStatus"
+    "KeyFacts"
    ],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "ProgressStatus"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
-   "right": true,
+   "selector_hit": false,
+   "right": false,
    "valid": true,
    "rendered": true,
    "floor_findings": 0,
@@ -1018,19 +920,15 @@
    ],
    "ui": true,
    "parts": [
-    "ProgressStatus"
+    "KeyFacts"
    ],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "ProgressStatus"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
-   "right": true,
+   "selector_hit": false,
+   "right": false,
    "valid": true,
    "rendered": true,
    "floor_findings": 0,
@@ -1163,18 +1061,13 @@
     "ApprovalPrompt",
     "DataTable"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title",
-    "copy-case /0/createSurface/components/0/details/0/label",
-    "copy-case /0/createSurface/components/0/details/2/label",
-    "copy-case /0/createSurface/components/0/approve/label"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -1271,17 +1164,13 @@
     "Comparison",
     "ApprovalPrompt"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title",
-    "copy-case /0/createSurface/components/0/details/1/label",
-    "copy-case /0/createSurface/components/0/approve/label"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -1350,15 +1239,13 @@
     "ApprovalPrompt",
     "Comparison"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/details/0/label"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -1377,16 +1264,13 @@
     "ApprovalPrompt",
     "Comparison"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title",
-    "copy-case /0/createSurface/components/0/approve/label"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -1405,17 +1289,13 @@
     "ApprovalPrompt",
     "Comparison"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title",
-    "copy-case /0/createSurface/components/0/details/0/label",
-    "copy-case /0/createSurface/components/0/approve/label"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -1433,15 +1313,13 @@
    "selector": [
     "ApprovalPrompt"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -1501,10 +1379,8 @@
     "ErrorRetry",
     "KeyFacts"
    ],
-   "ui": true,
-   "parts": [
-    "ErrorRetry"
-   ],
+   "ui": false,
+   "parts": [],
    "selector": [
     "FileCard",
     "KeyFacts",
@@ -1515,11 +1391,8 @@
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
-   "right": true,
-   "valid": true,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
+   "right": false,
+   "valid": null
   },
   {
    "id": "missing-invoice",
@@ -1591,15 +1464,13 @@
     "LineChart",
     "DataTable"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -1620,15 +1491,13 @@
     "LineChart",
     "DataTable"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -1649,15 +1518,13 @@
     "LineChart",
     "DataTable"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -1679,15 +1546,13 @@
     "Comparison",
     "LineChart"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -1754,16 +1619,12 @@
    "expect": [],
    "ui": false,
    "parts": [],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "DataTable"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": false,
+   "selector_hit": true,
    "right": true,
    "valid": null
   },
@@ -1773,16 +1634,12 @@
    "expect": [],
    "ui": false,
    "parts": [],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "DataTable"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": false,
+   "selector_hit": true,
    "right": true,
    "valid": null
   },
@@ -1792,16 +1649,12 @@
    "expect": [],
    "ui": false,
    "parts": [],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "DataTable"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": false,
+   "selector_hit": true,
    "right": true,
    "valid": null
   },
@@ -1984,6 +1837,132 @@
    "selector_hit": true,
    "right": true,
    "valid": null
+  },
+  {
+   "id": "edit-biggest-first",
+   "run": 1,
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "edit-biggest-first",
+   "run": 2,
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "edit-biggest-first",
+   "run": 3,
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "edit-top-two",
+   "run": 1,
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true
+  },
+  {
+   "id": "edit-top-two",
+   "run": 2,
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "edit-top-two",
+   "run": 3,
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true
   }
  ]
 }

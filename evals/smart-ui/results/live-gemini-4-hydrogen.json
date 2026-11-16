@@ -1,36 +1,48 @@
 {
  "model": "gemini-4-hydrogen",
  "provider": "gemini",
- "date": "2026-11-14",
+ "date": "2026-11-16",
  "runs_per_case": 3,
  "summary": {
-  "runs": 78,
-  "selector_recall_pct": 100.0,
-  "picked_right_pct": 90.5,
-  "valid_first_pct": 89.5,
+  "runs": 84,
+  "selector_recall_pct": 65.2,
+  "picked_right_pct": 87.0,
+  "valid_first_pct": 95.5,
   "valid_after_repair_pct": 100.0,
   "held_back_pct": 100.0,
   "over_trigger_pct": 0.0,
   "changes_run_by_model": 0,
   "approval_shown_pct": 100.0,
-  "rendered": 57,
+  "rendered": 64,
   "floor_findings": 3,
   "errors": 0,
   "copy_problems_first": 0,
   "copy_problems_left": 0,
   "speed": {
-   "turns": 93,
-   "skeleton_ms_p50": 4,
-   "skeleton_ms_p95": 4776,
-   "full_ms_p50": 5999,
-   "full_ms_p95": 14178,
-   "calls_per_turn": 1.32,
-   "tokens_per_turn": 3806
+   "turns": 99,
+   "skeleton_ms_p50": 5,
+   "skeleton_ms_p95": 4160,
+   "full_ms_p50": 4368,
+   "full_ms_p95": 10071,
+   "shell_ms_p50": 3,
+   "shell_ms_p95": 2716,
+   "first_data_ms_p50": 3922,
+   "first_data_ms_p95": 10465,
+   "parts_shown": 78,
+   "template_share_pct": 42.3,
+   "modes_pct": {
+    "fill": 24.2,
+    "edit": 9.1,
+    "generate": 45.5,
+    "text": 21.2
+   },
+   "calls_per_turn": 1.21,
+   "tokens_per_turn": 3229
   },
   "tokens": {
-   "calls": 123,
-   "input": 295054,
-   "output": 58938
+   "calls": 120,
+   "input": 267898,
+   "output": 51798
   }
  },
  "rows": [
@@ -44,16 +56,12 @@
    "parts": [
     "DataTable"
    ],
-   "selector": [
-    "DataTable",
-    "KeyFacts",
-    "FileCard"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
    "valid": true,
    "rendered": true,
@@ -70,16 +78,12 @@
    "parts": [
     "DataTable"
    ],
-   "selector": [
-    "DataTable",
-    "KeyFacts",
-    "FileCard"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
    "valid": true,
    "rendered": true,
@@ -96,16 +100,12 @@
    "parts": [
     "DataTable"
    ],
-   "selector": [
-    "DataTable",
-    "KeyFacts",
-    "FileCard"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
    "valid": true,
    "rendered": true,
@@ -122,16 +122,12 @@
    "parts": [
     "DataTable"
    ],
-   "selector": [
-    "FileCard",
-    "DataTable",
-    "KeyFacts"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
    "valid": true,
    "rendered": true,
@@ -148,16 +144,12 @@
    "parts": [
     "DataTable"
    ],
-   "selector": [
-    "FileCard",
-    "DataTable",
-    "KeyFacts"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
    "valid": true,
    "rendered": true,
@@ -174,16 +166,12 @@
    "parts": [
     "DataTable"
    ],
-   "selector": [
-    "FileCard",
-    "DataTable",
-    "KeyFacts"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
    "valid": true,
    "rendered": true,
@@ -200,16 +188,12 @@
    "parts": [
     "DataTable"
    ],
-   "selector": [
-    "DataTable",
-    "FileCard",
-    "KeyFacts"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
    "valid": true,
    "headers_ok": true,
@@ -227,16 +211,12 @@
    "parts": [
     "DataTable"
    ],
-   "selector": [
-    "DataTable",
-    "FileCard",
-    "KeyFacts"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
    "valid": true,
    "headers_ok": true,
@@ -254,16 +234,12 @@
    "parts": [
     "DataTable"
    ],
-   "selector": [
-    "DataTable",
-    "FileCard",
-    "KeyFacts"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
    "valid": true,
    "headers_ok": true,
@@ -280,18 +256,14 @@
    ],
    "ui": true,
    "parts": [
-    "FileCard"
+    "KeyFacts"
    ],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "DataTable"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
    "valid": true,
    "rendered": true,
@@ -307,18 +279,14 @@
    ],
    "ui": true,
    "parts": [
-    "FileCard"
+    "KeyFacts"
    ],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "DataTable"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
    "valid": true,
    "rendered": true,
@@ -334,18 +302,14 @@
    ],
    "ui": true,
    "parts": [
-    "FileCard"
+    "KeyFacts"
    ],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "DataTable"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
    "valid": true,
    "rendered": true,
@@ -391,7 +355,7 @@
    "selector": [
     "ApprovalPrompt",
     "FileCard",
-    "ErrorRetry"
+    "DataTable"
    ],
    "first_errors": [],
    "repaired": false,
@@ -839,7 +803,6 @@
    "parts": [],
    "selector": [
     "Comparison",
-    "ApprovalPrompt",
     "KeyFacts"
    ],
    "first_errors": [],
@@ -860,7 +823,6 @@
    "parts": [],
    "selector": [
     "Comparison",
-    "ApprovalPrompt",
     "KeyFacts"
    ],
    "first_errors": [],
@@ -881,7 +843,6 @@
    "parts": [],
    "selector": [
     "Comparison",
-    "ApprovalPrompt",
     "KeyFacts"
    ],
    "first_errors": [],
@@ -900,19 +861,15 @@
    ],
    "ui": true,
    "parts": [
-    "ProgressStatus"
+    "KeyFacts"
    ],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "ProgressStatus"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
-   "right": true,
+   "selector_hit": false,
+   "right": false,
    "valid": true,
    "rendered": true,
    "floor_findings": 0,
@@ -926,22 +883,16 @@
    ],
    "ui": true,
    "parts": [
-    "ProgressStatus"
+    "KeyFacts"
    ],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "ProgressStatus"
-   ],
-   "first_errors": [
-    "R6-number /0/createSurface/components/0/progress"
-   ],
-   "repaired": true,
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": false,
+   "selector_hit": false,
+   "right": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -954,22 +905,16 @@
    ],
    "ui": true,
    "parts": [
-    "ProgressStatus"
+    "KeyFacts"
    ],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "ProgressStatus"
-   ],
-   "first_errors": [
-    "R6-number /0/createSurface/components/0/progress"
-   ],
-   "repaired": true,
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": false,
+   "selector_hit": false,
+   "right": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -981,19 +926,21 @@
     "ProgressStatus",
     "KeyFacts"
    ],
-   "ui": false,
-   "parts": [],
-   "selector": [
-    "DataTable",
-    "ProgressStatus"
+   "ui": true,
+   "parts": [
+    "DataTable"
    ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": false,
-   "valid": null
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
   },
   {
    "id": "refund-followup",
@@ -1002,19 +949,21 @@
     "ProgressStatus",
     "KeyFacts"
    ],
-   "ui": false,
-   "parts": [],
-   "selector": [
-    "DataTable",
-    "ProgressStatus"
+   "ui": true,
+   "parts": [
+    "DataTable"
    ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": false,
-   "valid": null
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
   },
   {
    "id": "refund-followup",
@@ -1023,19 +972,21 @@
     "ProgressStatus",
     "KeyFacts"
    ],
-   "ui": false,
-   "parts": [],
-   "selector": [
-    "DataTable",
-    "ProgressStatus"
+   "ui": true,
+   "parts": [
+    "DataTable"
    ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": false,
-   "valid": null
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
   },
   {
    "id": "pay-approve",
@@ -1204,15 +1155,13 @@
     "Comparison",
     "ApprovalPrompt"
    ],
-   "first_errors": [
-    "length /0/createSurface/components/0/details/0/value"
-   ],
-   "repaired": true,
+   "first_errors": [],
+   "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -1669,16 +1618,12 @@
    "expect": [],
    "ui": false,
    "parts": [],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "DataTable"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": false,
+   "selector_hit": true,
    "right": true,
    "valid": null
   },
@@ -1688,16 +1633,12 @@
    "expect": [],
    "ui": false,
    "parts": [],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "DataTable"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": false,
+   "selector_hit": true,
    "right": true,
    "valid": null
   },
@@ -1707,198 +1648,320 @@
    "expect": [],
    "ui": false,
    "parts": [],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-card",
+   "run": 1,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-card",
+   "run": 2,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-card",
+   "run": 3,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-sso",
+   "run": 1,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-sso",
+   "run": 2,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-sso",
+   "run": 3,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-thanks",
+   "run": 1,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-thanks",
+   "run": 2,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-thanks",
+   "run": 3,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-count",
+   "run": 1,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-count",
+   "run": 2,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "noui-count",
+   "run": 3,
+   "expect": [],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": null
+  },
+  {
+   "id": "edit-biggest-first",
+   "run": 1,
+   "expect": [
     "DataTable"
    ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": false,
    "right": true,
-   "valid": null
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
   },
   {
-   "id": "noui-card",
-   "run": 1,
-   "expect": [],
-   "ui": false,
-   "parts": [],
-   "selector": [],
-   "first_errors": [],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": null
-  },
-  {
-   "id": "noui-card",
+   "id": "edit-biggest-first",
    "run": 2,
-   "expect": [],
-   "ui": false,
-   "parts": [],
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
    "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
-   "valid": null
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
   },
   {
-   "id": "noui-card",
+   "id": "edit-biggest-first",
    "run": 3,
-   "expect": [],
-   "ui": false,
-   "parts": [],
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
    "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
-   "valid": null
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
   },
   {
-   "id": "noui-sso",
+   "id": "edit-top-two",
    "run": 1,
-   "expect": [],
-   "ui": false,
-   "parts": [],
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
    "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
-   "valid": null
+   "valid": true
   },
   {
-   "id": "noui-sso",
+   "id": "edit-top-two",
    "run": 2,
-   "expect": [],
-   "ui": false,
-   "parts": [],
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
    "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
-   "valid": null
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
   },
   {
-   "id": "noui-sso",
+   "id": "edit-top-two",
    "run": 3,
-   "expect": [],
-   "ui": false,
-   "parts": [],
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
    "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
-   "valid": null
-  },
-  {
-   "id": "noui-thanks",
-   "run": 1,
-   "expect": [],
-   "ui": false,
-   "parts": [],
-   "selector": [],
-   "first_errors": [],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": null
-  },
-  {
-   "id": "noui-thanks",
-   "run": 2,
-   "expect": [],
-   "ui": false,
-   "parts": [],
-   "selector": [],
-   "first_errors": [],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": null
-  },
-  {
-   "id": "noui-thanks",
-   "run": 3,
-   "expect": [],
-   "ui": false,
-   "parts": [],
-   "selector": [],
-   "first_errors": [],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": null
-  },
-  {
-   "id": "noui-count",
-   "run": 1,
-   "expect": [],
-   "ui": false,
-   "parts": [],
-   "selector": [],
-   "first_errors": [],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": null
-  },
-  {
-   "id": "noui-count",
-   "run": 2,
-   "expect": [],
-   "ui": false,
-   "parts": [],
-   "selector": [],
-   "first_errors": [],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": null
-  },
-  {
-   "id": "noui-count",
-   "run": 3,
-   "expect": [],
-   "ui": false,
-   "parts": [],
-   "selector": [],
-   "first_errors": [],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": null
+   "valid": true
   }
  ]
 }
