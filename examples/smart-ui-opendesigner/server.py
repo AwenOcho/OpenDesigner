@@ -346,8 +346,7 @@ def _fix_edit(cid, folder):
 
 
 @app.post("/api/pages/<page>/fixes")
-@reversible
-@warns("This edits the sample app's CSS.")
+@reversible  # undone from its toast, so nothing to read first (a change with consequences goes through approval)
 @params(id="the check to fix: colour-tokens, spacing-scale or label-wrap", page="pricing")
 def fix_check(id, page="pricing"):
     """Apply one review fix to the sample app (a scratch copy in work/): a hard-coded colour becomes a token, a gap moves onto the scale, or a label is allowed to wrap. Changes the page; Undo puts it back."""

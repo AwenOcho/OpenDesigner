@@ -11025,8 +11025,8 @@ figcaption a,.bp-sec li a{{display:inline-flex;align-items:center;min-height:24p
     return out
 
 
-EXPORT_FORMATS = ("css", "tailwind", "figma", "paper", "swift", "compose", "dtcg", "artifact", "brand")
-NEUTRAL_FORMATS = ("figma", "paper", "dtcg", "artifact", "brand")  # for design tools, other token tools and people: every platform
+EXPORT_FORMATS = ("css", "tailwind", "figma", "paper", "swift", "compose", "dtcg", "artifact", "brand", "status")
+NEUTRAL_FORMATS = ("figma", "paper", "dtcg", "artifact", "brand", "status")  # for design tools, other token tools and people: every platform
 CODE_FORMATS = {"css": ("css", "tailwind"), "swift": ("swift",), "compose": ("compose",)}  # project tag -> the code exports it needs
 PLATFORM_OF = {"css": "web", "tailwind": "web", "swift": "ios", "compose": "android"}  # the platform each code export is for
 FORMAT_FILES = {"css": ("css", "tokens.css"), "tailwind": ("tailwind", "theme.css"), "swift": ("swift", "DesignTokens.swift"),
@@ -11046,6 +11046,91 @@ def build_formats(state, d=None):
     if d:
         want |= {f for f, parts in FORMAT_FILES.items() if os.path.exists(os.path.join(d, "build", *parts))}
     return [f for f in EXPORT_FORMATS if f in want], [f for f in EXPORT_FORMATS if f not in want]
+
+
+STATUS_MEANING = {  # what each status means, the words that say it, and an icon (Lucide names); never colour alone (WCAG 1.4.1)
+    "success": ("an action finished as asked", ["saved", "done", "sent", "paid", "approved", "complete", "on time", "verified"], "circle-check",
+                "after an action that worked, and for a state that is good (paid, verified)"),
+    "warning": ("something needs attention soon, but nothing is lost yet", ["check", "expires soon", "almost full", "due soon", "at risk",
+                                                                             "needs review"], "triangle-alert",
+                "for a risk the person can still avoid: a limit near, a date close, a change that is hard to undo"),
+    "danger": ("something failed or would destroy data", ["error", "failed", "delete", "overdue", "declined", "unpaid", "rejected"], "circle-x",
+               "for errors, failures, and actions that delete or cannot be undone"),
+    "info": ("neutral news the person may want", ["note", "tip", "update", "draft", "scheduled"], "info",
+             "for neutral facts and tips; never for errors or success"),
+    "discovery": ("something new to try", ["new", "beta", "try it"], "sparkles", "for new features and invitations"),
+}
+STATUS_ALIASES = {"good": "success", "ok": "success", "positive": "success", "bad": "danger", "error": "danger", "critical": "danger",
+                  "negative": "danger", "pending": "warning", "caution": "warning", "neutral": "info", "new": "discovery"}
+STATUS_ROLES = {"text": "color.text.{s}", "bg": "color.bg.{s}.subtle", "bgBold": "color.bg.{s}.bold", "onBold": "color.text.on-{s}",
+                "border": "color.border.{s}", "icon": "color.text.{s}"}
+FEEDBACK_WORDS = {"inline-banner": "In place, next to what changed, or in a banner over the section; a toast only for a low-stakes "
+                                   "confirmation that carries Undo",
+                  "no-toasts": "In place or in a banner; never a toast",
+                  "toasts-widely": "A toast for quick confirmations, in place for errors on a field"}
+UNDO_WORDS = {"undo-first": "an Undo button that stays until the person uses it or closes it, instead of a confirm step; an action that "
+                            "cannot be undone still asks first (house standard STD-visual-details-40)",
+              "confirm": "an \"Are you sure?\" step before it happens (house standard STD-visual-details-40 keeps that step for actions "
+                         "that cannot be undone; ask before using it for the rest)",
+              "both": "a confirm step for what cannot be undone, and an Undo that stays until used or closed for the rest"}
+
+
+def status_map(files, meta, state, prefix):
+    """build/status.json (v1, agreed with Smart UI): each status, what it means, its words and icon, the token behind each role,
+    its CSS name and its values per mode; the rule that colour is never alone; and how actions are confirmed (Q-form-04, -05)."""
+    res = files["opendesigner.resolver.json"]
+    modes = meta.get("modes") or ["light"]
+    flats = {m: resolve_all(files, {"theme": m} if "theme" in res.get("modifiers", {}) else {}) for m in modes}
+    base = flats[modes[0]]
+    out = {"v": 1, "prefix": prefix, "statuses": {}, "aliases": dict(STATUS_ALIASES),
+           "rules": {"neverColourAlone": True, "pairWith": ["icon", "word"], "source": "WCAG 2.2 SC 1.4.1; DC-L01-15"}}
+    for st, (meaning, words, icon, when) in STATUS_MEANING.items():
+        toks = {k: v.format(s=st) for k, v in STATUS_ROLES.items() if v.format(s=st) in base}
+        if not toks:
+            continue
+        out["statuses"][st] = {"meaning": meaning, "when": when, "words": words, "icon": icon, "tokens": toks,
+                               "css": {k: css_var(prefix, p) for k, p in toks.items()},
+                               "values": {m: {k: hex_of(fl[p]["resolved"]) for k, p in toks.items() if p in fl} for m, fl in flats.items()}}
+    fb = answer_value((state.get("answers") or {}).get("Q-form-04")) or "inline-banner"
+    fb = fb[0] if isinstance(fb, list) and fb else fb
+    undo = answer_value((state.get("answers") or {}).get("Q-form-05")) or "both"  # STD-visual-details-40: undo; confirm only the irreversible
+    undo = undo[0] if isinstance(undo, list) and undo else undo
+    t_ms = duration_ms((base.get("component.toast.duration") or {}).get("resolved")) or 4000  # STD-components-toasts-drawers-15
+    out["feedback"] = {"confirm": fb, "confirmSetBy": "answer" if (state.get("answers") or {}).get("Q-form-04") else "default",
+                       "usesToasts": fb in ("toasts-widely", "inline-banner"),
+                       "toastsFor": {"toasts-widely": "quick confirmations", "inline-banner": "low-stakes confirmations with Undo",
+                                     "no-toasts": None}.get(fb, None),
+                       "toastMs": {"success": int(t_ms), "info": int(t_ms), "warning": int(t_ms), "danger": None}, "errorsStay": True,
+                       "actionToastStays": True,
+                       "undo": undo, "undoStays": "until the person acts or dismisses it",
+                       "sources": ["STD-components-toasts-drawers-15", "STD-visual-details-40"]}
+    return out
+
+
+def status_lines(state, files, meta, prefix):
+    """DESIGN.md's Status and Feedback section, from the same map build/status.json holds."""
+    sm = status_map(files, meta, state, prefix)
+    rows = ["| Status | Means | Use it | Tokens (text and icon, background, border) | Say it with |", "|---|---|---|---|---|"]
+    for st, x in sm["statuses"].items():
+        t = x["css"]
+        rows.append(f"| {st.title()} | {x['meaning']} | {x['when']} | `{t.get('text', '')}`, `{t.get('bg', '')}`, `{t.get('border', '')}` | "
+                    f"the {x['icon']} icon and a word such as \"{x['words'][0].capitalize()}\" |")
+    fb = sm["feedback"]
+    rows += ["", "- **Never colour alone.** Every status carries an icon or a word as well as its colour (WCAG 2.2 SC 1.4.1).",
+             "- **One meaning per colour.** Success, warning and danger colours appear only for that status, never for a brand accent, "
+             "a primary button or decoration. Delete buttons take danger; everything else takes the action colour.",
+             f"- **After every action, the person sees what happened.** {FEEDBACK_WORDS.get(fb['confirm'], fb['confirm'])}"
+             + (" (Q-form-04)." if fb["confirmSetBy"] == "answer" else " (default until Q-form-04 is answered)."),
+             (f"- **Toasts:** a success or info toast closes after {fb['toastMs']['success'] / 1000:g} s; one with an action (Undo, Retry) "
+              "stays until the person acts or closes it" if fb["confirm"] == "toasts-widely" else
+              f"- **Banners and toasts:** a success banner may close after {fb['toastMs']['success'] / 1000:g} s; the rare toast "
+              "(low stakes, with Undo) stays until the person acts or closes it" if fb["confirm"] == "inline-banner" else
+              f"- **Banners:** a success banner may close after {fb['toastMs']['success'] / 1000:g} s") +
+             "; an error stays until the person dismisses it or fixes the cause, and never closes on its own.",
+             f"- **Undo:** {UNDO_WORDS.get(fb['undo'], fb['undo'])}"
+             + (" (Q-form-05)." if (state.get("answers") or {}).get("Q-form-05") else " (default, from house standard STD-visual-details-40)."),
+             f"- The same map, for tools and agents: `build/status.json`."]
+    return rows
 
 
 def cmd_export(d, fmt, files=None, meta=None, quiet=False):
@@ -11106,8 +11191,11 @@ def cmd_export(d, fmt, files=None, meta=None, quiet=False):
                 else:
                     write_text(fp, body)
             p = os.path.join(bdir, "index.html")
+        elif f == "status":  # what each status means and the tokens that carry it, for agents and validators (Smart UI)
+            p = os.path.join(d, "build", "status.json")
+            dump_json(p, status_map(files, meta, state, prefix))
         else:
-            raise SystemExit(f"unknown format {f}; use css, tailwind, figma, paper, swift, compose, dtcg, artifact, brand or all")
+            raise SystemExit(f"unknown format {f}; use css, tailwind, figma, paper, swift, compose, dtcg, artifact, brand, status or all")
         written.append(p)
     if not quiet:
         for p in written:
@@ -11119,7 +11207,7 @@ def cmd_export(d, fmt, files=None, meta=None, quiet=False):
 # DESIGN.md and PRODUCT.md (spec 7.2, 7.3)
 # =============================================================================================
 
-DESIGN_SECTIONS = ["Overview", "Colors", "Typography", "Layout", "Elevation & Depth", "Shapes", "Components", "States", "Do's and Don'ts",
+DESIGN_SECTIONS = ["Overview", "Colors", "Typography", "Layout", "Elevation & Depth", "Shapes", "Components", "States", "Status and Feedback", "Do's and Don'ts",
                    "Motion", "Modes and Themes", "Iconography and Imagery", "Content and Voice", "Accessibility",
                    "Platforms and Devices", "Decisions", "Open Items", "Audit Ledger", "For Agents"]
 PRODUCT_SECTIONS = ["Product", "Audience", "Users", "Site brief", "Surfaces", "Memorable Thing", "Principles", "Constraints", "Scope", "Team and Governance"]
@@ -12059,6 +12147,9 @@ def render_design_md(d, files, meta, state, existing="", out_dir=None):
     out.append(section("Components", "\n".join(body), lead=f"**Version 1 plans {len(inv)} components, all built from these tokens.**", term_key="Component inventory scope"))
     out.append(section("States", "\n".join(states_lines(state)), lead="**Every screen says what is happening while it loads, when it is "
                        "empty, and when something goes wrong.** The overview draws each one with these tokens.", fold=False))
+    out.append(section("Status and Feedback", "\n".join(status_lines(state, files, meta, prefix)),
+                       lead="**Each status colour has one meaning, always with an icon or a word, and every action shows what happened.**",
+                       fold=False))
 
     # 8 Do's and Don'ts
     vr = Report()
@@ -12280,9 +12371,11 @@ def render_design_md(d, files, meta, state, existing="", out_dir=None):
             "5. To extend: add a decision (never hand-edit tokens or this file). Keep semantic names the same across modes. Deprecate instead of deleting.",
             "6. Every build: open a round (`engine.py ledger start \"<what>\" --items ...`), build from the tokens, run `engine.py review`, "
             "check the rendered page with opendesigner-review and show screenshots at phone and desktop width, mark each ledger item "
-            "done or waived (with the owner's words), then re-read this file."]
+            "done or waived (with the owner's words), then re-read this file.",
+            f"7. Status colours ({', '.join(st for st in STATUS_MEANING if f'color.text.{st}' in light)}) carry one meaning each and never alone: follow Status and Feedback "
+            f"above (`{R('build/status.json')}` holds the same map). After every action, show what happened as it says."]
     if std_body:
-        body.append("7. Follow the Standards section. Change a standard only when the person explicitly asks: "
+        body.append("8. Follow the Standards section. Change a standard only when the person explicitly asks: "
                     "`engine.py standard override <id> --why \"<their words>\"`.")
     if removed_entries(state):
         body.append(f"{len(body) + 1}. Never bring back anything in Removed on Purpose. Only the owner can: `engine.py removed restore <id> --why \"<their words>\"`.")
@@ -16290,6 +16383,68 @@ TW_WEIGHTS = {"thin": 100, "extralight": 200, "light": 300, "normal": 400, "medi
               "extrabold": 800, "black": 900}
 
 
+RX_STATUS_TOKEN = re.compile(r"(?:var\(\s*--[a-z0-9-]+?-color-(?:(?:bg|text|border|icon)-)?|(?<![\w-])(?:bg|text|border|fill|stroke|ring|outline|decoration)-)"
+                             r"(success|warning|danger|info)(?=[-\s\"')}:;]|$)(?:[-\w]*)")
+STATUS_SAYS = {"success": r"success|valid|done|complete|saved|paid|ok\b|confirm|verified|positive|good",
+               "warning": r"warn|caution|expir|limit|pending|attention|risk",
+               "danger": r"error|danger|invalid|fail|destructive|delete|remove|critical|alert|negative|declin|denied",
+               "info": r"info|note|tip|help|notice|update|hint|about"}
+RX_TW_STATUS_PALETTE = re.compile(r"(?<![\w\[-])(?:[a-z-]+:)?(?:text|bg|border|fill|stroke|ring|outline)-(red|rose|green|emerald|lime|amber|yellow|orange)-\d{2,3}(?![\w-])")
+TW_STATUS_FAMILY = {"red": "danger", "rose": "danger", "green": "success", "emerald": "success", "lime": "success", "amber": "warning",
+                    "yellow": "warning", "orange": "warning"}
+RX_STATUS_CUE = re.compile(r"<svg|<i\b|icon|aria-label|role=[\"'](?:status|alert)|sr-only|visually-hidden", re.I)
+
+
+def status_misuse(line, ctx, rel, i, ext, prefix):
+    """Judgment notes (S1, owner 2026-11-14): a status colour on something that names another meaning or none, and in markup a
+    status colour with no icon or word beside it (WCAG 1.4.1). Code cannot be sure of either, so these go to a person."""
+    out = []
+    for m in RX_STATUS_TOKEN.finditer(line):
+        st = m.group(1)
+        if not re.search(STATUS_SAYS[st], ctx, re.I):
+            other = next((o for o, rx in STATUS_SAYS.items() if o != st and re.search(rx, ctx, re.I)), None)
+            out.append({"kind": "status-meaning", "file": rel, "line": i, "what": f"the {st} colour ({m.group(0)[:50]})",
+                        "ask": (f"this names {other}, not {st}: use the {other} tokens?" if other else
+                                f"nothing here says {st}: is it a {st} status? If it is decoration or a brand accent, use the action or "
+                                "accent tokens instead")})
+            break
+    for m in RX_TW_STATUS_PALETTE.finditer(line):  # a status colour typed by hand as a Tailwind palette class
+        st = TW_STATUS_FAMILY[m.group(1)]
+        out.append({"kind": "status-by-hand", "file": rel, "line": i, "what": f"{m.group(0)} looks like the {st} colour, typed by hand",
+                    "ask": f"if it means {st}, use the {st} token (build/status.json); if not, use a colour that does not read as {st}"})
+        break
+    # colour alone: an element whose text closes on this line (or that holds nothing at all) and says no status and has no icon;
+    # an element whose text runs on to the next lines is left alone, since one line cannot see it
+    m_el = re.search(r"<(\w+)\b[^>]*>([^<]*)</\1>|<(\w+)\b[^>]*/>|<(\w+)\b[^>]*>\s*</\4>", line)
+    if ext in (".html", ".jsx", ".tsx", ".vue", ".svelte") and m_el and (RX_STATUS_TOKEN.search(m_el.group(0))
+                                                                        or RX_TW_STATUS_PALETTE.search(m_el.group(0))):
+        text = re.sub(r"<[^>]+>|\{[^}]*\}", " ", line)
+        if not RX_STATUS_CUE.search(line) and not any(re.search(rx, text, re.I) for rx in STATUS_SAYS.values()):
+            out.append({"kind": "status-colour-only", "file": rel, "line": i, "what": "a status shown by colour alone",
+                        "ask": "add the status icon or a word (Error, Saved...) beside the colour (WCAG 2.2 SC 1.4.1)"})
+    return out
+
+
+RX_ACTION = re.compile(r"<form\b|onSubmit|method=[\"']post|\bfetch\([^;]{0,300}?method\s*:\s*[\"'](?:post|put|patch|delete)|"
+                       r"axios\.(?:post|put|patch|delete)|\.submit\(", re.I | re.S)
+RX_FEEDBACK = re.compile(r"role=[\"'](?:status|alert)[\"']|aria-live|toast|snackbar|notif(?:y|ication)|<(?:Banner|Alert|Callout)\b|"
+                         r"\balert\(|flash\(|set(?:Message|Error|Status|Notice|Saved)\b|>\s*(?:saved|sent|done)\b", re.I)
+
+
+def feedback_gap(lines, rel, ext):
+    """A judgment note: a file that sends something (a form, a POST, a fetch) and shows nothing back (no status or alert role, no
+    live region, no toast or banner, no message state). Only files with markup or UI code; servers and tests are not read here."""
+    if ext not in (".html", ".jsx", ".tsx", ".vue", ".svelte"):  # markup only: plain .js and .ts are often API helpers and servers
+        return []
+    text = "".join(lines)
+    m = RX_ACTION.search(text)
+    if not m or RX_FEEDBACK.search(text):
+        return []
+    return [{"kind": "no-feedback", "file": rel, "line": text.count("\n", 0, m.start()) + 1, "what": "an action with no feedback",
+             "ask": "after it runs, what does the person see? Say what happened in place, in a banner or a toast (DESIGN.md, "
+                    "Status and Feedback)"}]
+
+
 def font_literals(line, rel, i, ext, sys_weights, selector=""):
     """Typed font stacks and weights off the system on one line (S4 #1): font-family, the font shorthand, JSX fontFamily and
     fontWeight, Tailwind font-[...] and weight classes. Not inside @font-face (it declares a face, it does not pick one), not a
@@ -16735,6 +16890,7 @@ def cmd_review(d, project=None, strict=False, as_json=False, limit=40, collect=N
         if t_.get("type") == "fontWeight" and isinstance(t_.get("resolved"), (int, float)):
             sys_weights.add(int(t_["resolved"]))
     font_findings = []  # (rel, i, value): typed font stacks and weights off the system
+    status_notes = []  # judgment, not counted: a status colour off its meaning, a status by colour alone, an action with no feedback
     exempt = exempt_rules(state)
     exempt_hits = collections.Counter()
     kept, bare, std_notes = [], [], []  # od-ignore lines with and without a reason; standards broken on od-ignore lines (notes)
@@ -16767,6 +16923,7 @@ def cmd_review(d, project=None, strict=False, as_json=False, limit=40, collect=N
         scanned += 1
         rel = os.path.relpath(path, base)
         jsx = ext in (".js", ".jsx", ".ts", ".tsx", ".vue", ".svelte")
+        status_notes.extend(feedback_gap(lines, rel, ext))
         for i, line in enumerate(lines, 1):
             if re.search(r"^\s*(//|/\*|\*|<!--)", line):
                 continue
@@ -16845,9 +17002,15 @@ def cmd_review(d, project=None, strict=False, as_json=False, limit=40, collect=N
                     findings.append(item)
             if ignored:  # the comment keeps the raw values on the line (and, with a reason, a removed thing)
                 continue
+            raw_line = line
             line = mask_vars(line)  # every literal is read, even next to a var(); a var() and its fallback are tokens at work (R18)
             ctx = (css_selector_context(lines, i) if ext in (".css", ".scss", ".sass", ".less") else
                    (lines[i - 2] if i > 1 else "")) + " " + line  # the selector or the line above names the element's role
+            sel_ = css_selector_context(lines, i) if ext in (".css", ".scss", ".sass", ".less", ".html", ".vue", ".svelte") else ""
+            near_ = "".join(lines[i:i + 2]) if ext in (".html", ".jsx", ".tsx", ".vue", ".svelte") and not sel_.strip() else ""  # markup text below
+            status_notes.extend(status_misuse(raw_line[:REVIEW_LINE_CAP],
+                                              sel_ + " " + RX_STATUS_TOKEN.sub(" ", raw_line[:REVIEW_LINE_CAP] + " " + near_[:400]),
+                                              rel, i, ext, prefix))
             custom_prop = bool(re.match(r"\s*--", line))  # a custom property definition is a token source, not a bypass
             tw_ctx = bool(RX_TW_CONTEXT.search(line)) or (ext in (".css", ".scss") and "@apply" in line)
             add = lambda kind, value, fix: findings.append({"kind": kind, "file": rel, "line": i, "value": value, "fix": fix})
@@ -17062,6 +17225,22 @@ def cmd_review(d, project=None, strict=False, as_json=False, limit=40, collect=N
         + ([plural(len(unapproved), "od-ignore line") + " the owner has not approved"] if unapproved else [])
     to_fix = len(findings) + (0 if in_charge else 1) + len(drift_look) + (1 if stale or missing else 0) + len(set(untrue)) \
         + len(guard) + len(invalid) + len(r_errs) + len(broken) + len(open_items) + len(unapproved)
+    status_hex = {}
+    for st in ("success", "warning", "danger"):
+        for p_ in (f"color.text.{st}", f"color.bg.{st}.bold"):
+            if p_ in light:
+                status_hex[(st, p_)] = oklch_to_oklab(*hex_to_oklch(hex_of(light[p_]["resolved"]).lower()))
+    for f_ in findings:
+        if f_["kind"] != "color" or not re.fullmatch(r"#[0-9a-fA-F]{6}", str(f_["value"])) or not status_hex:
+            continue
+        a_ = oklch_to_oklab(*hex_to_oklch(f_["value"].lower()))
+        (st, p_), dd = min(((k, sum((x - y) ** 2 for x, y in zip(a_, v)) ** 0.5) for k, v in status_hex.items()), key=lambda kv: kv[1])
+        same_hue = ((a_[1] - status_hex[(st, p_)][1]) ** 2 + (a_[2] - status_hex[(st, p_)][2]) ** 2) ** 0.5
+        if dd < 0.12 and same_hue < 0.06 and (a_[1] ** 2 + a_[2] ** 2) ** 0.5 > 0.06:  # a chromatic colour in the status's hue
+            status_notes.append({"kind": "status-by-hand", "file": f_["file"], "line": f_["line"],
+                                 "what": f"{f_['value']} looks like the {st} colour, typed by hand",
+                                 "ask": f"if it means {st}, use var({css_var(prefix, p_)}); if not, use a colour that does not read as {st}"})
+    result["statusNotes"] = status_notes[:500]
     result.update({"keptOnPurpose": [k_ for k_ in kept if k_ not in unapproved][:500], "ignoredByAgent": unapproved[:500], "ignoredWithoutReason": bare[:500], "guard": guard, "guardNotes": guard_notes,
                    "standardNotes": std_notes[:500], "floorKept": floor_kept[:500],
                    "validateErrors": [{"category": i_["category"], "message": i_["message"], "where": i_["where"]} for i_ in invalid[:500]],
@@ -17216,6 +17395,12 @@ def cmd_review(d, project=None, strict=False, as_json=False, limit=40, collect=N
                 print(f"  {f_['file']}:{f_['line']}  {f_['value']}  ->  {f_['fix']}")
             if len(chf) > limit:
                 print(f"  ... and {len(chf) - limit} more (use --json for all).")
+        if status_notes:
+            print(f"For a person to judge (status and feedback; not counted, because code alone cannot be sure): {len(status_notes)}")
+            for n_ in status_notes[:10 if not show_all else None]:
+                print(f"  {n_['file']}:{n_['line']}  {n_['what']}  ->  {n_['ask']}")
+            if len(status_notes) > 10 and not show_all:
+                print(f"  ... and {len(status_notes) - 10} more (engine.py review --all). The rules: DESIGN.md, Status and Feedback.")
         for u in sorted(set(untrue)):
             print(f"Untrue: {u}. Fix: run `engine.py design-md`.")
         if missing == ["DESIGN.md"]:

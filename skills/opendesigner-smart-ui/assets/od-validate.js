@@ -7,7 +7,10 @@ const HANDLER = /^on[A-Z_]|^on(click|dblclick|load|error|abort|mouse\w*|key\w*|f
 const BANNED_KEYS = new Set(["style", "class", "classname", "css", "theme", "html", "innerhtml", "outerhtml", "dangerouslysetinnerhtml", "srcdoc"]);
 const HTML = /<\s*\/?\s*[a-zA-Z!][^>]*>|<\s*[a-zA-Z]/;
 const WHOLE_STYLE = /^\s*(#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})|-?\d*\.?\d+(px|rem|em|vh|vw|pt)|(rgba?|hsla?|oklch|oklab|lab|lch|color-mix|var|calc|url|expression)\(.*)\s*$/i;
-const NUM = /(?<![\w.])-?\d[\d,]*(?:\.\d+)?/g;
+// Numbers in text, not inside a word or after a dot. No lookbehind: Safari before 16.4 can't parse one, and a parse error
+// would stop the whole renderer, not just this check.
+const NUM_IN = /(^|[^\w.])(-?\d[\d,]*(?:\.\d+)?)/g;
+const numbersInText = (t) => [...t.matchAll(NUM_IN)].map((m) => m[2]);
 // copy rules (docs/COPY.md), checked when opts.copy; the same as smartui.py
 const BANNED_WORDS = /\b(successful(ly)?|seamless(ly)?|effortless(ly)?|leverag(e|es|ing)|utili[sz](e|es|ing)|robust|delve|unlock(s|ing)?|empower(s|ing)?|elevate(s|d)?|streamline(s|d)?|cutting-edge|hassle-free|please note)\b/i;
 const WORD = /[A-Za-z][A-Za-z'’-]*/g;
@@ -38,13 +41,17 @@ function duplicateRows(v, path, errs, sid) {
 const TONE_GOOD = /^(?:paid|done|complete|completed|approved|passed|pass|ok|active|on time|delivered|available|eligible|yes|confirmed|sent|saved|fixed|resolved|in stock)\b/i, TONE_BAD = /^(?:unpaid|overdue|failed|fail|broken|error|declined|refused|cancelled|canceled|rejected|missing|not eligible|no|expired|out of stock|blocked|still needed)\b/i;
 
 /** Colours follow meaning: a good value is never danger, a bad one never success. The data decides the tone. */
-function tonesFromData(comp, path, errs, sid) {
+function tonesFromData(comp, path, errs, sid, status) {
+  const st = (status && status.statuses) || {};
+  const words = [(st.success && st.success.words) || [], (st.danger && st.danger.words) || []].map((ws) => ws.map((w) => String(w).toLowerCase()));
+  const has = (low, ws) => ws.some((w) => low === w || low.startsWith(w + " "));
   const walk = (v, p) => {
     if (Array.isArray(v)) v.forEach((x, i) => walk(x, `${p}/${i}`));
     else if (isObj(v)) {
       if (v.tone === "success" || v.tone === "danger") {
         const k = ["value", "status", "text", "label"].find((k) => typeof v[k] === "string");
-        const said = k ? v[k].trim() : "", good = TONE_GOOD.test(said), bad = TONE_BAD.test(said);
+        const said = k ? v[k].trim() : "", low = said.toLowerCase();
+        const good = TONE_GOOD.test(said) || has(low, words[0]), bad = TONE_BAD.test(said) || has(low, words[1]);
         if ((v.tone === "success" && bad && !good) || (v.tone === "danger" && good && !bad))
           err(errs, "R6-tone", `${p}/tone`, `'${said}' is shown as ${v.tone}`, sid, "let the data set the tone: danger for a bad value, success for a good one, neutral when unsure");
       }
@@ -194,7 +201,7 @@ function checkValue(v, schema, path, errs, sid, cat, opts, ctx) {
     }
     if (opts.copy && !schema["x-od-code"] && !schema.enum && !schema.pattern && schema.format !== "uri") copyCheck(v, path, errs, sid, ctx.names || new Set());
     if (ctx.numbers && !schema["x-od-code"]) {
-      for (const n of v.match(NUM) || []) if (!ctx.numbers.has(num(n))) ctx.warnings.push({ rule: "R6-text", path, message: `${n} in the text is not in the data you were given` });
+      for (const n of numbersInText(v)) if (!ctx.numbers.has(num(n))) ctx.warnings.push({ rule: "R6-text", path, message: `${n} in the text is not in the data you were given` });
     }
   }
   if (typeof v === "number") {
@@ -230,7 +237,7 @@ function checkValue(v, schema, path, errs, sid, cat, opts, ctx) {
 export function numbersIn(obj, out = new Set()) {
   if (typeof obj === "boolean" || obj === null || obj === undefined) return out;
   if (typeof obj === "number") out.add(obj);
-  else if (typeof obj === "string") for (const n of obj.match(NUM) || []) { const x = num(n); if (x !== null) out.add(x); }
+  else if (typeof obj === "string") for (const n of numbersInText(obj)) { const x = num(n); if (x !== null) out.add(x); }
   else if (Array.isArray(obj)) obj.forEach((x) => numbersIn(x, out));
   else if (isObj(obj)) Object.values(obj).forEach((x) => numbersIn(x, out));
   return out;
@@ -349,7 +356,7 @@ export function validate(answer, cat, opts = {}) {
       const ctx = { data: surfaces[sid].data, numbers, warnings: warns, names };
       const checked = checkValue(c, schema, cpath, errs, sid, cat, opts, ctx);
       consequences(c, schema, cpath, errs, sid, opts.consequences || {});
-      tonesFromData(c, cpath, errs, sid);
+      tonesFromData(c, cpath, errs, sid, opts.status);
       if (opts.source !== undefined && opts.source !== null) stepsFromData(c, cpath, errs, sid, opts.source);
       if (typeof c.id === "string") surfaces[sid].components[c.id] = { c: isObj(checked) ? checked : c, path: cpath, schema };
     });

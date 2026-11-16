@@ -11,7 +11,7 @@
       "components": [
        {
         "component": "DataTable",
-        "title": "Open Invoices",
+        "title": "Open invoices",
         "columns": [
          {
           "label": "Invoice"
@@ -116,10 +116,10 @@
       "components": [
        {
         "component": "LineChart",
-        "title": "API Usage This Year",
+        "title": "API usage this year",
         "summary": "Monthly API calls",
         "unit": "Calls",
-        "series": "API Calls",
+        "series": "API calls",
         "points": [
          {
           "label": "Jan",
@@ -246,7 +246,7 @@
       "components": [
        {
         "component": "Comparison",
-        "title": "Plan Comparison",
+        "title": "Plan comparison",
         "options": [
          {
           "name": "Starter",
@@ -403,7 +403,7 @@
       "components": [
        {
         "component": "KeyFacts",
-        "title": "Subscription Details",
+        "title": "Subscription details",
         "facts": [
          {
           "label": "Plan",
@@ -537,16 +537,16 @@
       "components": [
        {
         "component": "DataTable",
-        "title": "Open Invoices",
+        "title": "Open invoices",
         "columns": [
          {
-          "label": "Invoice Number"
+          "label": "Invoice number"
          },
          {
-          "label": "Issue Date"
+          "label": "Issue date"
          },
          {
-          "label": "Due Date"
+          "label": "Due date"
          },
          {
           "label": "Amount",

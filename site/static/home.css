@@ -453,7 +453,7 @@
 .h-first { padding-top: 56px; }
 .book-title { max-width: 18ch; margin-top: 8px; }
 .book-lede { margin-top: 16px !important; }
-.book-grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 20px; margin: 40px 0 20px; align-items: stretch; }
+.book-grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 20px; margin: 40px 0 0; align-items: stretch; }
 @media (max-width: 860px) { .book-grid { grid-template-columns: minmax(0, 1fr); } }
 .book-card { display: flex; flex-direction: column; padding: 28px; border: 1px solid var(--line); border-radius: var(--r-panel); background: var(--surface-raised); }
 .book-card.later { background: var(--surface-sunken); }
@@ -467,6 +467,8 @@
 .book-dl dd { margin: 0; font-size: 15px; line-height: 22px; letter-spacing: -0.016em; }
 @media (max-width: 560px) { .book-dl > div { grid-template-columns: minmax(0, 1fr); gap: 4px; } }
 .book-act { margin-top: auto; }
+.book-card > p.h-fine { margin-top: 16px; font-size: 13px; line-height: 20px; letter-spacing: -0.006em; }
+.book-grid + .h-fine { margin-top: 24px; }
 .book-card .h-soon { margin-top: auto; }
 @supports (corner-shape: superellipse(1.35)) { .h-book, .book-card { corner-shape: superellipse(1.35); --corner-k: 1.22; } }
 /* text blocks in a section share one left edge (the hero's centred lede margin must not leak into left-aligned sections) */

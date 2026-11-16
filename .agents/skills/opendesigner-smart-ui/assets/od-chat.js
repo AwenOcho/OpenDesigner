@@ -45,7 +45,7 @@ class ODChat extends HTMLElement {
     try { info = await (await fetch("/api/info")).json(); } catch { info = { provider: "none" }; }
     this.info = info;
     const head = el("p", "od-chat-mode",
-      info.provider && info.provider !== "recorded" ? `Live: ${info.model || info.provider}` : "Recorded answers (no model key found)");
+      info.provider && info.provider !== "recorded" ? `Live: ${info.model || info.provider}` : "Recorded answers");
     this.log = el("div", "od-chat-log");
     this.log.setAttribute("aria-label", "Conversation");
     this.chips = el("div", "od-chat-chips");

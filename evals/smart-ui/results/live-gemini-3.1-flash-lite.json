@@ -1,36 +1,48 @@
 {
  "model": "gemini-3.1-flash-lite",
  "provider": "gemini",
- "date": "2026-11-14",
+ "date": "2026-11-16",
  "runs_per_case": 3,
  "summary": {
-  "runs": 78,
-  "selector_recall_pct": 100.0,
-  "picked_right_pct": 96.8,
-  "valid_first_pct": 50.8,
+  "runs": 84,
+  "selector_recall_pct": 65.2,
+  "picked_right_pct": 91.3,
+  "valid_first_pct": 95.7,
   "valid_after_repair_pct": 100.0,
-  "held_back_pct": 80.0,
-  "over_trigger_pct": 20.0,
+  "held_back_pct": 100.0,
+  "over_trigger_pct": 0.0,
   "changes_run_by_model": 0,
   "approval_shown_pct": 100.0,
-  "rendered": 65,
+  "rendered": 67,
   "floor_findings": 3,
   "errors": 0,
-  "copy_problems_first": 49,
+  "copy_problems_first": 1,
   "copy_problems_left": 0,
   "speed": {
-   "turns": 93,
+   "turns": 99,
    "skeleton_ms_p50": 5,
-   "skeleton_ms_p95": 3083,
-   "full_ms_p50": 2806,
-   "full_ms_p95": 4807,
-   "calls_per_turn": 1.26,
-   "tokens_per_turn": 1733
+   "skeleton_ms_p95": 1718,
+   "full_ms_p50": 1797,
+   "full_ms_p95": 2946,
+   "shell_ms_p50": 3,
+   "shell_ms_p95": 864,
+   "first_data_ms_p50": 1787,
+   "first_data_ms_p95": 3184,
+   "parts_shown": 84,
+   "template_share_pct": 39.3,
+   "modes_pct": {
+    "fill": 18.2,
+    "edit": 15.2,
+    "generate": 51.5,
+    "text": 15.2
+   },
+   "calls_per_turn": 1.21,
+   "tokens_per_turn": 1626
   },
   "tokens": {
-   "calls": 117,
-   "input": 135879,
-   "output": 25334
+   "calls": 120,
+   "input": 142998,
+   "output": 17969
   }
  },
  "rows": [
@@ -44,21 +56,14 @@
    "parts": [
     "DataTable"
    ],
-   "selector": [
-    "DataTable",
-    "KeyFacts",
-    "FileCard"
-   ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title",
-    "copy-case /0/createSurface/components/0/columns/2/label"
-   ],
+   "selector": [],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -73,21 +78,14 @@
    "parts": [
     "DataTable"
    ],
-   "selector": [
-    "DataTable",
-    "KeyFacts",
-    "FileCard"
-   ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title",
-    "copy-case /0/createSurface/components/0/columns/3/label"
-   ],
+   "selector": [],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -102,21 +100,14 @@
    "parts": [
     "DataTable"
    ],
-   "selector": [
-    "DataTable",
-    "KeyFacts",
-    "FileCard"
-   ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title",
-    "copy-case /0/createSurface/components/0/columns/2/label"
-   ],
+   "selector": [],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -131,16 +122,12 @@
    "parts": [
     "DataTable"
    ],
-   "selector": [
-    "FileCard",
-    "DataTable",
-    "KeyFacts"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
    "valid": true,
    "rendered": true,
@@ -157,16 +144,12 @@
    "parts": [
     "DataTable"
    ],
-   "selector": [
-    "FileCard",
-    "DataTable",
-    "KeyFacts"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
    "valid": true,
    "rendered": true,
@@ -183,16 +166,12 @@
    "parts": [
     "DataTable"
    ],
-   "selector": [
-    "FileCard",
-    "DataTable",
-    "KeyFacts"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
    "valid": true,
    "rendered": true,
@@ -209,21 +188,14 @@
    "parts": [
     "DataTable"
    ],
-   "selector": [
-    "DataTable",
-    "FileCard",
-    "KeyFacts"
-   ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title",
-    "copy-case /0/createSurface/components/0/columns/1/label"
-   ],
+   "selector": [],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
-   "valid": false,
+   "valid": true,
    "headers_ok": true,
    "rendered": true,
    "floor_findings": 0,
@@ -239,21 +211,14 @@
    "parts": [
     "DataTable"
    ],
-   "selector": [
-    "DataTable",
-    "FileCard",
-    "KeyFacts"
-   ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title",
-    "copy-case /0/createSurface/components/0/columns/1/label"
-   ],
+   "selector": [],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
-   "valid": false,
+   "valid": true,
    "headers_ok": true,
    "rendered": true,
    "floor_findings": 0,
@@ -269,21 +234,14 @@
    "parts": [
     "DataTable"
    ],
-   "selector": [
-    "DataTable",
-    "FileCard",
-    "KeyFacts"
-   ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title",
-    "copy-case /0/createSurface/components/0/columns/2/label"
-   ],
+   "selector": [],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
-   "valid": false,
+   "valid": true,
    "headers_ok": true,
    "rendered": true,
    "floor_findings": 0,
@@ -300,16 +258,12 @@
    "parts": [
     "KeyFacts"
    ],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "DataTable"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
    "valid": true,
    "rendered": true,
@@ -327,16 +281,12 @@
    "parts": [
     "KeyFacts"
    ],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "DataTable"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
    "valid": true,
    "rendered": true,
@@ -354,16 +304,12 @@
    "parts": [
     "KeyFacts"
    ],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "DataTable"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": true,
    "valid": true,
    "rendered": true,
@@ -463,16 +409,13 @@
     "LineChart",
     "BarChart"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title",
-    "copy-case /0/createSurface/components/0/unit"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -492,15 +435,13 @@
     "LineChart",
     "BarChart"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -520,16 +461,13 @@
     "LineChart",
     "BarChart"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title",
-    "copy-case /0/createSurface/components/0/series"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -551,15 +489,13 @@
     "Comparison",
     "LineChart"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -581,15 +517,13 @@
     "Comparison",
     "LineChart"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -611,16 +545,13 @@
     "Comparison",
     "LineChart"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title",
-    "copy-case /0/createSurface/components/0/unit"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -642,10 +573,9 @@
     "LineChart"
    ],
    "first_errors": [
-    "copy-case /0/createSurface/components/0/stats/0/label",
-    "copy-case /0/createSurface/components/0/stats/1/label"
+    "R6-number /0/createSurface/components/0/stats/0/share"
    ],
-   "repaired": false,
+   "repaired": true,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
@@ -671,13 +601,15 @@
     "BarChart",
     "LineChart"
    ],
-   "first_errors": [],
-   "repaired": false,
+   "first_errors": [
+    "R6-number /0/createSurface/components/0/stats/0/share"
+   ],
+   "repaired": true,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": true,
+   "valid": false,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -722,15 +654,13 @@
    "selector": [
     "Comparison"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/rows/3/label"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 1,
    "floors": [
@@ -750,16 +680,13 @@
    "selector": [
     "Comparison"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title",
-    "copy-case /0/createSurface/components/0/rows/3/label"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 1,
    "floors": [
@@ -779,17 +706,13 @@
    "selector": [
     "Comparison"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title",
-    "copy-case /0/createSurface/components/0/rows/0/label",
-    "copy-case /0/createSurface/components/0/rows/3/label"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 1,
    "floors": [
@@ -810,10 +733,9 @@
     "Comparison"
    ],
    "first_errors": [
-    "copy-case /0/createSurface/components/0/title",
-    "copy-case /0/createSurface/components/0/rows/2/label"
+    "copy-word text"
    ],
-   "repaired": false,
+   "repaired": true,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
@@ -836,15 +758,13 @@
    "selector": [
     "Comparison"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/rows/3/label"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -862,15 +782,13 @@
    "selector": [
     "Comparison"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -887,19 +805,15 @@
    ],
    "selector": [
     "Comparison",
-    "ApprovalPrompt",
     "KeyFacts"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title",
-    "copy-case /0/createSurface/components/0/facts/1/label"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -916,18 +830,15 @@
    ],
    "selector": [
     "Comparison",
-    "ApprovalPrompt",
     "KeyFacts"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -944,20 +855,15 @@
    ],
    "selector": [
     "Comparison",
-    "ApprovalPrompt",
     "KeyFacts"
    ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title",
-    "copy-case /0/createSurface/components/0/facts/0/label",
-    "copy-case /0/createSurface/components/0/facts/1/label"
-   ],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
    "right": true,
-   "valid": false,
+   "valid": true,
    "rendered": true,
    "floor_findings": 0,
    "floors": []
@@ -970,19 +876,15 @@
    ],
    "ui": true,
    "parts": [
-    "ProgressStatus"
+    "KeyFacts"
    ],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "ProgressStatus"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
-   "right": true,
+   "selector_hit": false,
+   "right": false,
    "valid": true,
    "rendered": true,
    "floor_findings": 0,
@@ -996,19 +898,15 @@
    ],
    "ui": true,
    "parts": [
-    "ProgressStatus"
+    "KeyFacts"
    ],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "ProgressStatus"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
-   "right": true,
+   "selector_hit": false,
+   "right": false,
    "valid": true,
    "rendered": true,
    "floor_findings": 0,
@@ -1022,19 +920,15 @@
    ],
    "ui": true,
    "parts": [
-    "ProgressStatus"
+    "KeyFacts"
    ],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "ProgressStatus"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
-   "right": true,
+   "selector_hit": false,
+   "right": false,
    "valid": true,
    "rendered": true,
    "floor_findings": 0,
@@ -1049,18 +943,14 @@
    ],
    "ui": true,
    "parts": [
-    "ErrorRetry"
-   ],
-   "selector": [
-    "ProgressStatus",
-    "ErrorRetry",
     "DataTable"
    ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": true,
+   "selector_hit": false,
    "right": false,
    "valid": true,
    "rendered": true,
@@ -1074,758 +964,710 @@
     "ProgressStatus",
     "KeyFacts"
    ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": false,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "refund-followup",
+   "run": 3,
+   "expect": [
+    "ProgressStatus",
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": false,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "pay-approve",
+   "run": 1,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "ApprovalPrompt",
+    "DataTable"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "pay-approve",
+   "run": 2,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "ApprovalPrompt",
+    "DataTable"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "pay-approve",
+   "run": 3,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "ApprovalPrompt",
+    "DataTable"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "pay-direct",
+   "run": 1,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "ApprovalPrompt",
+    "FileCard",
+    "KeyFacts"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "pay-direct",
+   "run": 2,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "ApprovalPrompt",
+    "FileCard",
+    "KeyFacts"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "pay-direct",
+   "run": 3,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "ApprovalPrompt",
+    "FileCard",
+    "KeyFacts"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "upgrade-approve",
+   "run": 1,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "Comparison",
+    "ApprovalPrompt"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "upgrade-approve",
+   "run": 2,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "Comparison",
+    "ApprovalPrompt"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "upgrade-approve",
+   "run": 3,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "Comparison",
+    "ApprovalPrompt"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "upgrade-after-compare",
+   "run": 1,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "ApprovalPrompt",
+    "Comparison"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "upgrade-after-compare",
+   "run": 2,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "ApprovalPrompt",
+    "Comparison"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "upgrade-after-compare",
+   "run": 3,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "ApprovalPrompt",
+    "Comparison"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "seats-approve",
+   "run": 1,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "ApprovalPrompt"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "seats-approve",
+   "run": 2,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "ApprovalPrompt"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "seats-approve",
+   "run": 3,
+   "expect": [
+    "ApprovalPrompt"
+   ],
+   "ui": true,
+   "parts": [
+    "ApprovalPrompt"
+   ],
+   "selector": [
+    "ApprovalPrompt"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "missing-invoice",
+   "run": 1,
+   "expect": [
+    "ErrorRetry",
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "ErrorRetry"
+   ],
+   "selector": [
+    "FileCard",
+    "KeyFacts",
+    "ErrorRetry"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "missing-invoice",
+   "run": 2,
+   "expect": [
+    "ErrorRetry",
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "ErrorRetry"
+   ],
+   "selector": [
+    "FileCard",
+    "KeyFacts",
+    "ErrorRetry"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "missing-invoice",
+   "run": 3,
+   "expect": [
+    "ErrorRetry",
+    "KeyFacts"
+   ],
+   "ui": true,
+   "parts": [
+    "ErrorRetry"
+   ],
+   "selector": [
+    "FileCard",
+    "KeyFacts",
+    "ErrorRetry"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "usage-and-table",
+   "run": 1,
+   "expect": [
+    "DataTable",
+    "BarChart"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [
+    "BarChart",
+    "LineChart",
+    "DataTable"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "usage-and-table",
+   "run": 2,
+   "expect": [
+    "DataTable",
+    "BarChart"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [
+    "BarChart",
+    "LineChart",
+    "DataTable"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "usage-and-table",
+   "run": 3,
+   "expect": [
+    "DataTable",
+    "BarChart"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [
+    "BarChart",
+    "LineChart",
+    "DataTable"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "seats-history",
+   "run": 1,
+   "expect": [
+    "LineChart",
+    "BarChart",
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "LineChart"
+   ],
+   "selector": [
+    "BarChart",
+    "Comparison",
+    "LineChart"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "seats-history",
+   "run": 2,
+   "expect": [
+    "LineChart",
+    "BarChart",
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "LineChart"
+   ],
+   "selector": [
+    "BarChart",
+    "Comparison",
+    "LineChart"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "seats-history",
+   "run": 3,
+   "expect": [
+    "LineChart",
+    "BarChart",
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "LineChart"
+   ],
+   "selector": [
+    "BarChart",
+    "Comparison",
+    "LineChart"
+   ],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": true,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "noui-due",
+   "run": 1,
+   "expect": [],
    "ui": false,
    "parts": [],
-   "selector": [
-    "DataTable",
-    "ProgressStatus"
-   ],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
    "selector_hit": true,
-   "right": false,
+   "right": true,
    "valid": null
   },
   {
-   "id": "refund-followup",
-   "run": 3,
-   "expect": [
-    "ProgressStatus",
-    "KeyFacts"
-   ],
-   "ui": true,
-   "parts": [
-    "ProgressStatus"
-   ],
-   "selector": [
-    "DataTable",
-    "ProgressStatus"
-   ],
-   "first_errors": [],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": true,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
-  },
-  {
-   "id": "pay-approve",
-   "run": 1,
-   "expect": [
-    "ApprovalPrompt"
-   ],
-   "ui": true,
-   "parts": [
-    "ApprovalPrompt"
-   ],
-   "selector": [
-    "ApprovalPrompt",
-    "DataTable"
-   ],
-   "first_errors": [],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": true,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
-  },
-  {
-   "id": "pay-approve",
-   "run": 2,
-   "expect": [
-    "ApprovalPrompt"
-   ],
-   "ui": true,
-   "parts": [
-    "ApprovalPrompt"
-   ],
-   "selector": [
-    "ApprovalPrompt",
-    "DataTable"
-   ],
-   "first_errors": [],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": true,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
-  },
-  {
-   "id": "pay-approve",
-   "run": 3,
-   "expect": [
-    "ApprovalPrompt"
-   ],
-   "ui": true,
-   "parts": [
-    "ApprovalPrompt"
-   ],
-   "selector": [
-    "ApprovalPrompt",
-    "DataTable"
-   ],
-   "first_errors": [],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": true,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
-  },
-  {
-   "id": "pay-direct",
-   "run": 1,
-   "expect": [
-    "ApprovalPrompt"
-   ],
-   "ui": true,
-   "parts": [
-    "ApprovalPrompt"
-   ],
-   "selector": [
-    "ApprovalPrompt",
-    "FileCard",
-    "KeyFacts"
-   ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/details/0/label"
-   ],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": false,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
-  },
-  {
-   "id": "pay-direct",
-   "run": 2,
-   "expect": [
-    "ApprovalPrompt"
-   ],
-   "ui": true,
-   "parts": [
-    "ApprovalPrompt"
-   ],
-   "selector": [
-    "ApprovalPrompt",
-    "FileCard",
-    "KeyFacts"
-   ],
-   "first_errors": [],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": true,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
-  },
-  {
-   "id": "pay-direct",
-   "run": 3,
-   "expect": [
-    "ApprovalPrompt"
-   ],
-   "ui": true,
-   "parts": [
-    "ApprovalPrompt"
-   ],
-   "selector": [
-    "ApprovalPrompt",
-    "FileCard",
-    "KeyFacts"
-   ],
-   "first_errors": [],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": true,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
-  },
-  {
-   "id": "upgrade-approve",
-   "run": 1,
-   "expect": [
-    "ApprovalPrompt"
-   ],
-   "ui": true,
-   "parts": [
-    "ApprovalPrompt"
-   ],
-   "selector": [
-    "Comparison",
-    "ApprovalPrompt"
-   ],
-   "first_errors": [],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": true,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
-  },
-  {
-   "id": "upgrade-approve",
-   "run": 2,
-   "expect": [
-    "ApprovalPrompt"
-   ],
-   "ui": true,
-   "parts": [
-    "ApprovalPrompt"
-   ],
-   "selector": [
-    "Comparison",
-    "ApprovalPrompt"
-   ],
-   "first_errors": [],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": true,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
-  },
-  {
-   "id": "upgrade-approve",
-   "run": 3,
-   "expect": [
-    "ApprovalPrompt"
-   ],
-   "ui": true,
-   "parts": [
-    "ApprovalPrompt"
-   ],
-   "selector": [
-    "Comparison",
-    "ApprovalPrompt"
-   ],
-   "first_errors": [],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": true,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
-  },
-  {
-   "id": "upgrade-after-compare",
-   "run": 1,
-   "expect": [
-    "ApprovalPrompt"
-   ],
-   "ui": true,
-   "parts": [
-    "ApprovalPrompt"
-   ],
-   "selector": [
-    "ApprovalPrompt",
-    "Comparison"
-   ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/details/0/label"
-   ],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": false,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
-  },
-  {
-   "id": "upgrade-after-compare",
-   "run": 2,
-   "expect": [
-    "ApprovalPrompt"
-   ],
-   "ui": true,
-   "parts": [
-    "ApprovalPrompt"
-   ],
-   "selector": [
-    "ApprovalPrompt",
-    "Comparison"
-   ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/details/0/label"
-   ],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": false,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
-  },
-  {
-   "id": "upgrade-after-compare",
-   "run": 3,
-   "expect": [
-    "ApprovalPrompt"
-   ],
-   "ui": true,
-   "parts": [
-    "ApprovalPrompt"
-   ],
-   "selector": [
-    "ApprovalPrompt",
-    "Comparison"
-   ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/details/0/label"
-   ],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": false,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
-  },
-  {
-   "id": "seats-approve",
-   "run": 1,
-   "expect": [
-    "ApprovalPrompt"
-   ],
-   "ui": true,
-   "parts": [
-    "ApprovalPrompt"
-   ],
-   "selector": [
-    "ApprovalPrompt"
-   ],
-   "first_errors": [],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": true,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
-  },
-  {
-   "id": "seats-approve",
-   "run": 2,
-   "expect": [
-    "ApprovalPrompt"
-   ],
-   "ui": true,
-   "parts": [
-    "ApprovalPrompt"
-   ],
-   "selector": [
-    "ApprovalPrompt"
-   ],
-   "first_errors": [],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": true,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
-  },
-  {
-   "id": "seats-approve",
-   "run": 3,
-   "expect": [
-    "ApprovalPrompt"
-   ],
-   "ui": true,
-   "parts": [
-    "ApprovalPrompt"
-   ],
-   "selector": [
-    "ApprovalPrompt"
-   ],
-   "first_errors": [],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": true,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
-  },
-  {
-   "id": "missing-invoice",
-   "run": 1,
-   "expect": [
-    "ErrorRetry",
-    "KeyFacts"
-   ],
-   "ui": true,
-   "parts": [
-    "ErrorRetry"
-   ],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "ErrorRetry"
-   ],
-   "first_errors": [],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": true,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
-  },
-  {
-   "id": "missing-invoice",
-   "run": 2,
-   "expect": [
-    "ErrorRetry",
-    "KeyFacts"
-   ],
-   "ui": true,
-   "parts": [
-    "ErrorRetry"
-   ],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "ErrorRetry"
-   ],
-   "first_errors": [],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": true,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
-  },
-  {
-   "id": "missing-invoice",
-   "run": 3,
-   "expect": [
-    "ErrorRetry",
-    "KeyFacts"
-   ],
-   "ui": true,
-   "parts": [
-    "ErrorRetry"
-   ],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "ErrorRetry"
-   ],
-   "first_errors": [],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": true,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
-  },
-  {
-   "id": "usage-and-table",
-   "run": 1,
-   "expect": [
-    "DataTable",
-    "BarChart"
-   ],
-   "ui": true,
-   "parts": [
-    "DataTable"
-   ],
-   "selector": [
-    "BarChart",
-    "LineChart",
-    "DataTable"
-   ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title"
-   ],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": false,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
-  },
-  {
-   "id": "usage-and-table",
-   "run": 2,
-   "expect": [
-    "DataTable",
-    "BarChart"
-   ],
-   "ui": true,
-   "parts": [
-    "DataTable"
-   ],
-   "selector": [
-    "BarChart",
-    "LineChart",
-    "DataTable"
-   ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title"
-   ],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": false,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
-  },
-  {
-   "id": "usage-and-table",
-   "run": 3,
-   "expect": [
-    "DataTable",
-    "BarChart"
-   ],
-   "ui": true,
-   "parts": [
-    "DataTable"
-   ],
-   "selector": [
-    "BarChart",
-    "LineChart",
-    "DataTable"
-   ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title"
-   ],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": false,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
-  },
-  {
-   "id": "seats-history",
-   "run": 1,
-   "expect": [
-    "LineChart",
-    "BarChart",
-    "DataTable"
-   ],
-   "ui": true,
-   "parts": [
-    "LineChart"
-   ],
-   "selector": [
-    "BarChart",
-    "Comparison",
-    "LineChart"
-   ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title"
-   ],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": false,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
-  },
-  {
-   "id": "seats-history",
-   "run": 2,
-   "expect": [
-    "LineChart",
-    "BarChart",
-    "DataTable"
-   ],
-   "ui": true,
-   "parts": [
-    "LineChart"
-   ],
-   "selector": [
-    "BarChart",
-    "Comparison",
-    "LineChart"
-   ],
-   "first_errors": [],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": true,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
-  },
-  {
-   "id": "seats-history",
-   "run": 3,
-   "expect": [
-    "LineChart",
-    "BarChart",
-    "DataTable"
-   ],
-   "ui": true,
-   "parts": [
-    "LineChart"
-   ],
-   "selector": [
-    "BarChart",
-    "Comparison",
-    "LineChart"
-   ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/title"
-   ],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": true,
-   "right": true,
-   "valid": false,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
-  },
-  {
-   "id": "noui-due",
-   "run": 1,
-   "expect": [],
-   "ui": true,
-   "parts": [
-    "KeyFacts"
-   ],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "DataTable"
-   ],
-   "first_errors": [],
-   "repaired": false,
-   "final_errors": [],
-   "changes_run": [],
-   "selector_hit": false,
-   "right": false,
-   "valid": true,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
-  },
-  {
    "id": "noui-due",
    "run": 2,
    "expect": [],
-   "ui": true,
-   "parts": [
-    "KeyFacts"
-   ],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "DataTable"
-   ],
-   "first_errors": [
-    "copy-case /0/createSurface/components/0/facts/1/label"
-   ],
+   "ui": false,
+   "parts": [],
+   "selector": [],
+   "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": false,
-   "right": false,
-   "valid": false,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
+   "selector_hit": true,
+   "right": true,
+   "valid": null
   },
   {
    "id": "noui-due",
    "run": 3,
    "expect": [],
-   "ui": true,
-   "parts": [
-    "KeyFacts"
-   ],
-   "selector": [
-    "FileCard",
-    "KeyFacts",
-    "DataTable"
-   ],
+   "ui": false,
+   "parts": [],
+   "selector": [],
    "first_errors": [],
    "repaired": false,
    "final_errors": [],
    "changes_run": [],
-   "selector_hit": false,
-   "right": false,
-   "valid": true,
-   "rendered": true,
-   "floor_findings": 0,
-   "floors": []
+   "selector_hit": true,
+   "right": true,
+   "valid": null
   },
   {
    "id": "noui-card",
@@ -2006,6 +1848,132 @@
    "selector_hit": true,
    "right": true,
    "valid": null
+  },
+  {
+   "id": "edit-biggest-first",
+   "run": 1,
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "edit-biggest-first",
+   "run": 2,
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "edit-biggest-first",
+   "run": 3,
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "edit-top-two",
+   "run": 1,
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true
+  },
+  {
+   "id": "edit-top-two",
+   "run": 2,
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true,
+   "rendered": true,
+   "floor_findings": 0,
+   "floors": []
+  },
+  {
+   "id": "edit-top-two",
+   "run": 3,
+   "expect": [
+    "DataTable"
+   ],
+   "ui": true,
+   "parts": [
+    "DataTable"
+   ],
+   "selector": [],
+   "first_errors": [],
+   "repaired": false,
+   "final_errors": [],
+   "changes_run": [],
+   "selector_hit": false,
+   "right": true,
+   "valid": true
   }
  ]
 }

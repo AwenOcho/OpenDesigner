@@ -93,7 +93,7 @@ Run `build` after every change, so the exports and pages are never out of date.
 {{figure:engine-build-output}}
 
 :::dev
-The export formats are `css`, `tailwind`, `figma`, `paper`, `swift`, `compose`, `dtcg`, `artifact`, `brand` and `all`.
+The export formats are `css`, `tailwind`, `figma`, `paper`, `swift`, `compose`, `dtcg`, `artifact`, `brand`, `status` and `all`. `status` writes `build/status.json`: what each status (success, warning, danger, info, discovery) means, the tokens that carry it, and how actions are confirmed.
 :::
 
 ## See the system

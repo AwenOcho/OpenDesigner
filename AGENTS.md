@@ -71,7 +71,7 @@ python3 skills/opendesigner/scripts/engine.py pick Q-shape-01 subtle --set-by ch
 python3 skills/opendesigner/scripts/engine.py set dials.roundness 45 --set-by delegated --why "..."   (fonts, brand color, dials and answers say how they were set; chosen needs --quote)
 python3 skills/opendesigner/scripts/engine.py generate && python3 skills/opendesigner/scripts/engine.py validate
 python3 skills/opendesigner/scripts/engine.py design-md        (DESIGN.md and PRODUCT.md at the project root)
-python3 skills/opendesigner/scripts/engine.py export --format css|tailwind|figma|paper|swift|compose|dtcg|artifact|brand|all
+python3 skills/opendesigner/scripts/engine.py export --format css|tailwind|figma|paper|swift|compose|dtcg|artifact|brand|status|all
 python3 skills/opendesigner/scripts/engine.py build     (generate + validate; if no errors: exports + DESIGN.md + overview + preview; --force exports anyway)
 python3 skills/opendesigner/scripts/engine.py overview --open   (overview.html: the person's whole system on one page; what is missing says "Not enough information")
 python3 skills/opendesigner/scripts/engine.py audit-page --open   (audit.html: the system as the code builds it; every inconsistency with file:line evidence and options to preview and copy; reports only)
@@ -154,6 +154,7 @@ Follow `_coordination/PROTOCOL.md`. In short:
 8. Open a pull request for the owner to review and merge (owner, 2026-11-07). Push straight to `main` (`python3 tools/od.py sync -m "<lane>: what changed"`) only when the owner says so.
 
 Processes that held up in use (details in each file):
+- **The design bar:** `_coordination/DESIGN-BAR.md`. Read it before building anything people will see, link it in every brief, and check against it before showing Kunal: picture first, a fresh-eyes visual audit, then a local look.
 - **Website:** `site/README.md` "Before every deploy": local build, `site/check.py`, `site/check_layout.py` with 0 errors at 13 widths, a real-header check, then deploy and IndexNow.
 - **Showcase:** `brand/showcase/BRIEF.md` and `ROUND3-BRIEF.md`: the owner's verdict outranks AI scores; a fresh-eyes audit; `brand/tools/check_dates.py` and `check_names.py`; `.example` domains.
 - **Changelog on every push** (owner, 2026-11-01): every push to main that changes what people get adds one `CHANGELOG.md` entry per change, so the website's changelog says what changed in its own words, not just a commit title or a link to the README. Write `- **Short title** (YYYY-MM-DD). One to three plain sentences.`, dated the day it lands, under 400 characters; the full story goes in the commit or PR. `python3 tools/changelog_check.py` checks the format.
@@ -176,6 +177,7 @@ python3 tools/test_wiki.py               learning wiki tests (.venv-wiki/bin/pyt
 python3 tools/test_plugin_hook.py        the plugin's start-of-session hook: read-only and fast, one offer per project, silent otherwise
 python3 tools/test_checkins.py           check-ins: every N decisions, closed rounds, settings, none before the first result
 python3 tools/test_review_drift.py       review flags unknown token names, typed fonts, off-system weights and unapproved od-ignore
+python3 tools/test_status_feedback.py    the status map (build/status.json), DESIGN.md's Status and Feedback rules, review's judgment notes
 python3 tools/design_evals.py --check --no-save   the engine on 20 fixed briefs: every required check passes (evals/README.md)
 python3 skills/opendesigner/scripts/library.py check   every library component uses only tokens every engine system writes, is scoped, and has complete tags, a complete spec, and library.json is current (else: library.py catalog)
 python3 server/mcp/test_server.py           the library MCP server over stdio: read-only tools, the gallery view, both protocol versions

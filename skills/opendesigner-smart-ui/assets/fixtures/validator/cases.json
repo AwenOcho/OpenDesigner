@@ -2410,6 +2410,51 @@
    ],
    "opts": {},
    "expect": []
+  },
+  {
+   "name": "bad-tone-against-the-systems-words",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Facts",
+        "title": "Shipment",
+        "facts": [
+         {
+          "label": "Status",
+          "value": "Lost in transit",
+          "tone": "success"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {
+    "status": {
+     "statuses": {
+      "success": {
+       "words": [
+        "arrived"
+       ]
+      },
+      "danger": {
+       "words": [
+        "lost in transit"
+       ]
+      }
+     }
+    }
+   },
+   "expect": [
+    "R6-tone@/0/createSurface/components/0/facts/0/tone"
+   ]
   }
  ]
 }

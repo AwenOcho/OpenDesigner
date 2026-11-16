@@ -945,7 +945,11 @@
        "which is better",
        "side by side",
        "fare types",
-       "plans"
+       "plans",
+       "the different",
+       "what's the difference",
+       "how do they differ",
+       "what do the"
       ],
       "width": "medium",
       "name_from": "title"
@@ -1834,7 +1838,7 @@
    "opendesigner": {
     "system": "Tallyhaus",
     "set_version": 1,
-    "made": "2026-11-14",
+    "made": "2026-11-16",
     "allow": {
      "images": [],
      "links": []
