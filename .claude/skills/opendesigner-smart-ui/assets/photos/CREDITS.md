@@ -1,6 +1,6 @@
 # Photo credits and licences
 
-The Smart UI picture fixtures hotlink these photos from images.unsplash.com under the [Unsplash License](https://unsplash.com/license). Photographer names are not confirmed yet: Unsplash blocks AI crawlers, so a person needs to read each name off its photo page. `ledger.json` has the alt text and the brand check for each.
+The Smart UI picture fixtures hotlink these photos from images.unsplash.com under the [Unsplash License](https://unsplash.com/license). The coat and café photographers are not confirmed yet: Unsplash blocks AI crawlers, so a person needs to read each name off its photo page. The rest come from the library's verified `photos.json`. `ledger.json` has the alt text and the brand check for each.
 
 | Photo | Shows | Photographer | Used in |
 |---|---|---|---|
@@ -14,5 +14,12 @@ The Smart UI picture fixtures hotlink these photos from images.unsplash.com unde
 | `photo-1567880905822-56f8e06fe630` | Bright café with arched windows, a long wooden counter and a menu board on the wall | not confirmed | place list, place card |
 | `photo-1511081692775-05d0f180a065` | Café counter under hanging bulbs, with menu boards and a long wooden table | not confirmed | place list |
 | `photo-1770739539412-d9e1021429cf` | Dark café with warm lamps, low chairs and bar stools on a wooden floor | not confirmed | place list |
+| `photo-1512621776951-a57141f2eefd` | Bowl of mixed vegetable salad | Anna Pelzer ([page](https://unsplash.com/photos/IGfIGP5ONV0)) | recipe-card |
+| `photo-1459749411175-04bf5292ceea` | Concert crowd and stage lights | Nainoa Shizuru ([page](https://unsplash.com/photos/NcdG9mK3PBY)) | event-card |
+| `photo-1566665797739-1674de7a421a` | Bedroom with a blue headboard | mark champs ([page](https://unsplash.com/photos/Id2IIl1jOB0)) | home-listing, stay-card |
+| `photo-1583847268964-b28dc8f51f92` | Holiday-rental living room with a large window | Minh Pham ([page](https://unsplash.com/photos/OtXADkUh3-I)) | home-listing |
+| `photo-1570129477492-45c003edd2be` | Grey wooden house with a lawn | todd kent ([page](https://unsplash.com/photos/178j8tJrNlc)) | home-listing |
+| `photo-1605096048662-5ab61695a122` | Hillside town houses in daylight | Zoltan Tasi ([page](https://unsplash.com/photos/_snNw0rqRVs)) | stay-card |
+| `photo-1629140727571-9b5c6f6267b4` | White bed with a grey pillow | Linus Mimietz ([page](https://unsplash.com/photos/p3UWyaujtQo)) | stay-card |
 
 Not used: `photo-1565532070333-43edd7d75c90` (the hanger shows a logo).

@@ -5,14 +5,14 @@
 .odl-home-listing .odl-card { display: grid; overflow: hidden; background: var(--ds-color-surface-raised); border: var(--ds-border-width-default) solid var(--ds-color-border-subtle);
   border-radius: var(--ds-radius-container); box-shadow: var(--ds-elevation-raised); }
 .odl-home-listing .odl-ph::after { content: none; }
-.odl-home-listing .odl-body { display: grid; align-content: start; gap: var(--ds-space-stack-md); padding: var(--ds-space-inset-lg); min-inline-size: 0; }
+.odl-home-listing .odl-body { display: grid; align-content: start; gap: var(--ds-space-stack-sm); padding: var(--ds-space-inset-lg); min-inline-size: 0; }
 .odl-home-listing .odl-head { display: grid; gap: var(--ds-space-stack-xs); }
 .odl-home-listing h3 { margin: 0; font: var(--ds-text-title-md); overflow-wrap: anywhere; }
 .odl-home-listing .odl-kicker { margin: 0; color: var(--ds-color-text-secondary); font: var(--ds-text-label-md); }
 .odl-home-listing .odl-facts { display: flex; flex-wrap: wrap; gap: var(--ds-space-stack-xs) var(--ds-space-inline-md); margin: 0; padding: 0; list-style: none; color: var(--ds-color-text-secondary); font: var(--ds-text-body-sm); font-variant-numeric: tabular-nums; }
-.odl-home-listing .odl-facts li { display: inline-flex; align-items: center; gap: var(--ds-space-inline-sm); }
+.odl-home-listing .odl-facts li { display: inline-flex; align-items: center; gap: var(--ds-space-inline-sm); white-space: nowrap; }
 .odl-home-listing .odl-facts svg { flex: none; inline-size: var(--ds-size-icon-sm); block-size: var(--ds-size-icon-sm); stroke-width: var(--ds-icon-stroke-md); }
-.odl-home-listing .odl-acts { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ds-space-stack-sm) var(--ds-space-inline-md); }
+.odl-home-listing .odl-acts { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ds-space-stack-sm) var(--ds-space-inline-md); margin-block-start: var(--ds-space-stack-sm); }
 .odl-home-listing .odl-price { display: grid; margin: 0; font-variant-numeric: tabular-nums; }
 .odl-home-listing .odl-price strong { font: var(--ds-text-title-md); font-weight: var(--ds-font-weight-heading); }
 .odl-home-listing .odl-price span { color: var(--ds-color-text-secondary); font: var(--ds-text-label-md); }
@@ -26,7 +26,7 @@
 .odl-home-listing .odl-btn:focus-visible { outline: var(--ds-focus-ring-width) solid var(--ds-color-border-focus); outline-offset: var(--ds-focus-ring-offset); }
 .odl-home-listing .odl-btn:disabled { cursor: not-allowed; border-color: var(--ds-color-border-subtle); background: var(--ds-color-bg-neutral-subtle); color: var(--ds-color-text-secondary); }
 .odl-home-listing .odl-btn svg { inline-size: var(--ds-size-icon-sm); block-size: var(--ds-size-icon-sm); stroke-width: var(--ds-icon-stroke-md); }
-.odl-home-listing .odl-body > .odl-status { padding-inline: 0; background: transparent; }
+.odl-home-listing .odl-body > .odl-status { min-block-size: 0; padding-inline: 0; background: transparent; }
 /* the photos: one large, two more beside it when there is room */
 .odl-home-listing .odl-pics { display: grid; gap: var(--ds-space-2); margin: 0; padding: 0; list-style: none; }
 .odl-home-listing .odl-pics .odl-ph { aspect-ratio: 4 / 3; min-block-size: 10rem; }
@@ -45,10 +45,10 @@
 .odl-home-listing .odl-top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--ds-space-stack-xs) var(--ds-space-inline-md); }
 .odl-home-listing .odl-top .odl-price strong { font: var(--ds-text-title-lg); font-weight: var(--ds-font-weight-heading); }
 .odl-home-listing .odl-where { margin: 0; color: var(--ds-color-text-secondary); font: var(--ds-text-body-md); overflow-wrap: anywhere; }
-.odl-home-listing .odl-ph { position: relative; overflow: hidden; background: var(--ds-color-surface-sunken); }
+.odl-home-listing .odl-ph { position: relative; inline-size: 100%; overflow: hidden; background: var(--ds-color-surface-sunken); }
 .odl-home-listing .odl-ph::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 var(--ds-border-width-default) var(--ds-color-border-subtle); pointer-events: none; }
-.odl-home-listing .odl-ph .odl-img { display: block; inline-size: 100%; block-size: 100%; object-fit: cover; }
-.odl-home-listing .odl-status { display: inline-flex; align-items: center; gap: var(--ds-space-inline-xs); inline-size: fit-content; max-inline-size: 100%; min-block-size: var(--ds-size-control-sm);
+.odl-home-listing .odl-ph .odl-img { position: absolute; inset: 0; display: block; inline-size: 100%; block-size: 100%; aspect-ratio: auto; object-fit: cover; }
+.odl-home-listing .odl-status { display: inline-flex; align-items: center; gap: var(--ds-space-inline-sm); inline-size: fit-content; max-inline-size: 100%; min-block-size: var(--ds-size-control-sm);
   padding: 0 var(--ds-space-inset-sm); border-radius: var(--ds-radius-full); background: var(--ds-color-surface-raised); color: var(--ds-color-text-secondary);
   font: var(--ds-text-label-md); font-weight: var(--ds-font-weight-label); }
 .odl-home-listing .odl-status::before { content: ""; flex: none; inline-size: var(--ds-space-6); block-size: var(--ds-space-6); border-radius: var(--ds-radius-full); background: currentColor; }
@@ -62,7 +62,7 @@
 </style>
 <article class="odl-home-listing" aria-label="Two-bedroom house on Orchard Close" data-od-label="title">
   <div class="odl-card">
-    <ul class="odl-pics" data-od-list="photos" aria-label="Photos"><li data-od-item data-od-template hidden><div class="odl-ph"><img class="odl-img" data-od-media="photo" src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=640&amp;h=480&amp;fit=crop&amp;auto=format&amp;q=70" alt="" width="320" height="240" loading="lazy" decoding="async"></div></li><li data-od-item><div class="odl-ph"><img class="odl-img" data-od-media="photo" src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=640&amp;h=480&amp;fit=crop&amp;auto=format&amp;q=70" alt="Grey wooden house with a lawn" width="320" height="240" loading="lazy" decoding="async"></div></li><li data-od-item><div class="odl-ph"><img class="odl-img" data-od-media="photo" src="https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=640&amp;h=480&amp;fit=crop&amp;auto=format&amp;q=70" alt="Holiday-rental living room with a large window" width="320" height="240" loading="lazy" decoding="async"></div></li><li data-od-item><div class="odl-ph"><img class="odl-img" data-od-media="photo" src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=640&amp;h=480&amp;fit=crop&amp;auto=format&amp;q=70" alt="Hotel bedroom with a wooden bed and garden view" width="320" height="240" loading="lazy" decoding="async"></div></li></ul>
+    <ul class="odl-pics" data-od-list="photos" aria-label="Photos"><li data-od-item data-od-template hidden><div class="odl-ph"><img class="odl-img" data-od-media="photo" src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=640&amp;h=480&amp;fit=crop&amp;auto=format&amp;q=70" alt="" width="320" height="240" loading="lazy" decoding="async"></div></li><li data-od-item><div class="odl-ph"><img class="odl-img" data-od-media="photo" src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=640&amp;h=480&amp;fit=crop&amp;auto=format&amp;q=70" alt="Grey wooden house with a lawn" width="320" height="240" loading="lazy" decoding="async"></div></li><li data-od-item><div class="odl-ph"><img class="odl-img" data-od-media="photo" src="https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=640&amp;h=480&amp;fit=crop&amp;auto=format&amp;q=70" alt="Holiday-rental living room with a large window" width="320" height="240" loading="lazy" decoding="async"></div></li><li data-od-item><div class="odl-ph"><img class="odl-img" data-od-media="photo" src="https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=640&amp;h=480&amp;fit=crop&amp;auto=format&amp;q=70" alt="Bedroom with a blue headboard" width="320" height="240" loading="lazy" decoding="async"></div></li></ul>
     <div class="odl-body">
       <div class="odl-top">
         <div class="odl-head"><h3 data-od-slot="title">Two-bedroom house on Orchard Close</h3><p class="odl-where" data-od-slot="address">Orchard Close, Fernhollow</p></div>

@@ -817,7 +817,7 @@ class LayoutRules(unittest.TestCase):
         more = [dict(p, name=f"{p['name']} {i}", open={"label": "View", "event": {"name": "open_place"}, "a11y_label": f"View place {i}"}) for i, p in enumerate(places["places"] * 2)][:5]
         stay = self.fixture("StayCard", "stay-card")
         gallery = self.fixture("ProductDetail", "product-gallery")
-        gallery["photos"] = gallery["photos"] * 3
+        gallery["photos"] = (gallery["photos"] * 3)[:3]
         comp = self.fixture("Comparison", "comparison")
         comp["options"] = (comp["options"] * 2)[:4]
         for i, o in enumerate(comp["options"]):

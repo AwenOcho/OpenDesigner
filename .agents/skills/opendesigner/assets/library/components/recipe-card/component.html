@@ -5,14 +5,14 @@
 .odl-recipe-card .odl-card { display: grid; overflow: hidden; background: var(--ds-color-surface-raised); border: var(--ds-border-width-default) solid var(--ds-color-border-subtle);
   border-radius: var(--ds-radius-container); box-shadow: var(--ds-elevation-raised); }
 .odl-recipe-card .odl-ph::after { content: none; }
-.odl-recipe-card .odl-body { display: grid; align-content: start; gap: var(--ds-space-stack-md); padding: var(--ds-space-inset-lg); min-inline-size: 0; }
+.odl-recipe-card .odl-body { display: grid; align-content: start; gap: var(--ds-space-stack-sm); padding: var(--ds-space-inset-lg); min-inline-size: 0; }
 .odl-recipe-card .odl-head { display: grid; gap: var(--ds-space-stack-xs); }
 .odl-recipe-card h3 { margin: 0; font: var(--ds-text-title-md); overflow-wrap: anywhere; }
 .odl-recipe-card .odl-kicker { margin: 0; color: var(--ds-color-text-secondary); font: var(--ds-text-label-md); }
 .odl-recipe-card .odl-facts { display: flex; flex-wrap: wrap; gap: var(--ds-space-stack-xs) var(--ds-space-inline-md); margin: 0; padding: 0; list-style: none; color: var(--ds-color-text-secondary); font: var(--ds-text-body-sm); font-variant-numeric: tabular-nums; }
-.odl-recipe-card .odl-facts li { display: inline-flex; align-items: center; gap: var(--ds-space-inline-sm); }
+.odl-recipe-card .odl-facts li { display: inline-flex; align-items: center; gap: var(--ds-space-inline-sm); white-space: nowrap; }
 .odl-recipe-card .odl-facts svg { flex: none; inline-size: var(--ds-size-icon-sm); block-size: var(--ds-size-icon-sm); stroke-width: var(--ds-icon-stroke-md); }
-.odl-recipe-card .odl-acts { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ds-space-stack-sm) var(--ds-space-inline-md); }
+.odl-recipe-card .odl-acts { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ds-space-stack-sm) var(--ds-space-inline-md); margin-block-start: var(--ds-space-stack-sm); }
 .odl-recipe-card .odl-price { display: grid; margin: 0; font-variant-numeric: tabular-nums; }
 .odl-recipe-card .odl-price strong { font: var(--ds-text-title-md); font-weight: var(--ds-font-weight-heading); }
 .odl-recipe-card .odl-price span { color: var(--ds-color-text-secondary); font: var(--ds-text-label-md); }
@@ -26,12 +26,12 @@
 .odl-recipe-card .odl-btn:focus-visible { outline: var(--ds-focus-ring-width) solid var(--ds-color-border-focus); outline-offset: var(--ds-focus-ring-offset); }
 .odl-recipe-card .odl-btn:disabled { cursor: not-allowed; border-color: var(--ds-color-border-subtle); background: var(--ds-color-bg-neutral-subtle); color: var(--ds-color-text-secondary); }
 .odl-recipe-card .odl-btn svg { inline-size: var(--ds-size-icon-sm); block-size: var(--ds-size-icon-sm); stroke-width: var(--ds-icon-stroke-md); }
-.odl-recipe-card .odl-body > .odl-status { padding-inline: 0; background: transparent; }
+.odl-recipe-card .odl-body > .odl-status { min-block-size: 0; padding-inline: 0; background: transparent; }
 .odl-recipe-card .odl-card > .odl-ph { aspect-ratio: 3 / 2; }
 .odl-recipe-card .odl-intro { margin: 0; color: var(--ds-color-text-secondary); font: var(--ds-text-body-md); }
 .odl-recipe-card .odl-cols { display: grid; gap: var(--ds-space-stack-lg); margin-inline: var(--ds-space-inset-lg); padding-block: var(--ds-space-stack-md) var(--ds-space-inset-lg); border-block-start: var(--ds-border-width-default) solid var(--ds-color-border-subtle); }
 .odl-recipe-card h4 { margin: 0 0 var(--ds-space-stack-sm); color: var(--ds-color-text-secondary); font: var(--ds-text-label-md); font-weight: var(--ds-font-weight-label); }
-.odl-recipe-card .odl-ingredients { display: grid; gap: var(--ds-space-stack-xs); margin: 0; padding: 0; list-style: none; font: var(--ds-text-body-sm); }
+.odl-recipe-card .odl-ingredients { display: grid; gap: var(--ds-space-stack-xs); margin: 0; padding: 0; list-style: none; font: var(--ds-text-body-md); }
 .odl-recipe-card .odl-ingredients li { display: flex; gap: var(--ds-space-inline-sm); }
 .odl-recipe-card .odl-ingredients li::before { content: ""; flex: none; inline-size: var(--ds-space-4); block-size: var(--ds-space-4); margin-block-start: calc((1lh - var(--ds-space-4)) / 2); border-radius: var(--ds-radius-full); background: var(--ds-color-text-tertiary); }
 .odl-recipe-card .odl-steps { display: grid; gap: var(--ds-space-stack-md); margin: 0; padding: 0; list-style: none; counter-reset: odl-step; }
@@ -40,16 +40,16 @@
   border-radius: var(--ds-radius-full); background: var(--ds-color-bg-neutral-subtle); color: var(--ds-color-text-primary); font: var(--ds-text-label-md); font-weight: var(--ds-font-weight-label); font-variant-numeric: tabular-nums; }
 .odl-recipe-card .odl-steps p { margin: 0; overflow-wrap: anywhere; }
 @container (min-width: 36rem) {
-  .odl-recipe-card .odl-top { display: grid; grid-template-columns: minmax(0, 40%) minmax(0, 1fr); gap: var(--ds-space-inline-md); align-items: start; }
+  .odl-recipe-card .odl-top { display: grid; grid-template-columns: minmax(0, 40%) minmax(0, 1fr); gap: var(--ds-space-24); align-items: start; }
   .odl-recipe-card .odl-top > .odl-ph { border-radius: var(--ds-radius-nested); }
   .odl-recipe-card .odl-card { padding: var(--ds-space-inset-xl); gap: var(--ds-space-stack-lg); }
   .odl-recipe-card .odl-body { padding: 0; }
   .odl-recipe-card .odl-cols { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); margin-inline: 0; padding-block-end: 0; }
 }
-.odl-recipe-card .odl-ph { position: relative; overflow: hidden; background: var(--ds-color-surface-sunken); }
+.odl-recipe-card .odl-ph { position: relative; inline-size: 100%; overflow: hidden; background: var(--ds-color-surface-sunken); }
 .odl-recipe-card .odl-ph::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 var(--ds-border-width-default) var(--ds-color-border-subtle); pointer-events: none; }
-.odl-recipe-card .odl-ph .odl-img { display: block; inline-size: 100%; block-size: 100%; object-fit: cover; }
-.odl-recipe-card .odl-status { display: inline-flex; align-items: center; gap: var(--ds-space-inline-xs); inline-size: fit-content; max-inline-size: 100%; min-block-size: var(--ds-size-control-sm);
+.odl-recipe-card .odl-ph .odl-img { position: absolute; inset: 0; display: block; inline-size: 100%; block-size: 100%; aspect-ratio: auto; object-fit: cover; }
+.odl-recipe-card .odl-status { display: inline-flex; align-items: center; gap: var(--ds-space-inline-sm); inline-size: fit-content; max-inline-size: 100%; min-block-size: var(--ds-size-control-sm);
   padding: 0 var(--ds-space-inset-sm); border-radius: var(--ds-radius-full); background: var(--ds-color-surface-raised); color: var(--ds-color-text-secondary);
   font: var(--ds-text-label-md); font-weight: var(--ds-font-weight-label); }
 .odl-recipe-card .odl-status::before { content: ""; flex: none; inline-size: var(--ds-space-6); block-size: var(--ds-space-6); border-radius: var(--ds-radius-full); background: currentColor; }

@@ -1343,9 +1343,27 @@
         "type": "string",
         "maxLength": 14
        },
+       "old_price": {
+        "type": "string",
+        "maxLength": 16
+       },
        "price_note": {
         "type": "string",
         "maxLength": 24
+       },
+       "status": {
+        "type": "string",
+        "maxLength": 28
+       },
+       "tone": {
+        "type": "string",
+        "enum": [
+         "neutral",
+         "success",
+         "warning",
+         "danger"
+        ],
+        "x-od-token": true
        },
        "choose": {
         "type": "object",

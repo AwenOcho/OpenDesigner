@@ -90,6 +90,12 @@
         "slot": "text"
       },
       {
+        "name": "status",
+        "selector": ".odl-status",
+        "what": "stock or availability as a status, the same place in every column",
+        "slot": "text"
+      },
+      {
         "name": "choose",
         "selector": ".odl-choose",
         "what": "picks this option",
@@ -218,6 +224,26 @@
                     "maxLength": 120
                   }
                 }
+              },
+              "old_price": {
+                "type": "string",
+                "maxLength": 16,
+                "part": "price"
+              },
+              "status": {
+                "type": "string",
+                "maxLength": 28,
+                "part": "status"
+              },
+              "tone": {
+                "type": "string",
+                "enum": [
+                  "neutral",
+                  "success",
+                  "warning",
+                  "danger"
+                ],
+                "part": "status"
               }
             }
           }

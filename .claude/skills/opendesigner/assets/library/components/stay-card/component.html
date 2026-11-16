@@ -1,6 +1,6 @@
 <!-- Icons: Lucide (lucide.dev), ISC licence -->
 <style>
-.odl-stay-card { box-sizing: border-box; inline-size: 100%; max-inline-size: 24rem; margin-inline: auto; container-type: inline-size; color: var(--ds-color-text-primary); font: var(--ds-text-body-md); text-wrap: pretty; }
+.odl-stay-card { box-sizing: border-box; inline-size: 100%; max-inline-size: 48rem; margin-inline: auto; container-type: inline-size; color: var(--ds-color-text-primary); font: var(--ds-text-body-md); text-wrap: pretty; }
 .odl-stay-card *, .odl-stay-card *::before, .odl-stay-card *::after { box-sizing: border-box; }
 .odl-stay-card .odl-media { position: relative; border-radius: var(--ds-radius-container); overflow: hidden; background: var(--ds-color-surface-sunken); }
 .odl-stay-card .odl-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; }
@@ -12,7 +12,7 @@
 .odl-stay-card .odl-slide { flex: 0 0 100%; aspect-ratio: 20 / 19; margin: 0; scroll-snap-align: start; }
 .odl-stay-card .odl-slide img { display: block; inline-size: 100%; block-size: 100%; object-fit: cover; }
 .odl-stay-card .odl-badge { position: absolute; inset-block-start: max(var(--ds-space-inset-md), var(--ds-radius-container)); inset-inline-start: max(var(--ds-space-inset-md), var(--ds-radius-container)); padding: var(--ds-space-inset-xs) var(--ds-space-inset-sm);
-  border-radius: var(--ds-radius-control-sm); background: var(--ds-color-white); color: var(--ds-color-neutral-light-12); font: var(--ds-text-label-md); box-shadow: var(--ds-elevation-raised); white-space: nowrap; }
+  border-radius: var(--ds-radius-control-sm); background: var(--ds-color-surface-raised); color: var(--ds-color-text-primary); font: var(--ds-text-label-md); box-shadow: var(--ds-elevation-raised); white-space: nowrap; }
 .odl-stay-card .odl-over { position: absolute; inset: 0; pointer-events: none; }
 .odl-stay-card .odl-over button { pointer-events: auto; }
 .odl-stay-card button { display: grid; place-items: center; padding: 0; border: 0; cursor: pointer; font: inherit; }
@@ -66,6 +66,19 @@
 .odl-stay-card .odl-status[data-tone="success"] { color: var(--ds-color-text-success); }
 .odl-stay-card .odl-status[data-tone="warning"] { color: var(--ds-color-text-warning); }
 .odl-stay-card .odl-status[data-tone="danger"] { color: var(--ds-color-text-danger); }
+/* a soft dark shade at the top and bottom of the photos keeps the heart and the dots readable on a bright picture */
+.odl-stay-card .odl-media::before { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  background: linear-gradient(to bottom, var(--ds-color-neutral-alpha-light-7), transparent 30%, transparent 70%, var(--ds-color-neutral-alpha-light-7)); }
+/* wider: the card fills its space and shows a strip of three photos; the swipe with dots is for a narrow space only */
+@container (min-width: 36rem) {
+  .odl-stay-card .odl-media { background: transparent; }
+  .odl-stay-card .odl-media::before { background: linear-gradient(to bottom, var(--ds-color-neutral-alpha-light-7), transparent 30%); }
+  .odl-stay-card .odl-track { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--ds-space-4); overflow: visible; scroll-snap-type: none; }
+  .odl-stay-card .odl-track::after { content: none; }
+  .odl-stay-card .odl-slide { aspect-ratio: 4 / 3; min-block-size: 10rem; }
+  .odl-stay-card .odl-slide:nth-child(n+4 of .odl-slide:not([hidden])) { display: none; }
+  .odl-stay-card .odl-nav, .odl-stay-card .odl-dots { display: none; }
+}
 </style>
 <article class="odl-stay-card" aria-label="Cabin by a mountain lake" data-od-label="title">
   <div class="odl-card">

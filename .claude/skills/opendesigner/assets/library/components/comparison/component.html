@@ -17,21 +17,38 @@
 .odl-comparison .odl-vals { display: contents; }
 .odl-comparison .odl-head { align-items: stretch; padding-block-end: var(--ds-space-stack-md); }
 /* the badge sits above its option's name; the other options keep that much room so the names line up */
-.odl-comparison .odl-head:has(.odl-badge) .odl-opt:not(:has(.odl-badge)) { padding-block-start: calc(var(--ds-size-control-sm) + var(--ds-space-stack-xs)); }
-.odl-comparison .odl-corner { min-inline-size: 0; }
-.odl-comparison .odl-opt { position: relative; display: flex; flex-direction: column; gap: var(--ds-space-stack-xs); min-inline-size: 0; }
+/* the options share seven rows (photo, badge, name, price, note, stock, button) through subgrid, so prices, stock and
+   buttons line up across the columns however the names wrap; a missing piece leaves its row empty */
+.odl-comparison .odl-head { grid-template-rows: repeat(7, auto); }
+.odl-comparison .odl-corner { grid-row: 1 / span 7; min-inline-size: 0; }
+.odl-comparison .odl-opt { position: relative; display: grid; grid-row: 1 / span 7; grid-template-rows: subgrid; row-gap: 0; align-items: start; min-inline-size: 0; }
+.odl-comparison .odl-opt > .odl-thumb { grid-row: 1; margin-block-end: var(--ds-space-stack-sm); }
+.odl-comparison .odl-opt > .odl-badge { grid-row: 2; margin-block-end: var(--ds-space-stack-xs); }
+.odl-comparison .odl-opt > .odl-name { grid-row: 3; margin-block-end: var(--ds-space-stack-xs); }
+.odl-comparison .odl-opt > .odl-priceline { grid-row: 4; }
+.odl-comparison .odl-opt > .odl-per { grid-row: 5; margin-block-start: var(--ds-space-2); }
+.odl-comparison .odl-opt > .odl-status { grid-row: 6; margin-block-start: var(--ds-space-stack-xs); }
+.odl-comparison .odl-opt > .odl-choose { grid-row: 7; margin-block-start: var(--ds-space-stack-sm); }
+.odl-comparison .odl-priceline { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--ds-space-inline-sm); }
+.odl-comparison .odl-was { color: var(--ds-color-text-tertiary); font: var(--ds-text-body-sm); font-variant-numeric: tabular-nums; }
+.odl-comparison .odl-status { display: inline-flex; align-items: center; gap: var(--ds-space-inline-sm); color: var(--ds-color-text-secondary); font: var(--ds-text-label-md); font-weight: var(--ds-font-weight-label); }
+.odl-comparison .odl-status::before { content: ""; flex: none; inline-size: var(--ds-space-6); block-size: var(--ds-space-6); border-radius: var(--ds-radius-full); background: currentColor; }
+.odl-comparison .odl-status[data-tone="neutral"] { color: var(--ds-color-text-secondary); }
+.odl-comparison .odl-status[data-tone="success"] { color: var(--ds-color-text-success); }
+.odl-comparison .odl-status[data-tone="warning"] { color: var(--ds-color-text-warning); }
+.odl-comparison .odl-status[data-tone="danger"] { color: var(--ds-color-text-danger); }
+.odl-comparison .odl-sr { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .odl-comparison .odl-name { font: var(--ds-text-title-sm); overflow-wrap: anywhere; }
-.odl-comparison .odl-badge { order: -1; align-self: flex-start; max-inline-size: 100%; display: inline-flex; align-items: center; min-block-size: var(--ds-size-control-sm);
+.odl-comparison .odl-badge { justify-self: start; max-inline-size: 100%; display: inline-flex; align-items: center; min-block-size: var(--ds-size-control-sm);
   padding: 0 var(--ds-space-inset-sm); border-radius: var(--ds-radius-full); background: var(--ds-color-bg-accent-subtle); color: var(--ds-color-text-accent); font: var(--ds-text-label-md);
   font-weight: var(--ds-font-weight-label); overflow-wrap: anywhere; }
 .odl-comparison .odl-price { font: var(--ds-text-numeric-md); font-weight: var(--ds-font-weight-heading); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .odl-comparison .odl-per { color: var(--ds-color-text-secondary); font: var(--ds-text-label-md); overflow-wrap: anywhere; }
-.odl-comparison .odl-choose { margin-block-start: auto; display: inline-flex; align-items: center; justify-content: center; inline-size: 100%; min-block-size: max(var(--ds-size-control-md), var(--ds-size-target-min));
+.odl-comparison .odl-choose { display: inline-flex; align-items: center; justify-content: center; inline-size: 100%; min-block-size: max(var(--ds-size-control-md), var(--ds-size-target-min));
   padding: 0 var(--ds-space-inset-sm); border: var(--ds-border-width-default) solid var(--ds-color-border-default); border-radius: var(--ds-radius-control); background: var(--ds-color-surface-raised);
   color: var(--ds-color-text-primary); font: var(--ds-text-label-lg); font-weight: var(--ds-font-weight-label); cursor: pointer; overflow-wrap: anywhere;
   transition: background-color var(--ds-motion-duration-short) var(--ds-motion-easing-standard); }
 .odl-comparison .odl-choose:hover { background: var(--ds-color-bg-neutral-subtle); }
-.odl-comparison .odl-opt > :nth-last-child(2) { margin-block-end: var(--ds-space-stack-sm); }
 /* the option with a badge is the recommended one: its button is the one accent */
 .odl-comparison .odl-opt:has(.odl-badge) .odl-choose { border-color: transparent; background: var(--ds-color-bg-action-primary); color: var(--ds-color-text-on-action); }
 .odl-comparison .odl-opt:has(.odl-badge) .odl-choose:hover { background: var(--ds-color-bg-action-primary-hover); }
@@ -58,12 +75,15 @@
 .odl-comparison [hidden] { display: none !important; }
 @media (prefers-reduced-motion: reduce) { .odl-comparison, .odl-comparison *, .odl-comparison *::before { transition: none !important; animation: none !important; } }
 /* products compared with their pictures: a photo above each option's name, in one shape so the names line up */
-.odl-comparison .odl-thumb { position: relative; order: -2; overflow: hidden; aspect-ratio: 4 / 5; margin-block-end: var(--ds-space-stack-xs); border-radius: var(--ds-radius-nested); background: var(--ds-color-surface-sunken); }
+.odl-comparison .odl-thumb { position: relative; display: block; overflow: hidden; aspect-ratio: 4 / 5; border-radius: var(--ds-radius-nested); background: var(--ds-color-surface-sunken); }
 .odl-comparison .odl-thumb::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 var(--ds-border-width-default) var(--ds-color-border-subtle); pointer-events: none; }
 .odl-comparison .odl-thumb .odl-img { display: block; inline-size: 100%; block-size: 100%; object-fit: cover; }
 /* with photos, the photos line up at the top and the room kept for a badge sits under each photo instead */
-.odl-comparison .odl-head:has(.odl-badge):has(.odl-thumb) .odl-opt:not(:has(.odl-badge)) { padding-block-start: 0; }
-.odl-comparison .odl-head:has(.odl-badge) .odl-opt:not(:has(.odl-badge)) .odl-thumb { margin-block-end: calc(2 * var(--ds-space-stack-xs) + var(--ds-size-control-sm)); }
+/* products with photos: no empty corner above the attribute names; each name sits on its own line over the values,
+   at every width, so the photos start at the left edge */
+.odl-comparison:has(.odl-opt:not([hidden]) .odl-thumb) [role="row"] { grid-template-columns: repeat(var(--odl-cols, 3), minmax(4.5rem, 1fr)) calc(var(--ds-space-24) - var(--ds-space-inline-md)); row-gap: var(--ds-space-stack-xs); }
+.odl-comparison:has(.odl-opt:not([hidden]) .odl-thumb) .odl-corner { display: none; }
+.odl-comparison:has(.odl-opt:not([hidden]) .odl-thumb) .odl-label { grid-column: 1 / -1; position: sticky; inset-inline-start: 0; justify-self: start; }
 </style>
 <section class="odl-comparison" aria-label="Compare fares" data-od-label="title" style="--odl-cols: 3"><div class="odl-card">
   <header><h3 data-od-slot="title">Compare fares</h3><p class="odl-note" data-od-slot="note" data-od-optional>London to Lisbon, Friday 21 November, one adult</p></header>
@@ -71,13 +91,14 @@
     <div role="rowgroup"><div class="odl-head" role="row" data-od-list="options">
       <span class="odl-corner" role="cell"></span>
       <div class="odl-opt" role="columnheader" data-od-item data-od-template hidden><span class="odl-name" data-od-slot="name"></span><span class="odl-thumb" data-od-optional><img class="odl-img" data-od-media="photo" src="https://images.unsplash.com/photo-1605733513597-a8f8341084e6?w=400&amp;h=500&amp;fit=crop&amp;auto=format&amp;q=70" alt="" width="200" height="250" loading="lazy" decoding="async"></span><span class="odl-badge" data-od-slot="badge" data-od-optional></span>
-        <span class="odl-price" data-od-slot="price" data-od-optional></span><span class="odl-per" data-od-slot="price_note" data-od-optional></span>
+        <span class="odl-priceline" data-od-optional><span class="odl-price" data-od-slot="price"></span><s class="odl-was" data-od-optional><span class="odl-sr">was </span><span data-od-slot="old_price"></span></s></span><span class="odl-per" data-od-slot="price_note" data-od-optional></span>
+        <span class="odl-status" data-od-slot="status" data-od-var="tone" data-tone="neutral" data-od-optional></span>
         <button type="button" class="odl-choose" data-od-action="choose">Choose</button></div>
-      <div class="odl-opt" role="columnheader" data-od-item><span class="odl-name">Basic</span><span class="odl-price">€89</span><span class="odl-per">per person</span>
+      <div class="odl-opt" role="columnheader" data-od-item><span class="odl-name">Basic</span><span class="odl-priceline"><span class="odl-price">€89</span></span><span class="odl-per">per person</span>
         <button type="button" class="odl-choose" aria-label="Choose Basic">Choose</button></div>
-      <div class="odl-opt" role="columnheader" data-od-item><span class="odl-name">Standard</span><span class="odl-price">€124</span><span class="odl-per">per person</span>
+      <div class="odl-opt" role="columnheader" data-od-item><span class="odl-name">Standard</span><span class="odl-priceline"><span class="odl-price">€124</span></span><span class="odl-per">per person</span>
         <button type="button" class="odl-choose" aria-label="Choose Standard">Choose</button></div>
-      <div class="odl-opt" role="columnheader" data-od-item><span class="odl-name">Flex</span><span class="odl-badge">Most flexible</span><span class="odl-price">€168</span><span class="odl-per">per person</span>
+      <div class="odl-opt" role="columnheader" data-od-item><span class="odl-name">Flex</span><span class="odl-badge">Most flexible</span><span class="odl-priceline"><span class="odl-price">€168</span></span><span class="odl-per">per person</span>
         <button type="button" class="odl-choose" aria-label="Choose Flex">Choose</button></div>
     </div></div>
     <div role="rowgroup" data-od-list="rows">

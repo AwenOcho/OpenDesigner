@@ -8440,6 +8440,12 @@
      "slot": "text"
     },
     {
+     "name": "status",
+     "selector": ".odl-status",
+     "what": "stock or availability as a status, the same place in every column",
+     "slot": "text"
+    },
+    {
      "name": "choose",
      "selector": ".odl-choose",
      "what": "picks this option",
@@ -8568,6 +8574,26 @@
            "maxLength": 120
           }
          }
+        },
+        "old_price": {
+         "type": "string",
+         "maxLength": 16,
+         "part": "price"
+        },
+        "status": {
+         "type": "string",
+         "maxLength": 28,
+         "part": "status"
+        },
+        "tone": {
+         "type": "string",
+         "enum": [
+          "neutral",
+          "success",
+          "warning",
+          "danger"
+         ],
+         "part": "status"
         }
        }
       }
@@ -8683,11 +8709,13 @@
     "--ds-color-surface-raised",
     "--ds-color-surface-sunken",
     "--ds-color-text-accent",
+    "--ds-color-text-danger",
     "--ds-color-text-on-action",
     "--ds-color-text-primary",
     "--ds-color-text-secondary",
     "--ds-color-text-success",
     "--ds-color-text-tertiary",
+    "--ds-color-text-warning",
     "--ds-elevation-raised",
     "--ds-focus-ring-offset",
     "--ds-focus-ring-width",
@@ -8707,6 +8735,7 @@
     "--ds-space-16",
     "--ds-space-2",
     "--ds-space-24",
+    "--ds-space-6",
     "--ds-space-inline-md",
     "--ds-space-inline-sm",
     "--ds-space-inset-lg",
@@ -8718,6 +8747,7 @@
     "--ds-space-stack-sm",
     "--ds-space-stack-xs",
     "--ds-text-body-md",
+    "--ds-text-body-sm",
     "--ds-text-label-lg",
     "--ds-text-label-md",
     "--ds-text-numeric-md",
@@ -8754,7 +8784,7 @@
    },
    "files": {
     "html": "components/comparison/component.html",
-    "bytes": 15390,
+    "bytes": 17947,
     "script": true
    },
    "source": null,
@@ -9560,7 +9590,6 @@
     "--ds-color-bg-neutral-subtle",
     "--ds-color-border-default",
     "--ds-color-border-focus",
-    "--ds-color-border-separator",
     "--ds-color-border-subtle",
     "--ds-color-surface-raised",
     "--ds-color-surface-sunken",
@@ -9624,7 +9653,7 @@
    },
    "files": {
     "html": "components/data-table/component.html",
-    "bytes": 23599,
+    "bytes": 23818,
     "script": true
    },
    "source": null,
@@ -12489,11 +12518,9 @@
     "--ds-space-6",
     "--ds-space-inline-md",
     "--ds-space-inline-sm",
-    "--ds-space-inline-xs",
     "--ds-space-inset-lg",
     "--ds-space-inset-sm",
     "--ds-space-inset-xl",
-    "--ds-space-stack-md",
     "--ds-space-stack-sm",
     "--ds-space-stack-xs",
     "--ds-text-body-md",
@@ -12526,7 +12553,7 @@
    },
    "files": {
     "html": "components/event-card/component.html",
-    "bytes": 8672,
+    "bytes": 8827,
     "script": false
    },
    "source": null,
@@ -15873,11 +15900,9 @@
     "--ds-space-6",
     "--ds-space-inline-md",
     "--ds-space-inline-sm",
-    "--ds-space-inline-xs",
     "--ds-space-inset-lg",
     "--ds-space-inset-sm",
     "--ds-space-inset-xl",
-    "--ds-space-stack-md",
     "--ds-space-stack-sm",
     "--ds-space-stack-xs",
     "--ds-text-body-md",
@@ -15911,7 +15936,7 @@
    },
    "files": {
     "html": "components/home-listing/component.html",
-    "bytes": 11007,
+    "bytes": 11144,
     "script": false
    },
    "source": null,
@@ -24129,6 +24154,7 @@
     "--ds-size-target-min",
     "--ds-space-2",
     "--ds-space-6",
+    "--ds-space-inline-md",
     "--ds-space-inline-sm",
     "--ds-space-inline-xs",
     "--ds-space-inset-lg",
@@ -24166,7 +24192,7 @@
    },
    "files": {
     "html": "components/place-card/component.html",
-    "bytes": 10294,
+    "bytes": 10788,
     "script": false
    },
    "source": null,
@@ -24497,7 +24523,7 @@
    },
    "files": {
     "html": "components/place-list/component.html",
-    "bytes": 14964,
+    "bytes": 16590,
     "script": false
    },
    "source": null,
@@ -25727,6 +25753,14 @@
         "detail": {
          "type": "string",
          "maxLength": 40
+        },
+        "icon": {
+         "type": "string",
+         "enum": [
+          "truck",
+          "undo",
+          "shield"
+         ]
         }
        }
       }
@@ -25814,7 +25848,6 @@
     "--ds-color-border-strong",
     "--ds-color-border-subtle",
     "--ds-color-icon-default",
-    "--ds-color-neutral-alpha-light-5",
     "--ds-color-neutral-light-1",
     "--ds-color-neutral-light-12",
     "--ds-color-success-light-9",
@@ -25896,7 +25929,7 @@
    },
    "files": {
     "html": "components/product-gallery/component.html",
-    "bytes": 32517,
+    "bytes": 34149,
     "script": true
    },
    "source": null,
@@ -26252,7 +26285,6 @@
     "--ds-space-inline-xs",
     "--ds-space-inset-sm",
     "--ds-space-stack-lg",
-    "--ds-space-stack-sm",
     "--ds-space-stack-xs",
     "--ds-text-body-md",
     "--ds-text-body-sm",
@@ -26285,7 +26317,7 @@
    },
    "files": {
     "html": "components/product-grid/component.html",
-    "bytes": 18409,
+    "bytes": 19180,
     "script": false
    },
    "source": null,
@@ -28925,11 +28957,11 @@
     "--ds-size-control-sm",
     "--ds-size-icon-sm",
     "--ds-size-target-min",
+    "--ds-space-24",
     "--ds-space-4",
     "--ds-space-6",
     "--ds-space-inline-md",
     "--ds-space-inline-sm",
-    "--ds-space-inline-xs",
     "--ds-space-inset-lg",
     "--ds-space-inset-sm",
     "--ds-space-inset-xl",
@@ -28964,7 +28996,7 @@
    },
    "files": {
     "html": "components/recipe-card/component.html",
-    "bytes": 11597,
+    "bytes": 11745,
     "script": false
    },
    "source": null,
@@ -35315,7 +35347,7 @@
   {
    "id": "stay-card",
    "name": "Stay card",
-   "purpose": "A holiday rental or hotel listing: a swipeable photo carousel with dots, a favourite heart, the place, host and dates, the rating, and the price per night with the total, and the cancellation rule shown as a status.",
+   "purpose": "A holiday rental or hotel listing: in a narrow space a swipeable photo carousel with dots, in a wider one a strip of three photos; a favourite heart, the place, host and dates, the rating, the price per night with the total, and the cancellation rule shown as a status.",
    "use_when": [
     "in a list or map of places to stay, for one listing a traveller can save or open",
     "a grid of search results where each place needs several photos and a save action before the person opens it"
@@ -35327,7 +35359,7 @@
    ],
    "type": "commerce",
    "style": "friendly",
-   "width": "narrow",
+   "width": "medium",
    "tags": {
     "audience": "consumer",
     "industries": [
@@ -35609,9 +35641,11 @@
    "tokens": [
     "--ds-color-border-focus",
     "--ds-color-danger-light-9",
+    "--ds-color-neutral-alpha-light-7",
     "--ds-color-neutral-alpha-light-9",
     "--ds-color-neutral-light-12",
     "--ds-color-shadow-key",
+    "--ds-color-surface-raised",
     "--ds-color-surface-sunken",
     "--ds-color-text-danger",
     "--ds-color-text-primary",
@@ -35679,7 +35713,7 @@
    },
    "files": {
     "html": "components/stay-card/component.html",
-    "bytes": 14298,
+    "bytes": 15504,
     "script": true
    },
    "source": null,

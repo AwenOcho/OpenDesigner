@@ -16,7 +16,7 @@
 .odl-data-table th:has(> [data-align="start"]), .odl-data-table td[data-align="start"] { text-align: start; }
 .odl-data-table thead th { padding: 0 calc(var(--ds-space-inset-sm) - var(--ds-space-inset-xs)); background: var(--ds-color-surface-sunken); color: var(--ds-color-text-secondary); font: var(--ds-text-label-md);
   border-block: var(--ds-border-width-default) solid var(--ds-color-border-subtle); white-space: nowrap; }
-.odl-data-table td { padding: var(--ds-space-inset-xs) var(--ds-space-inset-sm); block-size: var(--ds-size-row-md); border-block-end: var(--ds-border-width-default) solid var(--ds-color-border-separator); background: var(--ds-color-surface-raised);
+.odl-data-table td { padding: var(--ds-space-inset-xs) var(--ds-space-inset-sm); block-size: var(--ds-size-row-md); border-block-end: var(--ds-border-width-default) solid var(--ds-color-border-subtle); background: var(--ds-color-surface-raised);
   transition: background-color var(--ds-motion-duration-short) var(--ds-motion-easing-standard); }
 .odl-data-table tbody:last-of-type td, .odl-data-table tbody:has(+ tbody[hidden]) td { border-block-end: 0; }
 .odl-data-table td > span { display: block; inline-size: max-content; max-inline-size: 14rem; white-space: normal; overflow-wrap: anywhere; }
@@ -90,8 +90,10 @@
   .odl-data-table tbody[hidden] { display: none; }
   .odl-data-table thead { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .odl-data-table thead .odl-sort .odl-label { white-space: nowrap; }
-  .odl-data-table tbody { padding: var(--ds-space-inset-sm) var(--ds-space-inset-lg); border-block-end: var(--ds-border-width-default) solid var(--ds-color-border-separator); }
-  .odl-data-table tbody:last-of-type, .odl-data-table tbody:has(+ tbody[hidden]) { border-block-end: 0; }
+  /* records are divided by a quiet line inset to the text edge, never a bright full-width rule */
+  .odl-data-table tbody { padding: var(--ds-space-inset-sm) var(--ds-space-inset-lg); border-block-end: 0;
+    background: linear-gradient(var(--ds-color-border-subtle), var(--ds-color-border-subtle)) center bottom / calc(100% - 2 * var(--ds-space-inset-lg)) var(--ds-border-width-default) no-repeat; }
+  .odl-data-table tbody:last-of-type, .odl-data-table tbody:has(+ tbody[hidden]) { background: none; }
   .odl-data-table td, .odl-data-table td:first-child, .odl-data-table td:last-child { display: grid; grid-template-columns: minmax(5.5rem, 38%) minmax(0, 1fr); gap: var(--ds-space-inline-md);
     position: static; block-size: auto; padding: var(--ds-space-inset-xs) 0; border: 0; text-align: start; background: transparent; }
   .odl-data-table td[data-align="end"] { text-align: start; }

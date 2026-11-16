@@ -173,51 +173,6 @@
   },
   {
    "photo": {
-    "src": "https://images.unsplash.com/photo-1586081493946-c75071ee57c0?w=800&h=1000&fit=crop&auto=format&q=70",
-    "alt": "Long blue-grey wool coat worn open over a black jumper",
-    "width": 800,
-    "height": 1000
-   },
-   "name": "Blue-grey long coat",
-   "price": "£165",
-   "status": "Sold out in M",
-   "tone": "danger",
-   "colours": [
-    {
-     "name": "Sky",
-     "swatch": "sky"
-    },
-    {
-     "name": "Ash",
-     "swatch": "ash"
-    }
-   ],
-   "sizes": [
-    {
-     "label": "S",
-     "sold_out": "false"
-    },
-    {
-     "label": "M",
-     "sold_out": "true"
-    },
-    {
-     "label": "L",
-     "sold_out": "false"
-    }
-   ],
-   "open": {
-    "label": "View",
-    "event": {
-     "name": "open_product",
-     "context": {
-      "sku": "coat-bluegrey"
-     }
-    }
-   }
-  },
-  {
-   "photo": {
     "src": "https://images.unsplash.com/photo-1608635680046-aebf91c1a9c8?w=800&h=1000&fit=crop&auto=format&q=70",
     "alt": "Beige single-breasted coat with large buttons, worn over a black dress",
     "width": 800,
@@ -250,6 +205,51 @@
      "name": "open_product",
      "context": {
       "sku": "coat-tan"
+     }
+    }
+   }
+  },
+  {
+   "photo": {
+    "src": "https://images.unsplash.com/photo-1586081493946-c75071ee57c0?w=800&h=1000&fit=crop&auto=format&q=70",
+    "alt": "Long blue-grey wool coat worn open over a black jumper",
+    "width": 800,
+    "height": 1000
+   },
+   "name": "Blue-grey long coat",
+   "price": "£165",
+   "status": "Sold out",
+   "tone": "danger",
+   "colours": [
+    {
+     "name": "Sky",
+     "swatch": "sky"
+    },
+    {
+     "name": "Ash",
+     "swatch": "ash"
+    }
+   ],
+   "sizes": [
+    {
+     "label": "S",
+     "sold_out": "true"
+    },
+    {
+     "label": "M",
+     "sold_out": "true"
+    },
+    {
+     "label": "L",
+     "sold_out": "true"
+    }
+   ],
+   "open": {
+    "label": "View",
+    "event": {
+     "name": "open_product",
+     "context": {
+      "sku": "coat-bluegrey"
      }
     }
    }

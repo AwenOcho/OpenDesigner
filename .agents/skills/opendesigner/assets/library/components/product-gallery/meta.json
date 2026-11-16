@@ -321,6 +321,14 @@
               "detail": {
                 "type": "string",
                 "maxLength": 40
+              },
+              "icon": {
+                "type": "string",
+                "enum": [
+                  "truck",
+                  "undo",
+                  "shield"
+                ]
               }
             }
           }
