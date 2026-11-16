@@ -593,5 +593,256 @@ class Offer(unittest.TestCase):
             self.assertIsNone(smartui.offer_reason(root))
 
 
+PICTURE_PARTS = {"ProductGrid": "product-grid", "PlaceList": "place-list", "PlaceCard": "place-card", "ProductDetail": "product-gallery",
+                 "StayCard": "stay-card", "RecipeCard": "recipe-card", "EventCard": "event-card", "HomeListing": "home-listing"}
+
+
+class PictureParts(unittest.TestCase):
+    """The picture parts: each fixture validates, drafts bind from real-looking data, and the picture rules refuse what they should."""
+    cat = None
+
+    @classmethod
+    def setUpClass(cls):
+        cls.cat, _ = smartui.build_catalog(TOKENS, "Test", ["images.unsplash.com", "img.northfold.example"])
+
+    def fixture(self, name):
+        return {**json.loads((smartui.LIB / PICTURE_PARTS[name] / "fixture.json").read_text()), "component": name}
+
+    def errs(self, part):
+        return [e["rule"] for e in smartui.validate(smartui.wrap(part), self.cat)["errors"]]
+
+    def test_every_picture_part_is_in_the_catalog_and_its_fixture_validates(self):
+        for name in PICTURE_PARTS:
+            with self.subTest(name):
+                self.assertIn(name, self.cat["components"])
+                self.assertEqual(self.errs(self.fixture(name)), [])
+
+    def first_media(self, part):
+        """The first picture record in a part (a dict with src), for the tests to break."""
+        stack = [part]
+        while stack:
+            v = stack.pop(0)
+            if isinstance(v, dict):
+                if "src" in v:
+                    return v
+                stack += list(v.values())
+            elif isinstance(v, list):
+                stack += v
+        return None
+
+    def test_missing_alt_ratio_and_currency_fail_in_every_part(self):
+        for name in PICTURE_PARTS:
+            with self.subTest(name):
+                part = self.fixture(name)
+                m = self.first_media(part)
+                m.pop("alt")
+                self.assertIn("R5-alt", self.errs(part))
+                part = self.fixture(name)
+                m = self.first_media(part)
+                for k in ("width", "height", "ratio"):
+                    m.pop(k, None)
+                self.assertIn("R5-ratio", self.errs(part))
+        for name, where in (("ProductGrid", lambda p: p["items"][0]), ("EventCard", lambda p: p), ("HomeListing", lambda p: p), ("StayCard", lambda p: p)):
+            with self.subTest(name + " currency"):
+                part = self.fixture(name)
+                where(part)["price"] = "149"
+                self.assertIn("R6-currency", self.errs(part))
+
+    def test_stock_that_is_gone_or_nearly_gone_is_never_success(self):
+        for name, where, key in (("ProductGrid", lambda p: p["items"][0], "status"), ("EventCard", lambda p: p, "status"),
+                                 ("ProductDetail", lambda p: p, "stock"), ("PlaceList", lambda p: p["places"][0], "status")):
+            for said in ("Sold out", "Only 2 left", "Fully booked"):
+                with self.subTest(f"{name}: {said}"):
+                    part = self.fixture(name)
+                    where(part)[key] = said
+                    where(part)["tone"] = "success"
+                    self.assertIn("R6-stock", self.errs(part))
+                    where(part)["tone"] = "danger" if said != "Only 2 left" else "warning"
+                    self.assertNotIn("R6-stock", self.errs(part))
+
+    def test_drafts_bind_picture_data_into_parts_that_validate(self):
+        img = "https://img.northfold.example/coats/"
+        cases = {
+            "ProductGrid": {"coats": [{"id": "c1", "name": "Rose wool coat", "price": "£149", "was_price": "£199", "stock": "Only 2 left", "sizes": ["S", "M"],
+                                       "image": img + "pink-coat.webp", "image_alt": "Pink coat on a hanger", "image_width": 683, "image_height": 1024},
+                                      {"id": "c2", "name": "Long overcoat", "price": "£189", "stock": "In stock", "sizes": ["M", "L"],
+                                       "image": img + "overcoat-front.webp", "image_alt": "Brown overcoat", "image_width": 800, "image_height": 1160}]},
+            "PlaceList": {"cafes": [{"name": "The Reading Room", "area": "Mill Street", "rating": 4.8, "distance": "6 min walk", "status": "Open until 20:00",
+                                     "photo": {"src": img + "a.webp", "alt": "A café", "width": 960, "height": 600}},
+                                    {"name": "Kiln Coffee", "area": "Tanners Yard", "rating": 4.6, "distance": "9 min walk", "status": "Busy after 12:00",
+                                     "photo": {"src": img + "b.webp", "alt": "Another café", "width": 960, "height": 600}}]},
+            "EventCard": {"event": {"name": "Folk weekender", "date": "Sat 6 Dec", "venue": "St Anne's Hall", "price": "From £14", "seats_left": "Only 6 seats left",
+                                    "image": {"src": img + "e.webp", "alt": "A stage", "width": 960, "height": 540}}},
+            "RecipeCard": {"recipe": {"title": "Grain bowl", "time": "40 min", "servings": "Serves 2", "steps": ["Roast the squash.", "Cook the farro."],
+                                      "ingredients": ["Squash", "Farro"], "photo": {"src": img + "r.webp", "alt": "A grain bowl", "ratio": "3:2"}}},
+            "HomeListing": {"home": {"title": "Three-bedroom house", "address": "Larch Road", "price": "£385,000", "bedrooms": "3 bedrooms", "bathrooms": "2 bathrooms",
+                                     "status": "Under offer", "photos": [{"src": img + "h.webp", "alt": "A house", "width": 1280, "height": 960}]}},
+        }
+        for name, data in cases.items():
+            with self.subTest(name):
+                t = smartui.draft_template("get_" + name.lower(), data, self.cat)
+                self.assertIsNotNone(t)
+                self.assertEqual(t["part"]["component"], name)
+                part = smartui.bind(t["part"], data)
+                self.assertEqual(self.errs(part), [], json.dumps(part)[:400])
+        stock = smartui.bind(smartui.draft_template("search", cases["ProductGrid"], self.cat)["part"], cases["ProductGrid"])
+        self.assertEqual([i["tone"] for i in stock["items"]], ["warning", "success"])
+
+    def test_evidence_names_the_picture_answer_types(self):
+        coats = [{"id": "1", "name": "Coat", "price": "£1", "sizes": ["M"], "image": "https://x.example/a.jpg"}] * 2
+        cafes = [{"name": "Café", "rating": 4.5, "address": "1 Mill St", "photo": {"src": "https://x.example/a.jpg", "alt": "c"}}] * 2
+        self.assertIn("product grid", [t for t, _ in smartui.evidence_from_data("search", {"items": coats})])
+        self.assertIn("places", [t for t, _ in smartui.evidence_from_data("near", {"places": cafes})])
+        self.assertIn("event", [t for t, _ in smartui.evidence_from_data("gig", {"event": {"name": "Gig", "venue": "Hall", "date": "Fri", "image": "https://x.example/a.jpg"}})])
+        self.assertIn("recipe", [t for t, _ in smartui.evidence_from_data("dish", {"recipe": {"title": "Soup", "ingredients": ["Leek"], "photo": "https://x.example/a.jpg"}})])
+        self.assertIn("home listing", [t for t, _ in smartui.evidence_from_data("home", {"home": {"title": "Flat", "price": "£1,200", "bedrooms": 2, "photos": [{"src": "https://x.example/a.jpg", "alt": "f"}]}})])
+        types = {t for t, _, _ in smartui.ANSWER_TYPES}
+        self.assertTrue({"product grid", "product details", "places", "stay", "recipe", "event", "home listing"} <= types)
+
+    def test_renderer_keeps_the_picture_box_and_shows_a_calm_tile(self):
+        js = (SKILL / "assets" / "od-surface.js").read_text()
+        css = (SKILL / "assets" / "od-surface.css").read_text()
+        self.assertIn('"--od-img-ratio"', js)
+        self.assertIn('data-od-img', js)
+        self.assertIn("IMAGE_OFF", js)
+        self.assertIn(":where(.od-surface img[data-od-img])", css)
+        self.assertRegex(css, r"prefers-reduced-motion: reduce\)[^}]*img\[data-od-img\]")
+
+
+LAYOUT_PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="od-surface.css"><style>body{margin:0;padding:16px} .host{display:grid;gap:16px}</style>
+<script src="od-components.js"></script></head><body><div id="f"></div>
+<script type="module">
+import "./od-surface.js";
+const cat = await (await fetch("catalog.json")).json();
+window.__draw = (parts, width, tall) => {
+  const f = document.getElementById("f"); f.replaceChildren();
+  const host = document.createElement("div"); host.className = "host"; host.style.width = width + "px";
+  if (tall) { host.style.gridTemplateColumns = "1fr 1fr"; }
+  for (const p of parts) { const s = document.createElement("od-surface"); s.catalog = cat; host.append(s);
+    const r = s.process([{version: "1.0", createSurface: {surfaceId: "s1", components: [{...p, id: "root"}]}}], {}); if (!r.ok) throw new Error(JSON.stringify(r.errors)); }
+  if (tall) { const t = document.createElement("div"); t.style.height = tall + "px"; host.append(t); }
+  f.append(host);
+};
+window.__ready = true;
+</script></body></html>"""
+PNG = bytes.fromhex("89504e470d0a1a0a0000000d4948445200000001000000010806000000"
+                    "1f15c4890000000d49444154789c6360f8cf00000301010018dd8db00000000049454e44ae426082")
+
+
+class LayoutRules(unittest.TestCase):
+    """Measured in a browser (Playwright; skipped without it): balanced product rows, photos that keep their shape in one
+    column (never under 160 px), text parts that never stretch, and scrollers whose last item never meets the edge."""
+
+    @classmethod
+    def setUpClass(cls):
+        try:
+            from playwright.sync_api import sync_playwright
+        except ImportError:
+            raise unittest.SkipTest("Playwright for Python is not installed")
+        import surface_audit
+        cls.tmp = tempfile.TemporaryDirectory()
+        cat, bundle = smartui.build_catalog(TOKENS, "Test", ["images.unsplash.com"])
+        d = pathlib.Path(cls.tmp.name)
+        (d / "catalog.json").write_text(json.dumps(cat))
+        (d / "od-components.js").write_text(smartui.bundle_js(bundle))
+        for f in ("od-surface.js", "od-validate.js", "od-surface.css"):
+            shutil.copy(SKILL / "assets" / f, d / f)
+        shutil.copy(TOKENS, d / "tokens.css")
+        (d / "index.html").write_text(LAYOUT_PAGE)
+        cls.serve = surface_audit.serve(d)
+        url = cls.serve.__enter__()
+        cls.pw = sync_playwright().start()
+        try:
+            cls.browser = surface_audit.launch(cls.pw)
+        except Exception as e:  # no Chromium and no Chrome on this computer
+            cls.pw.stop()
+            raise unittest.SkipTest(f"no browser to measure in ({str(e)[:80]})")
+        cls.page = cls.browser.new_page(viewport={"width": 1200, "height": 900})
+        cls.page.route("https://images.unsplash.com/**", lambda r: r.fulfill(status=200, body=PNG, headers={"content-type": "image/png"}))
+        cls.page.goto(url + "/index.html")
+        cls.page.wait_for_function("window.__ready === true")
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.browser.close()
+        cls.pw.stop()
+        cls.serve.__exit__(None, None, None)
+        cls.tmp.cleanup()
+
+    def fixture(self, name, slug):
+        return {**json.loads((smartui.LIB / slug / "fixture.json").read_text()), "component": name}
+
+    def draw(self, parts, width, tall=0, viewport=1200):
+        self.page.set_viewport_size({"width": viewport, "height": 900})
+        self.page.evaluate("([p, w, t]) => window.__draw(p, w, t)", [parts, width, tall])
+        self.page.wait_for_timeout(30)
+
+    def test_product_rows_are_balanced(self):
+        base = self.fixture("ProductGrid", "product-grid")
+        for n in range(1, 9):
+            items = [dict(base["items"][i % len(base["items"])], name=f"Coat {i + 1}",
+                          open={"label": "View", "event": {"name": "open_product"}, "a11y_label": f"View coat {i + 1}"}) for i in range(n)]
+            for width in (280, 420, 640, 812, 1000):
+                with self.subTest(items=n, width=width):
+                    self.draw([{**base, "items": items, "note": f"{n} results"}], width)
+                    tops = self.page.evaluate("[...document.querySelectorAll('.odl-product-grid .odl-item')].map(e => Math.round(e.getBoundingClientRect().top))")
+                    rows = [tops.count(t) for t in sorted(set(tops))]
+                    self.assertEqual(sum(rows), n)
+                    if max(rows) > 1:
+                        self.assertNotIn(1, rows, f"rows {rows}: an item is alone on a row")
+
+    def test_photos_in_one_column_keep_their_shape_and_160px(self):
+        cases = [("PlaceCard", "place-card", ".odl-ph", 16 / 10), ("EventCard", "event-card", ".odl-card > .odl-ph", 16 / 9),
+                 ("HomeListing", "home-listing", ".odl-pics .odl-ph", 4 / 3), ("LocationCard", "location-card", ".odl-map", 16 / 9),
+                 ("RecipeCard", "recipe-card", ".odl-top > .odl-ph", 3 / 2)]
+        for name, slug, sel, ratio in cases:
+            for width in (240, 300, 420):
+                with self.subTest(name, width=width):
+                    self.draw([self.fixture(name, slug)], width)
+                    w, h = self.page.evaluate(f"(() => {{ const r = document.querySelector('.odl-{slug} {sel}').getBoundingClientRect(); return [r.width, r.height]; }})()")
+                    self.assertGreaterEqual(round(h), 160)
+                    self.assertAlmostEqual(h, max(160, w / ratio), delta=2)
+
+    def test_text_parts_never_stretch_in_a_taller_row(self):
+        for name, slug in (("KeyFacts", "key-facts"), ("Comparison", "comparison")):
+            with self.subTest(name):
+                self.draw([self.fixture(name, slug)], 900, tall=1400)
+                got = self.page.evaluate(f"(() => {{ const s = document.querySelector('od-surface'), r = s.querySelector('.odl-{slug}'); return [s.getBoundingClientRect().height, r.getBoundingClientRect().height, r.scrollHeight]; }})()")
+                self.assertLess(got[0], 1400)
+                self.assertAlmostEqual(got[1], got[2], delta=1)
+
+    def test_scrollers_end_with_space_after_the_last_item(self):
+        places = self.fixture("PlaceList", "place-list")
+        more = [dict(p, name=f"{p['name']} {i}", open={"label": "View", "event": {"name": "open_place"}, "a11y_label": f"View place {i}"}) for i, p in enumerate(places["places"] * 2)][:5]
+        stay = self.fixture("StayCard", "stay-card")
+        gallery = self.fixture("ProductDetail", "product-gallery")
+        gallery["photos"] = (gallery["photos"] * 3)[:3]
+        comp = self.fixture("Comparison", "comparison")
+        comp["options"] = (comp["options"] * 2)[:4]
+        for i, o in enumerate(comp["options"]):
+            o["name"] = f"Option {i + 1}"
+            o["choose"] = {**o["choose"], "a11y_label": f"Choose option {i + 1}"}
+        for r in comp["rows"]:
+            r["values"] = (r["values"] * 2)[:4]
+        cases = [("place row", {**places, "places": more}, ".odl-place-list .odl-list", ":scope > li", 640, 1200, 24),
+                 ("stay gallery", stay, ".odl-stay-card .odl-track", ":scope > .odl-slide", 360, 1200, 24),
+                 ("product photos", gallery, ".odl-product-gallery .odl-track", ":scope > .odl-slide", 360, 400, 16),
+                 ("comparison table", comp, ".odl-comparison .odl-scroll", "[role=cell], [role=columnheader]", 600, 1200, 24)]
+        for label, part, sel, items, width, viewport, need in cases:
+            with self.subTest(label):
+                self.draw([part], width, viewport=viewport)
+                gap = self.page.evaluate(f"""(async () => {{
+                  const s = document.querySelector('{sel}');
+                  if (s.scrollWidth <= s.clientWidth) return 'no scroll';
+                  s.style.scrollSnapType = 'none'; s.scrollLeft = s.scrollWidth; await new Promise(r => setTimeout(r, 50));
+                  const items = [...s.querySelectorAll('{items}')].filter(e => e.getClientRects().length);
+                  const right = Math.max(...items.map(e => e.getBoundingClientRect().right));
+                  return s.getBoundingClientRect().right - right;
+                }})()""")
+                self.assertNotEqual(gap, "no scroll", f"{label} did not scroll at {width} px")
+                self.assertGreaterEqual(gap, need - 0.5, f"{label}: {gap} px after the last item")
+
+
 if __name__ == "__main__":
     unittest.main()

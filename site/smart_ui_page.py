@@ -79,7 +79,8 @@ def facts():
     by_group = {g: [(c["slug"], lib_name(c["slug"]), c["as"]) for c in s["components"] if c["group"] == g] for g in s["groups"]}
     library = sum(1 for d in LIB.iterdir() if (d / "meta.json").exists())
     templates = json.loads((FERN / "opendesigner/smart-ui/templates.json").read_text())["templates"]
-    return {"library": library, "parts": len(s["components"]), "groups": groups, "group_what": s["groups"], "by_group": by_group,
+    return {"library": library, "parts": sum(1 for c in s["components"] if c["group"] != "domain"),  # the jobs' parts; the one-product parts are counted apart
+            "groups": groups, "group_what": s["groups"], "by_group": by_group,
             "cases": len(cases), "steps": steps, "rules": rules, "where": where, "untried": untried, "templates": templates}
 
 

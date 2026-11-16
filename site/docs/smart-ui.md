@@ -34,7 +34,7 @@ The model writes the sentence. The interface comes from parts made ahead of time
 
 ## What you get
 
-- 26 parts in six jobs: answer, data, choose, act, confirm, and media. They're all in the [component library](/library/), so they work in your product with or without the assistant.
+- 34 parts in seven jobs: answer, data, choose, act, confirm, media and pictures. They're all in the [component library](/library/), so they work in your product with or without the assistant.
 - A catalog in the A2UI v1.0 format, an MCP Apps view for Claude and ChatGPT, and a plain-text version for anywhere that shows no interface. See [where it runs](/docs/smart-ui-adapters/).
 - An audit of every part in every state (phone and desktop sizes, 200% text, dark mode, right to left) against the accessibility floors, and evals of how Claude and Gemini use it.
 - Toasts with Undo for changes that can be undone, in your system's colours.

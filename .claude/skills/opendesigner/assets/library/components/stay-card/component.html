@@ -1,16 +1,18 @@
 <!-- Icons: Lucide (lucide.dev), ISC licence -->
 <style>
-.odl-stay-card { box-sizing: border-box; inline-size: 100%; max-inline-size: 24rem; margin-inline: auto; container-type: inline-size; color: var(--ds-color-text-primary); font: var(--ds-text-body-md); text-wrap: pretty; }
+.odl-stay-card { box-sizing: border-box; inline-size: 100%; max-inline-size: 48rem; margin-inline: auto; container-type: inline-size; color: var(--ds-color-text-primary); font: var(--ds-text-body-md); text-wrap: pretty; }
 .odl-stay-card *, .odl-stay-card *::before, .odl-stay-card *::after { box-sizing: border-box; }
 .odl-stay-card .odl-media { position: relative; border-radius: var(--ds-radius-container); overflow: hidden; background: var(--ds-color-surface-sunken); }
 .odl-stay-card .odl-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; }
 /* a renderer's "nothing to show" slide, when no photos came */
 .odl-stay-card .odl-track > .od-empty { flex: 0 0 100%; aspect-ratio: 20 / 19; margin: 0; display: grid; place-items: center; color: var(--ds-color-text-secondary); font: var(--ds-text-body-md); }
 .odl-stay-card .odl-track::-webkit-scrollbar { display: none; }
+/* the last photo never meets the edge: the end space is a last spacer, never the scroller's padding (browsers drop it) */
+.odl-stay-card .odl-track::after { content: ""; flex: 0 0 var(--ds-space-24); scroll-snap-align: end; }
 .odl-stay-card .odl-slide { flex: 0 0 100%; aspect-ratio: 20 / 19; margin: 0; scroll-snap-align: start; }
 .odl-stay-card .odl-slide img { display: block; inline-size: 100%; block-size: 100%; object-fit: cover; }
 .odl-stay-card .odl-badge { position: absolute; inset-block-start: max(var(--ds-space-inset-md), var(--ds-radius-container)); inset-inline-start: max(var(--ds-space-inset-md), var(--ds-radius-container)); padding: var(--ds-space-inset-xs) var(--ds-space-inset-sm);
-  border-radius: var(--ds-radius-control-sm); background: var(--ds-color-white); color: var(--ds-color-neutral-light-12); font: var(--ds-text-label-md); box-shadow: var(--ds-elevation-raised); white-space: nowrap; }
+  border-radius: var(--ds-radius-control-sm); background: var(--ds-color-surface-raised); color: var(--ds-color-text-primary); font: var(--ds-text-label-md); box-shadow: var(--ds-elevation-raised); white-space: nowrap; }
 .odl-stay-card .odl-over { position: absolute; inset: 0; pointer-events: none; }
 .odl-stay-card .odl-over button { pointer-events: auto; }
 .odl-stay-card button { display: grid; place-items: center; padding: 0; border: 0; cursor: pointer; font: inherit; }
@@ -57,6 +59,26 @@
 .odl-stay-card button:focus-visible, .odl-stay-card .odl-link:focus-visible { outline: var(--ds-focus-ring-width) solid var(--ds-color-border-focus); outline-offset: var(--ds-focus-ring-offset); }
 .odl-stay-card .odl-sr { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 @media (prefers-reduced-motion: reduce) { .odl-stay-card, .odl-stay-card *, .odl-stay-card *::before { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
+/* the cancellation rule is a status: its colour comes from what it says (free cancellation, non-refundable) */
+.odl-stay-card .odl-status { display: inline-flex; align-items: center; gap: var(--ds-space-inline-xs); margin: 0; color: var(--ds-color-text-secondary); font: var(--ds-text-label-lg); font-weight: var(--ds-font-weight-label); }
+.odl-stay-card .odl-status::before { content: ""; flex: none; inline-size: var(--ds-space-6); block-size: var(--ds-space-6); border-radius: var(--ds-radius-full); background: currentColor; }
+.odl-stay-card .odl-status[data-tone="neutral"] { color: var(--ds-color-text-secondary); }
+.odl-stay-card .odl-status[data-tone="success"] { color: var(--ds-color-text-success); }
+.odl-stay-card .odl-status[data-tone="warning"] { color: var(--ds-color-text-warning); }
+.odl-stay-card .odl-status[data-tone="danger"] { color: var(--ds-color-text-danger); }
+/* a soft dark shade at the top and bottom of the photos keeps the heart and the dots readable on a bright picture */
+.odl-stay-card .odl-media::before { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  background: linear-gradient(to bottom, var(--ds-color-neutral-alpha-light-7), transparent 30%, transparent 70%, var(--ds-color-neutral-alpha-light-7)); }
+/* wider: the card fills its space and shows a strip of three photos; the swipe with dots is for a narrow space only */
+@container (min-width: 36rem) {
+  .odl-stay-card .odl-media { background: transparent; }
+  .odl-stay-card .odl-media::before { background: linear-gradient(to bottom, var(--ds-color-neutral-alpha-light-7), transparent 30%); }
+  .odl-stay-card .odl-track { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--ds-space-4); overflow: visible; scroll-snap-type: none; }
+  .odl-stay-card .odl-track::after { content: none; }
+  .odl-stay-card .odl-slide { aspect-ratio: 4 / 3; min-block-size: 10rem; }
+  .odl-stay-card .odl-slide:nth-child(n+4 of .odl-slide:not([hidden])) { display: none; }
+  .odl-stay-card .odl-nav, .odl-stay-card .odl-dots { display: none; }
+}
 </style>
 <article class="odl-stay-card" aria-label="Cabin by a mountain lake" data-od-label="title">
   <div class="odl-card">
@@ -84,6 +106,7 @@
     <p class="odl-line" data-od-item data-od-slot="text">Hosted by Ingrid · 2 bedrooms · hot tub</p>
     <p class="odl-line" data-od-item>12 to 17 Mar</p>
     </div>
+    <p class="odl-status" data-od-slot="status" data-od-var="tone" data-tone="success" data-od-optional>Free cancellation until 5 Mar</p>
     <p class="odl-price"><s data-od-optional><span class="odl-vh">was </span><span data-od-slot="old_price">€212</span></s><span><strong data-od-slot="price">€184</strong> <span data-od-slot="unit" data-od-optional>night</span></span><span class="odl-total" data-od-optional>· <span data-od-slot="total">€920 total</span></span></p>
   </div>
   </div>

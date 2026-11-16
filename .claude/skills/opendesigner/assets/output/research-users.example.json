@@ -19,11 +19,13 @@
   "findings": [
     {"id": "F1", "topic": "who", "text": "Most users in this group use a mid-range or low-cost Android phone, and many share it with family.", "confidence": "measured", "sources": ["S1"], "signals": ["low-end-devices"]},
     {"id": "F2", "topic": "accessibility", "text": "Near vision declines after about 45, so small text and low-contrast grey text are hard to read.", "confidence": "measured", "sources": ["S3"], "signals": ["older-users", "low-vision"]},
-    {"id": "F3", "topic": "expectations", "text": "The most common complaint is not finding the reorder button and losing the cart after a call interrupts.", "confidence": "reported", "sources": ["S2", "S4"], "signals": []},
+    {"id": "F3", "topic": "expectations", "text": "The most common complaint is not finding the reorder button and losing the cart after a call interrupts.", "confidence": "reported", "sources": ["S2", "S4"], "signals": [],
+     "answer_types": [{"type": "record details", "evidence": "people look for last month's order to repeat it, and lose it"}]},
     {"id": "F4", "topic": "apps", "text": "WhatsApp and a UPI payments app are the apps they open most; both use a bottom bar and big list rows.", "confidence": "reported", "sources": ["S1", "S4"], "signals": ["familiar-patterns"]},
     {"id": "F5", "topic": "context", "text": "Ordering happens at home, now and then, often with a family member helping.", "confidence": "reported", "sources": ["S4"], "signals": ["occasional-mobile"]},
     {"id": "F6", "topic": "preferences", "text": "Many read the app in Hindi or another Indian language rather than English.", "confidence": "reported", "sources": ["S1"], "signals": ["second-language", "non-latin-script"]},
-    {"id": "F7", "topic": "context", "text": "Money and health are both at stake: a wrong medicine or a double charge is the fear named most.", "confidence": "reported", "sources": ["S2"], "signals": ["high-stakes"]},
+    {"id": "F7", "topic": "context", "text": "Money and health are both at stake: a wrong medicine or a double charge is the fear named most.", "confidence": "reported", "sources": ["S2"], "signals": ["high-stakes"],
+     "answer_types": [{"type": "ask before a change", "evidence": "a double charge is the fear named most, so a payment needs a clear yes first"}]},
     {"id": "F8", "topic": "market", "text": "The top medicine-ordering apps all lead with search and offers; none puts last month's order first.", "confidence": "reported", "sources": ["S2", "S5"], "signals": []}
   ],
   "apps": [

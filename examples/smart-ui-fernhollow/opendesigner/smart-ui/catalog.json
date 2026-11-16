@@ -406,7 +406,7 @@
   },
   "Comparison": {
    "type": "object",
-   "description": "Two to four options side by side: each with its name, price and a Choose button, then one row per attribute so the differences line up.",
+   "description": "Two to four options side by side: each with its name, price and a Choose button, then one row per attribute so the differences line up. Products can carry a photo each.",
    "additionalProperties": false,
    "properties": {
     "component": {
@@ -442,6 +442,45 @@
         "type": "string",
         "maxLength": 24
        },
+       "photo": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+         "src"
+        ],
+        "x-od-media": true,
+        "properties": {
+         "src": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 2048,
+          "x-od-url": "image"
+         },
+         "alt": {
+          "type": "string",
+          "maxLength": 200
+         },
+         "width": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20000
+         },
+         "height": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20000
+         },
+         "ratio": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,3}(\\.[0-9]{1,2})?[:/][1-9][0-9]{0,3}(\\.[0-9]{1,2})?$",
+          "maxLength": 12
+         },
+         "credit": {
+          "type": "string",
+          "maxLength": 120
+         }
+        }
+       },
        "badge": {
         "type": "string",
         "maxLength": 18
@@ -450,9 +489,27 @@
         "type": "string",
         "maxLength": 14
        },
+       "old_price": {
+        "type": "string",
+        "maxLength": 16
+       },
        "price_note": {
         "type": "string",
         "maxLength": 24
+       },
+       "status": {
+        "type": "string",
+        "maxLength": 28
+       },
+       "tone": {
+        "type": "string",
+        "enum": [
+         "neutral",
+         "success",
+         "warning",
+         "danger"
+        ],
+        "x-od-token": true
        },
        "choose": {
         "type": "object",

@@ -41,8 +41,8 @@ def flight_info(flight="OV214"):
 
 
 HOTEL_PHOTOS = [  # the same Unsplash photos the library's stay card uses (Unsplash licence)
-    {"src": "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=768&h=730&fit=crop&auto=format&q=70", "alt": "Living room with a large window"},
-    {"src": "https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=768&h=730&fit=crop&auto=format&q=70", "alt": "Bedroom with a wooden bed and a garden view"}]
+    {"src": "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=768&h=730&fit=crop&auto=format&q=70", "alt": "Living room with a large window", "width": 768, "height": 730},
+    {"src": "https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=768&h=730&fit=crop&auto=format&q=70", "alt": "Bedroom with a wooden bed and a garden view", "width": 768, "height": 730}]
 
 
 def get_hotel():

@@ -5,7 +5,7 @@
 .odl-location-card *, .odl-location-card *::before { box-sizing: border-box; }
 .odl-location-card svg { flex: none; }
 /* The drawn placeholder: blocks and streets in the system's neutral colours, a pin in the middle. No map tiles. */
-.odl-location-card .odl-map { position: relative; display: grid; place-items: center; aspect-ratio: 12 / 5; overflow: hidden; background: var(--ds-color-surface-sunken);
+.odl-location-card .odl-map { position: relative; display: grid; place-items: center; aspect-ratio: 16 / 9; min-block-size: 10rem; overflow: hidden; background: var(--ds-color-surface-sunken);
   border-block-end: var(--ds-border-width-default) solid var(--ds-color-border-subtle); }
 .odl-location-card .odl-streets { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; }
 .odl-location-card .odl-block { fill: var(--ds-color-bg-neutral-subtle); }
@@ -32,7 +32,6 @@
 .odl-location-card button svg { inline-size: var(--ds-size-icon-sm); block-size: var(--ds-size-icon-sm); fill: none; stroke: currentColor; stroke-width: var(--ds-icon-stroke-md); }
 .odl-location-card button:focus-visible { outline: var(--ds-focus-ring-width) solid var(--ds-color-border-focus); outline-offset: var(--ds-focus-ring-offset); }
 @container (max-width: 26rem) {
-  .odl-location-card .odl-map { aspect-ratio: 2 / 1; }
   .odl-location-card .odl-body { padding: var(--ds-space-inset-lg); }
   .odl-location-card button { justify-self: stretch; }
 }

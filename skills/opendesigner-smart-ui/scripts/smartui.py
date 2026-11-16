@@ -45,9 +45,22 @@ EVENT = {"type": "object", "additionalProperties": False, "required": ["name"],
          "properties": {"name": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 40},
                         "context": {"type": "object", "maxProperties": 8,
                                     "additionalProperties": {"type": ["string", "number", "boolean"], "maxLength": 200}}}}
-MEDIA = {"type": "object", "additionalProperties": False, "required": ["src", "alt"],
+# A picture comes only from the host's data: its URL (on the owner's allow-list, R4), alt text (R5-alt), its shape as a
+# ratio or a width and height (R5-ratio: the renderer keeps a box of that shape, so nothing jumps while it loads) and,
+# when the licence asks for one, a credit. The model never writes or invents a picture.
+RATIO = r"^[1-9][0-9]{0,3}(\.[0-9]{1,2})?[:/][1-9][0-9]{0,3}(\.[0-9]{1,2})?$"
+MEDIA = {"type": "object", "additionalProperties": False, "required": ["src"], "x-od-media": True,
          "properties": {"src": {"type": "string", "format": "uri", "maxLength": 2048, "x-od-url": "image"},
-                        "alt": {"type": "string", "minLength": 1, "maxLength": 200}}}
+                        "alt": {"type": "string", "maxLength": 200},
+                        "width": {"type": "integer", "minimum": 1, "maximum": 20000},
+                        "height": {"type": "integer", "minimum": 1, "maximum": 20000},
+                        "ratio": {"type": "string", "pattern": RATIO, "maxLength": 12},
+                        "credit": {"type": "string", "maxLength": 120}}}
+# R6-currency: a price shows its currency. A key that holds money (price, old_price, total, fee...) is text with a currency
+# sign or code ("£35.00", "EUR 120", "€€"), or a number beside a "currency" key in the same object.
+MONEY_KEY = re.compile(r"^(?!.*_(?:note|label|unit|text|band|tone|count)$)(?:price|prices|cost|fee|fees|total|amount|subtotal|deposit|fare|rent|(?:[a-z]+_)+(?:price|cost|fee|total|amount|fare|rent)|price_[a-z_]+)$")
+CURRENCY = re.compile(r"[£$€¥₹₩₺₽¢₫₱₦₪]|(?<![A-Za-z])[A-Z]{3}(?![A-Za-z])")  # a sign, or an ISO code in capitals (EUR, CHF)
+CURRENCY_WORD = re.compile(r"\b(?:free|included|no charge)\b|(?<![A-Za-z])(?:kr|zł)(?![A-Za-z])", re.I)
 LIMITS = {"components": 8, "depth": 3, "leaves": 1}
 HANDLER = re.compile(r"^on[A-Z_]|^on(click|dblclick|load|error|abort|mouse\w*|key\w*|focus\w*|blur|change|input|submit|pointer\w*|touch\w*|wheel|scroll|drag\w*|drop|animation\w*|transition\w*)$", re.I)
 BANNED_KEYS = {"style", "class", "classname", "css", "theme", "html", "innerhtml", "outerhtml", "dangerouslysetinnerhtml", "srcdoc"}
@@ -1010,10 +1023,36 @@ def check_value(v, schema, path, errs, sid, cat, opts, ctx):
                 if r not in v:
                     _err(errs, "required", f"{path}/{r}", f"{r} is required", sid)
         table_headers(v, path, errs, sid)
+        if schema.get("x-od-media"):
+            media_rules(v, path, errs, sid)
+        money_rules(v, path, errs, sid, opts.get("partial"))
         if schema.get("x-od-effect") == "change" and isinstance(v.get("event"), dict) and "approved" in (v["event"].get("context") or {}):
             _err(errs, "R3-approval", f"{path}/event/context/approved", "an action that changes data is approved by the person, never in the answer", sid, "remove approved")
         return out
     return v
+
+
+def media_rules(v, path, errs, sid):
+    """R5-alt: every picture says what it shows. R5-ratio: every picture gives its shape, so its box is drawn before it loads."""
+    if not (isinstance(v.get("alt"), str) and v["alt"].strip()):
+        _err(errs, "R5-alt", f"{path}/alt", "a picture needs alt text that says what it shows", sid, "use the alt text from the data; no alt in the data: leave the picture out")
+    if not (isinstance(v.get("ratio"), str) or (isinstance(v.get("width"), int) and isinstance(v.get("height"), int))):
+        _err(errs, "R5-ratio", path, "a picture needs its shape: ratio, or width and height", sid, "copy width and height (or ratio) from the data")
+
+
+def money_rules(v, path, errs, sid, partial=False):
+    """R6-currency: a price shows its currency (a sign or a code), never a bare number. While an answer streams in, a number
+    may arrive before its currency field."""
+    if path.endswith("/context"):  # an event's context is for the app, never shown
+        return
+    cur = isinstance(v.get("currency"), str) and v["currency"].strip()
+    for k, x in v.items():
+        if not MONEY_KEY.match(k) or k == "currency":
+            continue
+        if isinstance(x, str) and re.search(r"\d", x) and not CURRENCY.search(x) and not CURRENCY_WORD.search(x) and not cur:
+            _err(errs, "R6-currency", f"{path}/{k}", f"'{x}' is a price without its currency", sid, "write the price as the data gives it, with its sign or code (£35.00)")
+        elif isinstance(x, (int, float)) and not isinstance(x, bool) and not cur and not partial:
+            _err(errs, "R6-currency", f"{path}/{k}", f"{x} is a price without its currency", sid, "write the price as text with its sign or code (£35.00)")
 
 
 def copy_check(v, path, errs, sid, names):
@@ -1078,7 +1117,11 @@ def duplicate_rows(v, path, errs, sid):
 
 
 TONE_GOOD = re.compile(r"^(?:paid|done|complete|completed|approved|passed|pass|ok|active|on time|delivered|available|eligible|yes|confirmed|sent|saved|fixed|resolved|in stock)\b", re.I)
-TONE_BAD = re.compile(r"^(?:unpaid|overdue|failed|fail|broken|error|declined|refused|cancelled|canceled|rejected|missing|not eligible|expired|out of stock|blocked|still needed|delayed)\b(?!\s+(?:issues?|problems?|errors?)\b)", re.I)
+TONE_BAD = re.compile(r"^(?:unpaid|overdue|failed|fail|broken|error|declined|refused|cancelled|canceled|rejected|missing|not eligible|expired|out of stock|blocked|still needed|delayed|sold out|fully booked|booked out|non-refundable|unavailable)\b(?!\s+(?:issues?|problems?|errors?)\b)", re.I)
+# Stock and availability (R6-stock): a value that says it is gone or nearly gone is never shown as success. Gone may be
+# danger or neutral; scarce ("Only 2 left") may be warning or neutral.
+STOCK_LOW = re.compile(r"\b(?:sold out|out of stock|fully booked|booked out|no (?:seats|rooms|tables|tickets|spaces?) left|unavailable|"
+                       r"waiting list|waitlist|only \d+ left|\d+ left|last \d+|few left|almost (?:full|gone)|selling fast|low stock)\b", re.I)
 
 
 def status_words(status):
@@ -1094,11 +1137,14 @@ def tones_from_data(comp, path, errs, sid, words=((), ())):
         if isinstance(v, dict):
             tone = v.get("tone")
             if tone in ("success", "danger"):
-                said = next((v[k] for k in ("value", "status", "text", "label") if isinstance(v.get(k), str)), "")
+                said = next((v[k] for k in ("value", "status", "stock", "availability", "text", "label") if isinstance(v.get(k), str)), "")
                 low = said.strip().lower()
                 good = TONE_GOOD.search(said.strip()) or any(low == w or low.startswith(w + " ") for w in words[0])
                 bad = TONE_BAD.search(said.strip()) or any(low == w or low.startswith(w + " ") for w in words[1])
-                if (tone == "success" and bad and not good) or (tone == "danger" and good and not bad):
+                if tone == "success" and STOCK_LOW.search(said):
+                    _err(errs, "R6-stock", f"{p}/tone", f"'{said}' is shown as success", sid,
+                         "stock that is gone or nearly gone is never success: danger or neutral when gone, warning when few are left")
+                elif (tone == "success" and bad and not good) or (tone == "danger" and good and not bad):
                     _err(errs, "R6-tone", f"{p}/tone", f"'{said}' is shown as {tone}", sid,
                          "let the data set the tone: danger for a bad value, success for a good one, neutral when unsure")
             for k, x in v.items():
@@ -1757,7 +1803,7 @@ def _label(key):
 def _tone_map(values):
     m = {}
     for v in values:
-        t = "success" if GOOD.search(v) else "danger" if BAD.search(v) else "warning" if WAIT.search(v) else None
+        t = "success" if GOOD.search(v) else "danger" if BAD.search(v) else "warning" if WAIT.search(v) or STOCK_LOW.search(v) else None
         if t:
             m[v] = t
     return m
@@ -1780,6 +1826,9 @@ def draft_template(action, result, catalog):
     for rk, rv in result.items():  # one level down: {"application": {"steps": [...]}}
         if isinstance(rv, dict):
             lists += [(f"{rk}.{k}", v) for k, v in rv.items() if isinstance(v, list) and v and all(isinstance(x, dict) for x in v)]
+    pic = draft_picture(action, result, lists, comps)
+    if pic:
+        return pic
     for k, v in lists:  # steps: label and state
         if "ProgressStatus" in comps and all("label" in x and "state" in x for x in v):
             states = {"done": "done", "complete": "done", "current": "now", "now": "now", "next": "next"}
@@ -1815,6 +1864,103 @@ def draft_template(action, result, catalog):
     return None
 
 
+def _photo_bind(d, cur="."):
+    """A picture from the data, bound as it comes: a {src, alt, width, height} record, or a URL beside alt and size fields."""
+    k = _has(d, r"photos?|images?|pictures?|cover|thumbnail")
+    if k and isinstance(d[k], dict) and "src" in d[k]:
+        return "{%s%s}" % (cur, k)
+    if k and isinstance(d[k], list) and d[k] and isinstance(d[k][0], dict) and "src" in d[k][0]:
+        return "{%s%s[0]}" % (cur, k)
+    url = k if k and isinstance(d.get(k), str) else next((x for x, y in d.items() if isinstance(y, str) and _IMG.search(y)), None)
+    if not url:
+        return None
+    out = {"src": "{%s%s}" % (cur, url)}
+    for f, pats in (("alt", (r"alt|.*_alt|alt_text",)), ("width", (r"width|.*_width",)), ("height", (r"height|.*_height",)), ("ratio", (r"ratio|aspect_ratio",)), ("credit", (r"credit|.*_credit|attribution",))):
+        x = _has(d, *pats)
+        if x:
+            out[f] = "{%s%s}" % (cur, x)
+    return out
+
+
+def _money(d, k, cur="."):
+    """A price bound with its currency: text as the data gives it, or a number beside the data's currency code."""
+    if isinstance(d.get(k), (int, float)) and _has(d, r"currency"):
+        return "{%s%s} {%s%s|text}" % (cur, _has(d, r"currency"), cur, k)
+    return "{%s%s}" % (cur, k)
+
+
+def draft_picture(action, result, lists, comps):
+    """A picture part for a read action whose data has pictures: products, places, an event, a recipe or a home."""
+    for k, v in lists:
+        first = v[0]
+        photo = _photo_bind(first)
+        if not photo:
+            continue
+        types = [t for t, _ in picture_types(first, plural=True)]
+        name = _has(first, r"name|title")
+        if "product grid" in types and "ProductGrid" in comps and name:
+            price = _has(first, r"price|sale_price|.*_price")
+            stock = _has(first, r"stock|availability|status")
+            item = {"photo": photo, "name": "{.%s}" % name, "price": _money(first, price)}
+            old = _has(first, r"old_price|was_price|was|compare_at_price|list_price")
+            if old:
+                item["old_price"] = _money(first, old)
+            if stock:
+                item["status"] = "{.%s}" % stock
+                item["tone"] = {"tone": "." + stock, "map": {**_tone_map([str(x.get(stock)) for x in v]), "*": "neutral"}}
+            sizes = _has(first, r"sizes?")
+            if sizes and isinstance(first[sizes], list):
+                item["sizes"] = {"each": "." + sizes, "item": {"label": "{.}"}} if all(isinstance(x, str) for x in first[sizes]) else \
+                    {"each": "." + sizes, "item": {"label": "{.label}", "sold_out": "{.sold_out}"}}
+            return {"action": action, "intent": _label(action), "part": {"component": "ProductGrid", "title": _label(k.split(".")[-1]),
+                    "note": "{count(%s)} results" % k, "items": {"each": k, "max": 8, "item": item}}}
+        if "places" in types and "PlaceList" in comps and name:
+            where = _has(first, r"area|neighbou?rhood|address|city|location")
+            item = {"photo": photo, "name": "{.%s}" % name, "area": "{.%s}" % where}
+            for f, pats in (("rating", (r"rating|stars|rating_average",)), ("price_band", (r"price_band|price_level|price_range",)),
+                            ("distance", (r"distance|walk|travel_time",)), ("why", (r"why|reason|summary|note",)), ("status", (r"status|open_now|hours_today",))):
+                x = _has(first, *pats)
+                if x:
+                    item[f] = "{.%s}" % x if f != "rating" else "{.%s}" % x
+            if "status" in item:
+                st = _has(first, r"status|open_now|hours_today")
+                item["tone"] = {"tone": "." + st, "map": {**_tone_map([str(x.get(st)) for x in v]), "*": "neutral"}}
+            return {"action": action, "intent": _label(action), "part": {"component": "PlaceList", "title": _label(k.split(".")[-1]),
+                    "places": {"each": k, "max": 5, "item": item}}}
+    rec = next((x for x in [result, *[y for y in result.values() if isinstance(y, dict)]] if _photo_bind(x)), None)
+    if not rec:
+        return None
+    prefix = "" if rec is result else next(k for k, y in result.items() if y is rec) + "."
+    photo = _photo_bind(rec, prefix or "")
+    if isinstance(photo, str):
+        photo = photo.replace("{", "{", 1)
+    title = _has(rec, r"name|title")
+    types = [t for t, _ in picture_types(rec, plural=False)]
+    f = lambda *p: (lambda x: "{%s%s}" % (prefix, x) if x else None)(_has(rec, *p))
+    if "event" in types and "EventCard" in comps and title:
+        part = {"component": "EventCard", "photo": photo, "title": f(r"name|title"), "date": f(r"date|starts?|starts_at|when"), "venue": f(r"venue|place|location"),
+                "price": f(r"price|from_price|.*_price"), "status": f(r"seats?_left|tickets?_left|availability|status")}
+    elif "recipe" in types and "RecipeCard" in comps and title:
+        steps, ing = _has(rec, r"steps|method|instructions"), _has(rec, r"ingredients")
+        part = {"component": "RecipeCard", "photo": photo, "title": f(r"name|title"), "time": f(r"time|total_time|cook_time"), "servings": f(r"servings|serves|yield"),
+                "steps": {"each": prefix + steps, "item": {"text": "{.}" if all(isinstance(x, str) for x in rec[steps]) else "{.text}"}} if steps else None,
+                "ingredients": {"each": prefix + ing, "item": {"text": "{.}"}} if ing and all(isinstance(x, str) for x in rec[ing]) else None}
+    elif "home listing" in types and "HomeListing" in comps and title:
+        pk = _has(rec, r"photos|images")
+        photos = {"each": prefix + pk, "max": 3, "item": {"photo": "{.}"}} if pk and isinstance(rec[pk], list) else [{"photo": photo}]
+        part = {"component": "HomeListing", "photos": photos, "title": f(r"name|title"), "address": f(r"address|area|street"), "price": f(r"price|rent"),
+                "beds": f(r"beds?|bedrooms?"), "baths": f(r"baths?|bathrooms?"), "status": f(r"status|availability")}
+    elif "places" in types and "PlaceCard" in comps and title:
+        part = {"component": "PlaceCard", "photo": photo, "name": f(r"name|title"), "area": f(r"area|neighbou?rhood|address|city"), "rating": f(r"rating|stars"),
+                "why": f(r"why|reason|summary"), "address": f(r"address"), "status": f(r"status|open_now|hours_today")}
+    else:
+        return None
+    st = _has(rec, r"seats?_left|tickets?_left|availability|status|open_now|hours_today")
+    if "status" in part and part["status"] and st:
+        part["tone"] = {"tone": prefix + st, "map": {**_tone_map([str(rec.get(st))]), "*": "neutral"}}
+    return {"action": action, "intent": _label(action), "part": {k: v for k, v in part.items() if v is not None}}
+
+
 # ----------------------------------------------------------------------------------------------- use cases from evidence
 # Which answer types this product's assistant needs: from its own data and actions, what it is (PRODUCT.md), its
 # research and its screens. Never a fixed list. Each type maps to a library part, or says the library has none.
@@ -1830,6 +1976,13 @@ ANSWER_TYPES = [  # (type, what it is for, parts in preference order; empty: the
     ("results to pick from", "a short list to choose one", ["FlightResults", "ResultList", "ProductCard"]),
     ("pick a time", "free times to book", ["TimeSlots"]),
     ("pictures", "a photo, a gallery", ["ImageCard", "ProductCard"]),
+    ("product grid", "four to eight products with photos, prices, colours and sizes", ["ProductGrid"]),
+    ("product details", "one product with its photos, sizes, colours and stock", ["ProductDetail", "ProductCard"]),
+    ("places", "places to go, with photos, ratings and where they are", ["PlaceList", "PlaceCard"]),
+    ("stay", "a room or rental with photos, a price a night and its cancellation rule", ["StayCard"]),
+    ("recipe", "a dish with its photo, time, servings and steps", ["RecipeCard"]),
+    ("event", "an event with its photo, date, venue, price and seats left", ["EventCard"]),
+    ("home listing", "a home to rent or buy with photos, price, rooms and status", ["HomeListing"]),
     ("place", "an address on a map", ["LocationCard"]),
     ("file", "a document to open or download", ["FileCard"]),
     ("answer with sources", "an answer that cites its sources", ["AnswerSources", "CitationList"]),
@@ -1839,8 +1992,8 @@ ANSWER_TYPES = [  # (type, what it is for, parts in preference order; empty: the
     ("embed", "a video, a live page or a widget inside the answer", []),
 ]
 INDUSTRY_TYPES = {  # what assistants in each kind of product commonly need (a starting point, weighed with the evidence)
-    "travel": ["results to pick from", "pictures", "place", "pick a time", "compare options", "ask before a change"],
-    "commerce": ["results to pick from", "pictures", "compare options", "what happened"],
+    "travel": ["results to pick from", "pictures", "places", "stay", "event", "place", "pick a time", "compare options", "ask before a change"],
+    "commerce": ["product grid", "product details", "results to pick from", "pictures", "compare options", "what happened"],
     "work-tool": ["table", "chart over time", "headline numbers", "record details", "file"],
     "public-service": ["progress", "record details", "pick a time", "form", "ask before a change", "place"],
     "health": ["pick a time", "record details", "place", "form"],
@@ -1862,6 +2015,35 @@ def _walk_shapes(v, key="", out=None):
     return out
 
 
+def _has(d, *pats):
+    return next((k for k in d if any(re.fullmatch(p, k) for p in pats)), None)
+
+
+def picture_types(d, plural):
+    """Which picture answer a pictured record (or a list's first item) points to, from the fields beside the picture."""
+    out = []
+    price = _has(d, r"price|.*_price|price_.*|cost|amount", r"total")
+    sizes = _has(d, r"sizes?", r"size_options", r"variants")
+    colours = _has(d, r"colou?rs?", r"swatch(es)?")
+    stock = _has(d, r"stock", r"in_stock", r"availability", r"inventory")
+    rating = _has(d, r"rating|stars|score|rating_average")
+    where = _has(d, r"address|area|neighbou?rhood|lat|lng|latitude|longitude|distance|location|city")
+    beds = _has(d, r"beds?|bedrooms?")
+    if price and (sizes or colours or stock) and not beds:
+        out.append(("product grid" if plural else "product details", f"with a price and {sizes or colours or stock}"))
+    if rating and where and not beds:
+        out.append(("places", f"with a rating and {where}"))
+    if price and (re.search(r"night", " ".join(map(str, d.values())).lower()) or _has(d, r"per_night|nightly|cancellation|check_?in")):
+        out.append(("stay", "with a price a night"))
+    if _has(d, r"ingredients") or (_has(d, r"steps|method|instructions") and _has(d, r"servings|serves|yield|cook_time|prep_time|time")):
+        out.append(("recipe", "with ingredients or steps"))
+    if _has(d, r"venue") or (_has(d, r"date|starts?|starts_at|doors") and _has(d, r"seats?_left|tickets?_left|tickets?|capacity")):
+        out.append(("event", "with a date and a venue or tickets"))
+    if beds and price:
+        out.append(("home listing", f"with a price and {beds}"))
+    return out
+
+
 def evidence_from_data(name, result):
     """Answer types a read action's real result points to, each with a short reason."""
     found = []
@@ -1879,8 +2061,11 @@ def evidence_from_data(name, result):
                 found.append(("table", f"{name} returns {len(v)} {key} with {len(first)} fields each"))
             if any(k in first for k in ("price", "fare", "cost")) and "id" in first and len(v) >= 2:
                 found.append(("results to pick from", f"{name} returns {len(v)} {key} to choose from, each with a price"))
-            if any(isinstance(x, str) and _IMG.search(x) for x in first.values()) or any(k in first for k in ("image", "photo", "photos")) or ("src" in first and "alt" in first):
+            pictured = any(isinstance(x, str) and _IMG.search(x) for x in first.values()) or any(k in first for k in ("image", "photo", "photos")) or ("src" in first and "alt" in first)
+            if pictured:
                 found.append(("pictures", f"{key} in {name} have pictures"))
+                for typ, why_ in picture_types(first, plural=True):
+                    found.append((typ, f"{len(v)} {key} in {name} have pictures {why_}"))
             if len(v) in (2, 3, 4) and re.search(r"plan|option|tier|fare|price", key):
                 found.append(("compare options", f"{name} returns {len(v)} {key} to compare"))
             if any(k in first for k in ("url", "source", "link")) and any(k in first for k in ("title", "snippet", "quote")):
@@ -1893,8 +2078,10 @@ def evidence_from_data(name, result):
                 found.append(("file", f"{name} returns a file"))
             if any(isinstance(x, str) and re.search(r"youtube\.com|vimeo\.com|\.mp4(\?|$)|/embed/", x) for x in d.values()):
                 found.append(("embed", f"{name} returns a video or embed link"))
-            if any(isinstance(x, str) and _IMG.search(x) for x in d.values()) or "image" in d or "photo" in d:
+            if any(isinstance(x, str) and _IMG.search(x) for x in d.values()) or any(k in d for k in ("image", "photo", "photos", "images")):
                 found.append(("pictures", f"{name} returns a picture"))
+                for typ, why_ in picture_types(d, plural=False):
+                    found.append((typ, f"{name} returns {key or 'one record'} with pictures {why_}"))
             scal = [k for k, x in d.items() if isinstance(x, (str, int, float)) and not k.endswith("_in_words")]
             if key and len(scal) >= 4:
                 found.append(("record details", f"{name} returns one {key} with {len(scal)} facts"))
@@ -1953,16 +2140,33 @@ def use_cases(root, app=None, catalog=None):
         if t in score:
             add(t, 1, f"common in {kind.replace('-', ' ')} assistants", "product: " + (product[:80] or "PRODUCT.md"))
     research = root / "opendesigner" / "research"
-    texts = [(f, f.read_text(errors="ignore").lower()) for f in sorted(research.glob("*")) if f.suffix in (".md", ".json")] if research.is_dir() else []
-    words = {"table": "table", "chart over time": "chart|trend|graph", "pictures": "photo|picture|image|gallery", "place": "map|address|location",
-             "pick a time": "booking|appointment|slot", "compare options": "compare|comparison", "answer with sources": "source|citation|cite",
-             "embed": "video|embed", "progress": "status|progress|tracking", "file": "invoice pdf|download|document"}
-    for f, t in texts:
-        for typ, pat in words.items():
-            n = len(re.findall(r"\b(" + pat + r")\b", t))
-            if n:
-                add(typ, min(3, n), f"the research mentions it {n} times", f"research: {f.name}")
-    if not texts:
+    files = sorted(f for f in research.glob("*") if f.suffix in (".md", ".json")) if research.is_dir() else []
+    known = {t for t, _, _ in ANSWER_TYPES}
+    weight = {"measured": 3, "reported": 2, "inferred": 1}
+    cited = 0
+    for f in files:  # findings that name answer types (research.py), each cited by its id
+        doc = _load_json(f) if f.suffix == ".json" else None
+        for fd in (doc or {}).get("findings") or [] if isinstance(doc, dict) else []:
+            for at in (fd.get("answer_types") or []) if isinstance(fd, dict) else []:
+                typ = at.get("type") if isinstance(at, dict) else None
+                if typ not in known:
+                    continue
+                cited += 1
+                add(typ, weight.get(fd.get("confidence"), 1), f"research {fd.get('id')}: {at.get('evidence') or fd.get('text', '')[:80]}",
+                    f"research: {f.name} {fd.get('id')}")
+    if files and not cited:  # a fallback only, and labelled as one, until the findings name answer types
+        words = {"table": "table", "chart over time": "chart|trend|graph", "pictures": "photo|picture|image|gallery", "place": "map|address|location",
+                 "pick a time": "booking|appointment|slot", "compare options": "compare|comparison", "answer with sources": "source|citation|cite",
+                 "embed": "video|embed", "progress": "status|progress|tracking", "file": "invoice pdf|download|document"}
+        for f in files:
+            t = f.read_text(errors="ignore").lower()
+            for typ, pat in words.items():
+                n = len(re.findall(r"\b(" + pat + r")\b", t))
+                if n:
+                    add(typ, 1, f"a keyword count, not a finding: the research mentions it {n} times", f"research: {f.name} (keywords)")
+        gaps.append("no research finding names an answer type, so the research counts only as keywords: add answer_types to the "
+                    "findings (research.md section 6) and run research check")
+    if not files:
         gaps.append("no research on this product's users or on what assistants in its industry show: run "
                     "`engine.py research plan --brief \"what answers do assistants for <this product> show, and which do people use\"`")
     for f in sorted(list(root.glob("web/*.html")) + list(root.glob("*.html")) + list(root.glob("src/**/*.tsx")))[:30]:
