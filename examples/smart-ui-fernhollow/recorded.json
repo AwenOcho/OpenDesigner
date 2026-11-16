@@ -165,7 +165,7 @@
             "text": "£70.00"
            },
            {
-            "text": "Paid £35.00 on 2026-08-25"
+            "text": "Paid £35.00 on 25 August 2026"
            }
           ]
          }
@@ -194,7 +194,7 @@
        "date_in_words": "Wednesday 19 August 2026",
        "location": "Larkspur Road, outside Fernhollow Primary School",
        "amount": "£70.00",
-       "status": "Paid £35.00 on 2026-08-25"
+       "status": "Paid £35.00 on 25 August 2026"
       }
      ],
      "unpaid": 1

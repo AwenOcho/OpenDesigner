@@ -4,12 +4,14 @@
 .odl-product-gallery *, .odl-product-gallery *::before, .odl-product-gallery *::after { box-sizing: border-box; }
 .odl-product-gallery .odl-wrap { --odl-tap: max(var(--ds-size-target-min), var(--ds-size-control-md)); display: grid; gap: var(--ds-space-stack-lg); }
 @container (max-width: 30rem) { .odl-product-gallery .odl-wrap { --odl-tap: var(--ds-size-target-touch); } }
-@container (min-width: 44rem) { .odl-product-gallery .odl-wrap { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: var(--ds-space-section-sm); align-items: start; } }
+@container (min-width: 36rem) { .odl-product-gallery .odl-wrap { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--ds-space-section-sm); align-items: start; } }
 /* Gallery: a scroll-snap track you can swipe, dots under the picture on a phone, thumbnails from tablet up. */
 .odl-product-gallery .odl-gallery { display: grid; gap: var(--ds-space-stack-md); min-inline-size: 0; }
 .odl-product-gallery .odl-stage { position: relative; display: grid; gap: var(--ds-space-stack-sm); min-inline-size: 0; }
 .odl-product-gallery .odl-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; border-radius: var(--ds-radius-container); background: var(--ds-color-surface-sunken); }
 .odl-product-gallery .odl-track::-webkit-scrollbar { display: none; }
+/* the last photo never meets the edge: the end space is a last spacer, never the scroller's padding (browsers drop it) */
+.odl-product-gallery .odl-track::after { content: ""; flex: 0 0 var(--ds-space-24); scroll-snap-align: end; }
 .odl-product-gallery .odl-slide { flex: 0 0 100%; margin: 0; aspect-ratio: 4 / 5; scroll-snap-align: start; }
 .odl-product-gallery .odl-slide img, .odl-product-gallery .odl-thumb img { display: block; inline-size: 100%; block-size: 100%; object-fit: cover; }
 .odl-product-gallery .odl-dots { display: flex; justify-content: center; }
@@ -33,7 +35,7 @@
 }
 /* Details */
 .odl-product-gallery .odl-info { display: grid; gap: var(--ds-space-stack-lg); align-content: start; min-inline-size: 0; }
-@container (min-width: 44rem) { .odl-product-gallery .odl-info { padding-block-start: var(--ds-space-stack-md); } }
+@container (min-width: 36rem) { .odl-product-gallery .odl-info { padding-block-start: var(--ds-space-stack-md); } }
 .odl-product-gallery .odl-head { display: grid; gap: var(--ds-space-stack-xs); }
 .odl-product-gallery .odl-eyebrow { margin: 0; color: var(--ds-color-text-secondary); font: var(--ds-text-label-md); }
 .odl-product-gallery h3 { margin: 0; font: var(--ds-text-title-lg); }
@@ -60,15 +62,17 @@
 .odl-product-gallery .odl-sizes { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--ds-space-inline-sm); }
 .odl-product-gallery .odl-sw, .odl-product-gallery .odl-size { position: relative; }
 .odl-product-gallery .odl-sw input, .odl-product-gallery .odl-size input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }
-.odl-product-gallery .odl-sw span { position: relative; display: block; inline-size: var(--odl-tap); block-size: var(--odl-tap); border-radius: var(--ds-radius-full);
+.odl-product-gallery .odl-sw span { position: relative; display: block; inline-size: var(--ds-size-target-touch); block-size: var(--ds-size-target-touch); border-radius: var(--ds-radius-full);
   border: var(--ds-border-width-emphasis) solid transparent; transition: border-color var(--ds-motion-duration-short) var(--ds-motion-easing-standard); }
 .odl-product-gallery .odl-sw span::before { content: ""; position: absolute; inset: var(--ds-space-4); border-radius: var(--ds-radius-full); background: var(--c);
-  box-shadow: inset 0 0 0 var(--ds-border-width-default) var(--ds-color-neutral-alpha-light-5); }
+  box-shadow: inset 0 0 0 var(--ds-border-width-default) var(--ds-color-border-strong); }
 .odl-product-gallery .odl-sw:hover span { border-color: var(--ds-color-border-default); }
 .odl-product-gallery .odl-sw input:checked + span { border-color: var(--ds-color-text-primary); }
 .odl-product-gallery .odl-sw.is-chalk, .odl-product-gallery .odl-sw[data-swatch="chalk"] { --c: var(--ds-color-neutral-light-1); } .odl-product-gallery .odl-sw.is-sand, .odl-product-gallery .odl-sw[data-swatch="sand"] { --c: var(--ds-color-warning-light-4); }
 .odl-product-gallery .odl-sw.is-ink, .odl-product-gallery .odl-sw[data-swatch="ink"] { --c: var(--ds-color-neutral-light-12); } .odl-product-gallery .odl-sw.is-moss, .odl-product-gallery .odl-sw[data-swatch="moss"] { --c: var(--ds-color-success-light-9); }
 .odl-product-gallery .odl-cname { display: none; }
+/* one photo: nothing to switch between, so no thumbnails and no dots */
+.odl-product-gallery.is-single .odl-thumbs, .odl-product-gallery.is-single .odl-dots { display: none; }
 /* Rendered from data: the script names the chosen colour here, paints each swatch and disables sold-out sizes; template items stay hidden. */
 .odl-product-gallery .odl-cname.is-live { display: inline; }
 .odl-product-gallery .odl-size[data-sold_out="true"], .odl-product-gallery .odl-size[data-sold_out="false"] { position: relative; }
@@ -81,13 +85,21 @@
 .odl-product-gallery .odl-size:hover span { border-color: var(--ds-color-border-strong); }
 .odl-product-gallery .odl-size input:checked + span { border-color: var(--ds-color-text-primary); box-shadow: inset 0 0 0 var(--ds-border-width-default) var(--ds-color-text-primary); }
 .odl-product-gallery .odl-size input:disabled { cursor: not-allowed; }
-.odl-product-gallery .odl-size input:disabled + span { background: var(--ds-color-surface-sunken); border-color: var(--ds-color-border-subtle); color: var(--ds-color-text-tertiary); text-decoration: line-through; }
-.odl-product-gallery .odl-low { margin: 0; color: var(--ds-color-text-secondary); font: var(--ds-text-label-md); }
+.odl-product-gallery .odl-size input:disabled + span { background: transparent; border-style: dashed; border-color: var(--ds-color-border-default); color: var(--ds-color-text-tertiary); text-decoration: line-through; }
+.odl-product-gallery .odl-low { display: inline-flex; align-items: center; gap: var(--ds-space-inline-xs); margin: 0; color: var(--ds-color-text-secondary); font: var(--ds-text-label-md); font-weight: var(--ds-font-weight-label); }
+/* stock is a status: its colour comes from what it says (sold out is never green) */
+.odl-product-gallery .odl-low::before { content: ""; flex: none; inline-size: var(--ds-space-6); block-size: var(--ds-space-6); border-radius: var(--ds-radius-full); background: currentColor; }
+.odl-product-gallery .odl-low[data-tone="neutral"] { color: var(--ds-color-text-secondary); }
+.odl-product-gallery .odl-low[data-tone="success"] { color: var(--ds-color-text-success); }
+.odl-product-gallery .odl-low[data-tone="warning"] { color: var(--ds-color-text-warning); }
+.odl-product-gallery .odl-low[data-tone="danger"] { color: var(--ds-color-text-danger); }
 .odl-product-gallery .odl-buy { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--ds-space-inline-sm); }
 .odl-product-gallery .odl-add, .odl-product-gallery .odl-fav { display: inline-flex; align-items: center; justify-content: center; gap: var(--ds-space-inline-md); min-block-size: max(var(--ds-size-control-lg), var(--ds-size-target-min));
   padding: 0 var(--ds-space-inset-lg); border: 0; border-radius: var(--ds-radius-control); font: var(--ds-text-label-lg); cursor: pointer;
   transition: background-color var(--ds-motion-duration-short) var(--ds-motion-easing-standard), transform var(--ds-motion-duration-micro) var(--ds-motion-easing-standard); }
 .odl-product-gallery .odl-add { background: var(--ds-color-bg-action-primary); color: var(--ds-color-text-on-action); }
+/* adding to the basket changes data: the main action is at least the touch target (44 px) */
+.odl-product-gallery .odl-add { min-block-size: max(var(--ds-size-control-md), var(--ds-size-target-touch)); }
 .odl-product-gallery .odl-add:hover { background: var(--ds-color-bg-action-primary-hover); }
 .odl-product-gallery .odl-add:active { background: var(--ds-color-bg-action-primary-pressed); transform: scale(var(--ds-motion-scale-press)); }
 .odl-product-gallery .odl-add svg, .odl-product-gallery .odl-fav svg { inline-size: var(--ds-size-icon-md); block-size: var(--ds-size-icon-md); stroke-width: var(--ds-icon-stroke-md); }
@@ -99,6 +111,9 @@
 .odl-product-gallery .odl-perks { display: grid; gap: var(--ds-space-stack-md); margin: 0; padding: var(--ds-space-stack-lg) 0 0; list-style: none; border-block-start: var(--ds-border-width-default) solid var(--ds-color-border-subtle); font: var(--ds-text-body-md); color: var(--ds-color-text-secondary); }
 .odl-product-gallery .odl-perks li { display: flex; align-items: center; gap: var(--ds-space-inline-md); }
 .odl-product-gallery .odl-perks svg { flex: none; inline-size: var(--ds-size-icon-md); block-size: var(--ds-size-icon-md); stroke-width: var(--ds-icon-stroke-md); color: var(--ds-color-icon-default); }
+/* each perk's icon follows what it is: delivery a truck, returns an arrow back, a warranty a shield */
+.odl-product-gallery .odl-perks li > svg { display: none; }
+.odl-product-gallery .odl-perks li[data-icon="truck"] > .is-truck, .odl-product-gallery .odl-perks li[data-icon="undo"] > .is-undo, .odl-product-gallery .odl-perks li[data-icon="shield"] > .is-shield { display: block; }
 .odl-product-gallery .odl-perks b { color: var(--ds-color-text-primary); font-weight: var(--ds-font-weight-label); }
 .odl-product-gallery button:focus-visible, .odl-product-gallery .odl-sw:has(input:focus-visible) span, .odl-product-gallery .odl-size:has(input:focus-visible) span, .odl-product-gallery .odl-track:focus-visible {
   outline: var(--ds-focus-ring-width) solid var(--ds-color-border-focus); outline-offset: var(--ds-focus-ring-offset); }
@@ -163,7 +178,7 @@
           <label class="odl-size" data-od-item><input type="radio" name="odl-product-gallery-size" value="XL" disabled aria-label="XL, sold out"><span>XL</span></label>
           <label class="odl-size" data-od-item><input type="radio" name="odl-product-gallery-size" value="XXL"><span>XXL</span></label>
         </div>
-        <p class="odl-low" data-od-slot="stock" data-od-optional>Only 3 left in M</p>
+        <p class="odl-low" data-od-slot="stock" data-od-var="tone" data-tone="warning" data-od-optional>Only 3 left in M</p>
       </fieldset>
       <div class="odl-buy">
         <button type="button" class="odl-add" data-od-action="add" data-od-effect="change"><svg class="is-bag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><svg class="is-done" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span class="odl-add-label" data-od-slot="label">Add to bag</span></button>
@@ -171,9 +186,9 @@
       </div>
       <p class="odl-sr" aria-live="polite"></p>
       <ul class="odl-perks" data-od-list="perks">
-        <li data-od-item data-od-template hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg><span><b data-od-slot="title"></b> <span data-od-slot="detail" data-od-optional></span></span></li>
-        <li data-od-item><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg><span><b>Free delivery</b> by Thursday, 5 Nov</span></li>
-        <li data-od-item><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"/></svg><span><b>Free returns</b> for 30 days</span></li>
+        <li data-od-item data-od-template hidden data-od-var="icon" data-icon="truck"><svg class="is-truck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg><svg class="is-undo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"/></svg><svg class="is-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg><span><b data-od-slot="title"></b> <span data-od-slot="detail" data-od-optional></span></span></li>
+        <li data-od-item data-icon="truck"><svg class="is-truck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg><span><b>Free delivery</b> by Thursday, 5 Nov</span></li>
+        <li data-od-item data-icon="undo"><svg class="is-undo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"/></svg><span><b>Free returns</b> for 30 days</span></li>
       </ul>
     </div>
   </div>
@@ -193,6 +208,10 @@ document.querySelectorAll(".odl-product-gallery").forEach((root) => {
     thumbBox.replaceChildren(...slides.map((f, i) => { const t = t0.cloneNode(true), l = f.querySelector('[data-od-slot="label"]')?.textContent.trim(), im = f.querySelector("img");
       t.setAttribute("aria-label", `Show ${l || "photo " + (i + 1)}`); t.setAttribute("aria-current", String(!i)); if (im) t.querySelector("img").src = im.src; else t.querySelector("img").remove(); return t; }));
   }
+  root.classList.toggle("is-single", slides.length < 2);
+  // each copy's radios form their own groups: several galleries on one page each keep their own choice
+  const uid = Math.random().toString(36).slice(2, 8);
+  root.querySelectorAll('input[type="radio"][name^="odl-product-gallery-"]').forEach((i) => { i.name = `${i.name}-${uid}`; });
   const cur = root.querySelector('[data-od-slot="currency"]')?.textContent.trim();
   if (cur) root.querySelectorAll('[data-od-slot="price"], [data-od-slot="was_price"]').forEach((el) => {
     const n = Number(el.textContent.replace(/[^\d.]/g, ""));

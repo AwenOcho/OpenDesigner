@@ -38,7 +38,29 @@ function duplicateRows(v, path, errs, sid) {
   });
 }
 
-const TONE_GOOD = /^(?:paid|done|complete|completed|approved|passed|pass|ok|active|on time|delivered|available|eligible|yes|confirmed|sent|saved|fixed|resolved|in stock)\b/i, TONE_BAD = /^(?:unpaid|overdue|failed|fail|broken|error|declined|refused|cancelled|canceled|rejected|missing|not eligible|no|expired|out of stock|blocked|still needed)\b/i;
+const TONE_GOOD = /^(?:paid|done|complete|completed|approved|passed|pass|ok|active|on time|delivered|available|eligible|yes|confirmed|sent|saved|fixed|resolved|in stock)\b/i, TONE_BAD = /^(?:unpaid|overdue|failed|fail|broken|error|declined|refused|cancelled|canceled|rejected|missing|not eligible|no|expired|out of stock|blocked|still needed|sold out|fully booked|booked out|non-refundable|unavailable)\b/i;
+// R6-stock: stock or availability that is gone or nearly gone is never success (the same list as smartui.py STOCK_LOW)
+const STOCK_LOW = /\b(?:sold out|out of stock|fully booked|booked out|no (?:seats|rooms|tables|tickets|spaces?) left|unavailable|waiting list|waitlist|only \d+ left|\d+ left|last \d+|few left|almost (?:full|gone)|selling fast|low stock)\b/i;
+// R6-currency: a price shows its currency (smartui.py MONEY_KEY, CURRENCY, CURRENCY_WORD)
+const MONEY_KEY = /^(?!.*_(?:note|label|unit|text|band|tone|count)$)(?:price|prices|cost|fee|fees|total|amount|subtotal|deposit|fare|rent|(?:[a-z]+_)+(?:price|cost|fee|total|amount|fare|rent)|price_[a-z_]+)$/;
+const CURRENCY = /[£$€¥₹₩₺₽¢₫₱₦₪]|(?:^|[^A-Za-z])[A-Z]{3}(?![A-Za-z])/, CURRENCY_WORD = /\b(?:free|included|no charge)\b|(?:^|[^A-Za-z])(?:kr|zł)(?![A-Za-z])/i;
+
+/** R5-alt: every picture says what it shows. R5-ratio: every picture gives its shape, so its box is drawn before it loads. */
+function mediaRules(v, path, errs, sid) {
+  if (!(typeof v.alt === "string" && v.alt.trim())) err(errs, "R5-alt", `${path}/alt`, "a picture needs alt text that says what it shows", sid, "use the alt text from the data; no alt in the data: leave the picture out");
+  if (!(typeof v.ratio === "string" || (Number.isInteger(v.width) && Number.isInteger(v.height)))) err(errs, "R5-ratio", path, "a picture needs its shape: ratio, or width and height", sid, "copy width and height (or ratio) from the data");
+}
+
+/** R6-currency: a price shows its currency (a sign or a code), never a bare number. */
+function moneyRules(v, path, errs, sid, partial) {
+  if (path.endsWith("/context")) return;  // an event's context is for the app, never shown
+  const cur = typeof v.currency === "string" && v.currency.trim();
+  for (const [k, x] of Object.entries(v)) {
+    if (!MONEY_KEY.test(k) || k === "currency" || cur) continue;
+    if (typeof x === "string" && /\d/.test(x) && !CURRENCY.test(x) && !CURRENCY_WORD.test(x)) err(errs, "R6-currency", `${path}/${k}`, `'${x}' is a price without its currency`, sid, "write the price as the data gives it, with its sign or code (£35.00)");
+    else if (typeof x === "number" && !partial) err(errs, "R6-currency", `${path}/${k}`, `${x} is a price without its currency`, sid, "write the price as text with its sign or code (£35.00)");
+  }
+}
 
 /** Colours follow meaning: a good value is never danger, a bad one never success. The data decides the tone. */
 function tonesFromData(comp, path, errs, sid, status) {
@@ -49,10 +71,12 @@ function tonesFromData(comp, path, errs, sid, status) {
     if (Array.isArray(v)) v.forEach((x, i) => walk(x, `${p}/${i}`));
     else if (isObj(v)) {
       if (v.tone === "success" || v.tone === "danger") {
-        const k = ["value", "status", "text", "label"].find((k) => typeof v[k] === "string");
+        const k = ["value", "status", "stock", "availability", "text", "label"].find((k) => typeof v[k] === "string");
         const said = k ? v[k].trim() : "", low = said.toLowerCase();
         const good = TONE_GOOD.test(said) || has(low, words[0]), bad = TONE_BAD.test(said) || has(low, words[1]);
-        if ((v.tone === "success" && bad && !good) || (v.tone === "danger" && good && !bad))
+        if (v.tone === "success" && STOCK_LOW.test(said))
+          err(errs, "R6-stock", `${p}/tone`, `'${said}' is shown as success`, sid, "stock that is gone or nearly gone is never success: danger or neutral when gone, warning when few are left");
+        else if ((v.tone === "success" && bad && !good) || (v.tone === "danger" && good && !bad))
           err(errs, "R6-tone", `${p}/tone`, `'${said}' is shown as ${v.tone}`, sid, "let the data set the tone: danger for a bad value, success for a good one, neutral when unsure");
       }
       for (const [k, x] of Object.entries(v)) walk(x, `${p}/${k}`);
@@ -227,6 +251,8 @@ function checkValue(v, schema, path, errs, sid, cat, opts, ctx) {
     }
     if (!opts.partial) for (const r of schema.required || []) if (!(r in v)) err(errs, "required", `${path}/${r}`, `${r} is required`, sid);
     tableHeaders(v, path, errs, sid);
+    if (schema["x-od-media"]) mediaRules(v, path, errs, sid);
+    moneyRules(v, path, errs, sid, opts.partial);
     if (schema["x-od-effect"] === "change" && isObj(v.event) && isObj(v.event.context) && "approved" in v.event.context)
       err(errs, "R3-approval", `${path}/event/context/approved`, "an action that changes data is approved by the person, never in the answer", sid, "remove approved");
     return out;

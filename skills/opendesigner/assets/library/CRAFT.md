@@ -60,6 +60,19 @@ become one scrolling row or a full-width stack. Long labels wrap whole or trunca
 - The thing a person came for is the largest and first; secondary actions are quieter (text or secondary buttons).
 - A part fills its width cap (`max-inline-size`) and is centred at desktop; it never sits as a narrow strip on the left.
 
+## 6b. Pictures, rows and scrollers (owner, 2026-11-16)
+- **Stretching.** A map, photo or sketch may stretch to fill only beside words, in the part's own columns. Alone in one
+  column it keeps a fixed shape (16:9 for a map, the photo's own ratio for a photo) and is never shorter than 160 px
+  (`min-block-size: 10rem`). A text card (facts, options, checks) never stretches: it keeps its natural height in a taller
+  row (`<od-surface>` sets `align-self: start`).
+- **Scroll ends.** When a part scrolls (a row of cards, a photo strip, a gallery, a wide table), the space after the last
+  item comes from a last spacer (`::after` with `flex: 0 0 var(--ds-space-24)`, or a spacer column), never from the
+  scroller's padding, which browsers drop. The last item never touches the edge.
+- **Balanced rows.** A grid picks its columns from the space and the number of items, so no item sits alone on a row
+  unless only one column fits (4 go 4 or 2 x 2, never 3 + 1).
+- **Nested corners.** A photo flush with a bordered card rounds only the corners it shares with the card, at the card's
+  radius minus its border; a photo inset by padding takes the outer radius minus the padding (`--ds-radius-nested`).
+
 ## 7. Our own shapes and words
 A part may follow a common pattern (a progress bar, a week strip, a product card), never one product's signature. Don't
 copy a component people recognise as a brand's, or its wording: `activity-rings` drew Apple's three nested Move, Exercise

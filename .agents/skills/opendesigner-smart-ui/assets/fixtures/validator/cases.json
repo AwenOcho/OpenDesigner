@@ -394,7 +394,8 @@
           "title": "Harbour room",
           "photo": {
            "src": "https://evil.example/p.png?d=secret",
-           "alt": "Room"
+           "alt": "Room",
+           "ratio": "3:2"
           },
           "book": {
            "label": "Book",
@@ -431,7 +432,8 @@
           "title": "Harbour room",
           "photo": {
            "src": "http://images.unsplash.com/photo-1",
-           "alt": "Room"
+           "alt": "Room",
+           "ratio": "3:2"
           },
           "book": {
            "label": "Book",
@@ -468,7 +470,8 @@
           "title": "Harbour room",
           "photo": {
            "src": "https://img.cdn.example/a.jpg",
-           "alt": "Room"
+           "alt": "Room",
+           "ratio": "3:2"
           },
           "book": {
            "label": "Book",
@@ -503,7 +506,8 @@
           "title": "Harbour room",
           "photo": {
            "src": "https://images.unsplash.com/photo-1",
-           "alt": ""
+           "alt": "",
+           "ratio": "3:2"
           },
           "book": {
            "label": "Book",
@@ -520,7 +524,7 @@
    ],
    "opts": {},
    "expect": [
-    "empty@/0/createSurface/components/0/items/0/photo/alt"
+    "R5-alt@/0/createSurface/components/0/items/0/photo/alt"
    ]
   },
   {
@@ -1377,7 +1381,8 @@
            "event": {
             "name": "book_room"
            }
-          }
+          },
+          "currency": "GBP"
          }
         ]
        }
@@ -1420,7 +1425,8 @@
            "event": {
             "name": "book_room"
            }
-          }
+          },
+          "currency": "GBP"
          }
         ]
        }
@@ -2455,6 +2461,780 @@
    "expect": [
     "R6-tone@/0/createSurface/components/0/facts/0/tone"
    ]
+  },
+  {
+   "name": "picture-ok",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Shelf",
+        "items": [
+         {
+          "name": "Wool coat",
+          "photo": {
+           "src": "https://images.unsplash.com/photo-1",
+           "alt": "Pink wool coat on a hanger",
+           "width": 683,
+           "height": 1024
+          },
+          "price": "£149",
+          "old_price": "£199",
+          "status": "In stock",
+          "tone": "success"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": []
+  },
+  {
+   "name": "picture-ratio-ok",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Shelf",
+        "items": [
+         {
+          "name": "Wool coat",
+          "photo": {
+           "src": "https://images.unsplash.com/photo-1",
+           "alt": "Coat",
+           "ratio": "4:5",
+           "credit": "Photo: A. Person, CC BY 2.0"
+          },
+          "price": "EUR 120"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": []
+  },
+  {
+   "name": "picture-no-alt",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Shelf",
+        "items": [
+         {
+          "name": "Wool coat",
+          "photo": {
+           "src": "https://images.unsplash.com/photo-1",
+           "width": 683,
+           "height": 1024
+          },
+          "price": "£149"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": [
+    "R5-alt@/0/createSurface/components/0/items/0/photo/alt"
+   ]
+  },
+  {
+   "name": "picture-blank-alt",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Shelf",
+        "items": [
+         {
+          "name": "Wool coat",
+          "photo": {
+           "src": "https://images.unsplash.com/photo-1",
+           "alt": "  ",
+           "ratio": "3:4"
+          },
+          "price": "£149"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": [
+    "R5-alt@/0/createSurface/components/0/items/0/photo/alt"
+   ]
+  },
+  {
+   "name": "picture-no-shape",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Shelf",
+        "items": [
+         {
+          "name": "Wool coat",
+          "photo": {
+           "src": "https://images.unsplash.com/photo-1",
+           "alt": "Coat"
+          },
+          "price": "£149"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": [
+    "R5-ratio@/0/createSurface/components/0/items/0/photo"
+   ]
+  },
+  {
+   "name": "picture-half-shape",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Shelf",
+        "items": [
+         {
+          "name": "Wool coat",
+          "photo": {
+           "src": "https://images.unsplash.com/photo-1",
+           "alt": "Coat",
+           "width": 683
+          },
+          "price": "£149"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": [
+    "R5-ratio@/0/createSurface/components/0/items/0/photo"
+   ]
+  },
+  {
+   "name": "picture-bad-ratio",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Shelf",
+        "items": [
+         {
+          "name": "Wool coat",
+          "photo": {
+           "src": "https://images.unsplash.com/photo-1",
+           "alt": "Coat",
+           "ratio": "wide"
+          },
+          "price": "£149"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": [
+    "pattern@/0/createSurface/components/0/items/0/photo/ratio"
+   ]
+  },
+  {
+   "name": "price-no-currency",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Shelf",
+        "items": [
+         {
+          "name": "Wool coat",
+          "photo": {
+           "src": "https://images.unsplash.com/photo-1",
+           "alt": "Pink wool coat on a hanger",
+           "width": 683,
+           "height": 1024
+          },
+          "price": "149.00"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": [
+    "R6-currency@/0/createSurface/components/0/items/0/price"
+   ]
+  },
+  {
+   "name": "old-price-no-currency",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Shelf",
+        "items": [
+         {
+          "name": "Wool coat",
+          "photo": {
+           "src": "https://images.unsplash.com/photo-1",
+           "alt": "Pink wool coat on a hanger",
+           "width": 683,
+           "height": 1024
+          },
+          "price": "£149",
+          "old_price": "199"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": [
+    "R6-currency@/0/createSurface/components/0/items/0/old_price"
+   ]
+  },
+  {
+   "name": "price-number-no-currency",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Shelf",
+        "items": [
+         {
+          "name": "Wool coat",
+          "photo": {
+           "src": "https://images.unsplash.com/photo-1",
+           "alt": "Pink wool coat on a hanger",
+           "width": 683,
+           "height": 1024
+          },
+          "price": 149
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": [
+    "R6-currency@/0/createSurface/components/0/items/0/price"
+   ]
+  },
+  {
+   "name": "price-number-with-currency",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Shelf",
+        "items": [
+         {
+          "name": "Wool coat",
+          "photo": {
+           "src": "https://images.unsplash.com/photo-1",
+           "alt": "Pink wool coat on a hanger",
+           "width": 683,
+           "height": 1024
+          },
+          "price": 149,
+          "currency": "GBP"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": []
+  },
+  {
+   "name": "price-band-ok",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Shelf",
+        "items": [
+         {
+          "name": "Wool coat",
+          "photo": {
+           "src": "https://images.unsplash.com/photo-1",
+           "alt": "Pink wool coat on a hanger",
+           "width": 683,
+           "height": 1024
+          },
+          "price": "€€"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": []
+  },
+  {
+   "name": "price-free-ok",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Shelf",
+        "items": [
+         {
+          "name": "Wool coat",
+          "photo": {
+           "src": "https://images.unsplash.com/photo-1",
+           "alt": "Pink wool coat on a hanger",
+           "width": 683,
+           "height": 1024
+          },
+          "price": "Free"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": []
+  },
+  {
+   "name": "sold-out-as-success",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Shelf",
+        "items": [
+         {
+          "name": "Wool coat",
+          "photo": {
+           "src": "https://images.unsplash.com/photo-1",
+           "alt": "Pink wool coat on a hanger",
+           "width": 683,
+           "height": 1024
+          },
+          "price": "£149",
+          "status": "Sold out",
+          "tone": "success"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": [
+    "R6-stock@/0/createSurface/components/0/items/0/tone"
+   ]
+  },
+  {
+   "name": "few-left-as-success",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Shelf",
+        "items": [
+         {
+          "name": "Wool coat",
+          "photo": {
+           "src": "https://images.unsplash.com/photo-1",
+           "alt": "Pink wool coat on a hanger",
+           "width": 683,
+           "height": 1024
+          },
+          "price": "£149",
+          "status": "Only 2 left",
+          "tone": "success"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": [
+    "R6-stock@/0/createSurface/components/0/items/0/tone"
+   ]
+  },
+  {
+   "name": "fully-booked-as-success",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Shelf",
+        "items": [
+         {
+          "name": "Wool coat",
+          "photo": {
+           "src": "https://images.unsplash.com/photo-1",
+           "alt": "Pink wool coat on a hanger",
+           "width": 683,
+           "height": 1024
+          },
+          "price": "£149",
+          "status": "Fully booked",
+          "tone": "success"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": [
+    "R6-stock@/0/createSurface/components/0/items/0/tone"
+   ]
+  },
+  {
+   "name": "few-left-as-warning",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Shelf",
+        "items": [
+         {
+          "name": "Wool coat",
+          "photo": {
+           "src": "https://images.unsplash.com/photo-1",
+           "alt": "Pink wool coat on a hanger",
+           "width": 683,
+           "height": 1024
+          },
+          "price": "£149",
+          "status": "Only 2 left",
+          "tone": "warning"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": []
+  },
+  {
+   "name": "sold-out-as-danger",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Shelf",
+        "items": [
+         {
+          "name": "Wool coat",
+          "photo": {
+           "src": "https://images.unsplash.com/photo-1",
+           "alt": "Pink wool coat on a hanger",
+           "width": 683,
+           "height": 1024
+          },
+          "price": "£149",
+          "status": "Sold out",
+          "tone": "danger"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": []
+  },
+  {
+   "name": "in-stock-as-danger",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Shelf",
+        "items": [
+         {
+          "name": "Wool coat",
+          "photo": {
+           "src": "https://images.unsplash.com/photo-1",
+           "alt": "Pink wool coat on a hanger",
+           "width": 683,
+           "height": 1024
+          },
+          "price": "£149",
+          "status": "In stock",
+          "tone": "danger"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": [
+    "R6-tone@/0/createSurface/components/0/items/0/tone"
+   ]
+  },
+  {
+   "name": "stock-key-sold-out-as-success",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Shelf",
+        "items": [
+         {
+          "name": "Wool coat",
+          "photo": {
+           "src": "https://images.unsplash.com/photo-1",
+           "alt": "Coat",
+           "ratio": "4:5"
+          },
+          "price": "£149",
+          "stock": "Sold out",
+          "tone": "success"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": [
+    "R6-stock@/0/createSurface/components/0/items/0/tone"
+   ]
+  },
+  {
+   "name": "stock-key-in-stock-as-success",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Shelf",
+        "items": [
+         {
+          "name": "Wool coat",
+          "photo": {
+           "src": "https://images.unsplash.com/photo-1",
+           "alt": "Coat",
+           "ratio": "4:5"
+          },
+          "price": "£149",
+          "stock": "In stock",
+          "tone": "success"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": []
+  },
+  {
+   "name": "price-with-code-ok",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Shelf",
+        "items": [
+         {
+          "name": "Wool coat",
+          "photo": {
+           "src": "https://images.unsplash.com/photo-1",
+           "alt": "Coat",
+           "ratio": "4:5"
+          },
+          "price": "GBP 149.00",
+          "old_price": "CHF 120"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": []
+  },
+  {
+   "name": "price-in-words-ok",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Shelf",
+        "items": [
+         {
+          "name": "Wool coat",
+          "photo": {
+           "src": "https://images.unsplash.com/photo-1",
+           "alt": "Coat",
+           "ratio": "4:5"
+          },
+          "price": "Included"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": []
   }
  ]
 }

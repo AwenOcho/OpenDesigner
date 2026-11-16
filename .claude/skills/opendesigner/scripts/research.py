@@ -146,7 +146,8 @@ SIGNALS = {
 # Answer types: what a finding says an assistant for this product should show (Smart UI's use cases read them; the names
 # are the ones opendesigner-smart-ui/scripts/smartui.py ANSWER_TYPES uses, and test_research.py keeps the two lists equal).
 ANSWER_TYPES = ("table", "chart over time", "share of a whole", "headline numbers", "record details", "progress", "compare options",
-                "results to pick from", "pick a time", "pictures", "place", "file", "answer with sources", "form",
+                "results to pick from", "pick a time", "pictures", "product grid", "product details", "places", "stay",
+                "recipe", "event", "home listing", "place", "file", "answer with sources", "form",
                 "ask before a change", "what happened", "embed")
 SINGLE = {"Q-aud-01", "Q-aud-02", "Q-aud-03"}
 PERSON_OWN = ("chosen", "confirmed_default", "reference", "asset", "research")  # a value someone said yes to; research never overwrites it

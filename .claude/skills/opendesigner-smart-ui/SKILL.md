@@ -38,10 +38,11 @@ Follow `references/flow.md`. In short:
 - **R4** Nothing off-system: no colours, sizes, styles, classes, handlers, HTML or outside URLs. Unknown parts and properties are refused, not dropped.
 - **R5** Accessibility floors: WCAG 2.2 AA contrast, 24 px targets (44 px for main actions), visible focus, one polite live region, reduced motion, and every control named differently.
 - **R6** Honest data. A number shown must be in the data the model was given (`validate --source`). Missing stays missing.
+- **Pictures** come only from the host's data, with alt text and a shape (`R5-alt`, `R5-ratio`); a price shows its currency (`R6-currency`); sold out or nearly gone is never green (`R6-stock`).
 - **R7** In Claude or ChatGPT, the host's look applies only if the person opts in. In their own product, their tokens win.
 
 ## The parts
-`references/components.md`: 26 parts in six jobs (answer, data, choose, act, confirm, media), the system's toast for feedback after a change, and parts made for one kind of product (flights). Each is a library component with slot marks; `smartui.py catalog` lists only the ones that are marked. Add a part to the library first (the library's own rules), then to `assets/set.json`.
+`references/components.md`: 34 parts in seven jobs (answer, data, choose, act, confirm, media, pictures), the system's toast for feedback after a change, and parts made for one kind of product (flights). Each is a library component with slot marks; `smartui.py catalog` lists only the ones that are marked. Add a part to the library first (the library's own rules), then to `assets/set.json`.
 
 ## Commands
 ```

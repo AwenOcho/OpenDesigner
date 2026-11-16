@@ -19,6 +19,14 @@ import { validate, toText, od } from "./od-validate.js";
 const G = typeof window !== "undefined" ? window : globalThis;
 const REG = () => ((G.ODSmartUI = G.ODSmartUI || {}).components = G.ODSmartUI.components || {});
 let uid = 0;
+// Lucide image-off (lucide.dev, ISC licence): the fallback tile's icon
+const IMAGE_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="2" x2="22" y1="2" y2="22"/><path d="M10.41 10.41a2 2 0 1 1-2.83-2.83"/><line x1="13.5" x2="6" y1="13.5" y2="21"/><line x1="18" x2="21" y1="12" y2="15"/><path d="M3.59 3.59A1.99 1.99 0 0 0 3 5v14a2 2 0 0 0 2 2h14c.55 0 1.052-.22 1.41-.59"/><path d="M21 15V5a2 2 0 0 0-2-2H9"/></svg>';
+/** The picture's shape as a CSS aspect-ratio, from width and height or a ratio ("4:5"). */
+function ratioOf(v) {
+  if (Number.isInteger(v.width) && Number.isInteger(v.height) && v.width > 0 && v.height > 0) return `${v.width} / ${v.height}`;
+  const m = typeof v.ratio === "string" && /^([\d.]+)[:/]([\d.]+)$/.exec(v.ratio);
+  return m ? `${m[1]} / ${m[2]}` : "";
+}
 const SCOPE = "[data-od-item],[data-od-action],[data-od-list]";
 
 /** The one polite live region on the page that announces new surfaces (R5). */
@@ -264,10 +272,8 @@ export class ODSurface extends (G.HTMLElement || class {}) {
     }
     for (const el of marked(scope, "[data-od-media]")) {
       const v = data[el.dataset.odMedia];
-      if (!v || missing(v.src)) { this.missingImage(el, v && v.alt, partial); continue; }
-      el.alt = v.alt || "";
-      el.addEventListener("error", () => this.missingImage(el, v.alt, false), { once: true });
-      el.src = v.src; // the validator allowed this host (R4)
+      if (!v || missing(v.src)) { this.missingImage(el, v && v.alt, partial, v); continue; }
+      this.loadImage(el, v);
     }
     for (const el of marked(scope, "[data-od-measure]")) {
       const name = el.dataset.odMeasure, v = data[name], p = props[name] || {};
@@ -309,6 +315,8 @@ export class ODSurface extends (G.HTMLElement || class {}) {
         }
         continue;
       }
+      // an optional list with nothing in it goes (no colours, no sizes); a list the part needs says there is nothing to show
+      if (!items.length && el.closest("[data-od-optional]") && scope.contains(el.closest("[data-od-optional]"))) { el.closest("[data-od-optional]").remove(); continue; }
       if (!items.length) { el.append(this.emptyItem(tpl)); continue; }
       items.forEach((it, i) => {
         const n = tpl.cloneNode(true);
@@ -346,13 +354,42 @@ export class ODSurface extends (G.HTMLElement || class {}) {
     if (el.tagName === "A") el.addEventListener("keydown", (ev) => { if (ev.key === "Enter" || ev.key === " ") go(ev); });
   }
 
-  missingImage(el, alt, partial) {
+  /** A picture from the data: its box takes the data's shape before it loads (a part's own CSS shape wins), a quiet
+   *  skeleton while it loads, a short fade when it arrives (none with reduced motion), and a calm tile if it fails. */
+  loadImage(el, v) {
+    el.alt = v.alt || "";
+    const r = ratioOf(v);
+    if (r) el.style.setProperty("--od-img-ratio", r);
+    if (v.credit) el.title = v.credit;
+    el.setAttribute("data-od-img", "loading");
+    el.addEventListener("load", () => el.setAttribute("data-od-img", "ready"), { once: true });
+    el.addEventListener("error", () => this.missingImage(el, v.alt, false, v), { once: true });
+    el.src = v.src; // the validator allowed this host (R4)
+    if (el.complete && el.naturalWidth) el.setAttribute("data-od-img", "ready");
+  }
+
+  missingImage(el, alt, partial, v) {
     const d = document.createElement("div");
     d.className = el.className + " od-missing-image";
     d.setAttribute("role", "img");
     d.setAttribute("aria-label", alt || "Image not available");
+    const r = ratioOf(v || {}) || el.style.getPropertyValue("--od-img-ratio");
+    if (r) d.style.setProperty("--od-img-ratio", r);
     if (partial) d.setAttribute("data-od-pending", "");
-    else d.textContent = alt || "Image not available";
+    else if (!v || missing(v.src)) {
+      // no picture in the data: an optional wrapper around it goes; a required one shows the tile
+      d.setAttribute("data-od-media", el.dataset.odMedia || "");
+      d.setAttribute("data-od-missing", "");
+      d.innerHTML = IMAGE_OFF;
+      const t = document.createElement("span");
+      t.textContent = alt || "Image not available";
+      d.append(t);
+    } else {
+      d.innerHTML = IMAGE_OFF; // a fixed Lucide icon, never model text
+      const t = document.createElement("span");
+      t.textContent = alt || "Image not available";
+      d.append(t);
+    }
     el.replaceWith(d);
   }
 

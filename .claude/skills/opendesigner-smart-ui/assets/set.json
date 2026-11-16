@@ -8,7 +8,8 @@
     "act": "Collect input or ask before acting",
     "confirm": "Say what happened",
     "media": "Show a picture, a place, a file or code",
-    "domain": "Parts made for one kind of product; offered only when the scope step picks them"
+    "domain": "Parts made for one kind of product; offered only when the scope step picks them",
+    "pictures": "Answer with photos: products, places, stays, dishes, events, homes"
   },
   "components": [
     {
@@ -378,6 +379,133 @@
         "how do i run",
         "example request",
         "curl"
+      ]
+    },
+    {
+      "slug": "product-grid",
+      "as": "ProductGrid",
+      "group": "pictures",
+      "intents": [
+        "coats",
+        "jackets",
+        "shoes",
+        "dresses",
+        "find me a",
+        "show me some",
+        "shop for",
+        "products under",
+        "in my size",
+        "what do you have in",
+        "gift ideas",
+        "under £",
+        "under $"
+      ]
+    },
+    {
+      "slug": "place-list",
+      "as": "PlaceList",
+      "group": "pictures",
+      "intents": [
+        "places near",
+        "somewhere to",
+        "a quiet café",
+        "where can i eat",
+        "restaurants near",
+        "cafés near",
+        "bars near",
+        "where should we go",
+        "places to visit",
+        "near me",
+        "things to do",
+        "recommend a place"
+      ]
+    },
+    {
+      "slug": "place-card",
+      "as": "PlaceCard",
+      "group": "pictures",
+      "intents": [
+        "tell me about this place",
+        "the best place for",
+        "one place for",
+        "where should i take",
+        "more about the café",
+        "what is it like"
+      ]
+    },
+    {
+      "slug": "product-gallery",
+      "as": "ProductDetail",
+      "group": "pictures",
+      "intents": [
+        "tell me about this coat",
+        "more about the",
+        "show me the",
+        "what sizes",
+        "is it in stock",
+        "what colours",
+        "product details",
+        "more photos of"
+      ]
+    },
+    {
+      "slug": "stay-card",
+      "as": "StayCard",
+      "group": "pictures",
+      "intents": [
+        "a room for",
+        "somewhere to stay",
+        "hotel in",
+        "flat for",
+        "a place to stay",
+        "rooms with",
+        "per night",
+        "free cancellation",
+        "holiday rental"
+      ]
+    },
+    {
+      "slug": "recipe-card",
+      "as": "RecipeCard",
+      "group": "pictures",
+      "intents": [
+        "recipe",
+        "how do i make",
+        "how to cook",
+        "what can i cook",
+        "dinner idea",
+        "something to cook",
+        "what should i make with"
+      ]
+    },
+    {
+      "slug": "event-card",
+      "as": "EventCard",
+      "group": "pictures",
+      "intents": [
+        "what's on",
+        "whats on",
+        "tickets for",
+        "gig",
+        "concert",
+        "event on",
+        "is there anything on",
+        "show tonight"
+      ]
+    },
+    {
+      "slug": "home-listing",
+      "as": "HomeListing",
+      "group": "pictures",
+      "intents": [
+        "house for sale",
+        "flat to rent",
+        "homes in",
+        "a home with",
+        "bedroom house",
+        "bedroom flat",
+        "book a viewing",
+        "property"
       ]
     },
     {

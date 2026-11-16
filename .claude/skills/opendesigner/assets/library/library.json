@@ -1,7 +1,7 @@
 {
  "format": "opendesigner.library/1",
  "version": "0.3.1",
- "count": 123,
+ "count": 129,
  "vocab": {
   "types": [
    "data",
@@ -8359,7 +8359,7 @@
   {
    "id": "comparison",
    "name": "Comparison",
-   "purpose": "Two to four options side by side: each with its name, price and a Choose button, then one row per attribute so the differences line up.",
+   "purpose": "Two to four options side by side: each with its name, price and a Choose button, then one row per attribute so the differences line up. Products can carry a photo each.",
    "use_when": [
     "when someone is choosing between a few fares, plans or memberships and wants the differences in one view",
     "two to four options of the same kind that differ on a few named attributes, such as fare types or plan tiers"
@@ -8410,6 +8410,12 @@
      "slot": "list"
     },
     {
+     "name": "photo",
+     "selector": ".odl-thumb .odl-img",
+     "what": "an optional photo above each option, for products compared by how they look",
+     "slot": "media"
+    },
+    {
      "name": "name",
      "selector": ".odl-name",
      "what": "the option's name",
@@ -8431,6 +8437,12 @@
      "name": "price_note",
      "selector": ".odl-per",
      "what": "what the price covers, such as 'per person'",
+     "slot": "text"
+    },
+    {
+     "name": "status",
+     "selector": ".odl-status",
+     "what": "stock or availability as a status, the same place in every column",
      "slot": "text"
     },
     {
@@ -8530,6 +8542,58 @@
           "label",
           "event"
          ]
+        },
+        "photo": {
+         "type": "object",
+         "part": "photo",
+         "required": [
+          "src",
+          "alt"
+         ],
+         "properties": {
+          "src": {
+           "type": "string",
+           "maxLength": 2048
+          },
+          "alt": {
+           "type": "string",
+           "maxLength": 200
+          },
+          "width": {
+           "type": "integer"
+          },
+          "height": {
+           "type": "integer"
+          },
+          "ratio": {
+           "type": "string",
+           "maxLength": 12
+          },
+          "credit": {
+           "type": "string",
+           "maxLength": 120
+          }
+         }
+        },
+        "old_price": {
+         "type": "string",
+         "maxLength": 16,
+         "part": "price"
+        },
+        "status": {
+         "type": "string",
+         "maxLength": 28,
+         "part": "status"
+        },
+        "tone": {
+         "type": "string",
+         "enum": [
+          "neutral",
+          "success",
+          "warning",
+          "danger"
+         ],
+         "part": "status"
         }
        }
       }
@@ -8592,7 +8656,8 @@
      "hover",
      "focus",
      "disabled",
-     "scrolls sideways on a phone"
+     "scrolls sideways on a phone",
+     "with photos"
     ],
     "edge": {
      "empty": {
@@ -8625,8 +8690,9 @@
       "evidence": "overflow-wrap: anywhere"
      },
      "missing_image": {
-      "status": "none",
-      "how": "the part has no photo"
+      "status": "handled",
+      "evidence": "data-od-media",
+      "how": "photos are optional; one that fails to load becomes a calm tile of the same shape with an icon and its alt text, and options sent without photos show none"
      }
     }
    },
@@ -8641,12 +8707,15 @@
     "--ds-color-border-separator",
     "--ds-color-border-subtle",
     "--ds-color-surface-raised",
+    "--ds-color-surface-sunken",
     "--ds-color-text-accent",
+    "--ds-color-text-danger",
     "--ds-color-text-on-action",
     "--ds-color-text-primary",
     "--ds-color-text-secondary",
     "--ds-color-text-success",
     "--ds-color-text-tertiary",
+    "--ds-color-text-warning",
     "--ds-elevation-raised",
     "--ds-focus-ring-offset",
     "--ds-focus-ring-width",
@@ -8658,11 +8727,15 @@
     "--ds-radius-container",
     "--ds-radius-control",
     "--ds-radius-full",
+    "--ds-radius-nested",
     "--ds-size-control-md",
     "--ds-size-control-sm",
     "--ds-size-icon-sm",
     "--ds-size-target-min",
+    "--ds-space-16",
     "--ds-space-2",
+    "--ds-space-24",
+    "--ds-space-6",
     "--ds-space-inline-md",
     "--ds-space-inline-sm",
     "--ds-space-inset-lg",
@@ -8674,6 +8747,7 @@
     "--ds-space-stack-sm",
     "--ds-space-stack-xs",
     "--ds-text-body-md",
+    "--ds-text-body-sm",
     "--ds-text-label-lg",
     "--ds-text-label-md",
     "--ds-text-numeric-md",
@@ -8710,11 +8784,11 @@
    },
    "files": {
     "html": "components/comparison/component.html",
-    "bytes": 13763,
+    "bytes": 17947,
     "script": true
    },
    "source": null,
-   "photos": 0
+   "photos": 1
   },
   {
    "id": "confirm-dialog",
@@ -9516,7 +9590,6 @@
     "--ds-color-bg-neutral-subtle",
     "--ds-color-border-default",
     "--ds-color-border-focus",
-    "--ds-color-border-separator",
     "--ds-color-border-subtle",
     "--ds-color-surface-raised",
     "--ds-color-surface-sunken",
@@ -9580,7 +9653,7 @@
    },
    "files": {
     "html": "components/data-table/component.html",
-    "bytes": 23537,
+    "bytes": 23818,
     "script": true
    },
    "source": null,
@@ -12197,6 +12270,294 @@
    },
    "source": null,
    "photos": 0
+  },
+  {
+   "id": "event-card",
+   "name": "Event card",
+   "purpose": "One event to go to: a photo, the name, the date and venue, the price with its currency, and how many seats are left as a status (sold out is never green), with a button to choose seats.",
+   "use_when": [
+    "when someone asks what is on, or about one event",
+    "one event with a date, a place and tickets"
+   ],
+   "avoid_when": [
+    "a ticket already bought, with seat and code: use event-ticket",
+    "several events: use result-list"
+   ],
+   "type": "commerce",
+   "style": "friendly",
+   "width": "medium",
+   "tags": {
+    "audience": "consumer",
+    "industries": [
+     "events",
+     "media",
+     "travel",
+     "any"
+    ],
+    "keywords": [
+     "event",
+     "tickets",
+     "photo",
+     "availability",
+     "card"
+    ]
+   },
+   "root": ".odl-event-card",
+   "parts": [
+    {
+     "name": "photo",
+     "selector": ".odl-ph .odl-img",
+     "what": "a photo of the event or the place",
+     "slot": "media"
+    },
+    {
+     "name": "kicker",
+     "selector": ".odl-kicker",
+     "what": "the kind of event",
+     "slot": "text"
+    },
+    {
+     "name": "title",
+     "selector": ".odl-event-card h3",
+     "what": "the event's name",
+     "slot": "text"
+    },
+    {
+     "name": "facts",
+     "selector": ".odl-facts",
+     "what": "date and time, and the venue",
+     "slot": "text"
+    },
+    {
+     "name": "status",
+     "selector": ".odl-status",
+     "what": "seats or tickets left, coloured by what it says",
+     "slot": "text"
+    },
+    {
+     "name": "price",
+     "selector": ".odl-price",
+     "what": "the price with its currency, and a note",
+     "slot": "number"
+    },
+    {
+     "name": "tickets",
+     "selector": ".odl-btn",
+     "what": "the main action: choose seats or tickets",
+     "slot": "action"
+    }
+   ],
+   "data": {
+    "type": "object",
+    "required": [
+     "photo",
+     "title",
+     "date",
+     "venue",
+     "price"
+    ],
+    "properties": {
+     "photo": {
+      "type": "object",
+      "part": "photo",
+      "required": [
+       "src",
+       "alt"
+      ],
+      "properties": {
+       "src": {
+        "type": "string",
+        "maxLength": 2048
+       },
+       "alt": {
+        "type": "string",
+        "maxLength": 200
+       },
+       "width": {
+        "type": "integer"
+       },
+       "height": {
+        "type": "integer"
+       },
+       "ratio": {
+        "type": "string",
+        "maxLength": 12
+       },
+       "credit": {
+        "type": "string",
+        "maxLength": 120
+       }
+      }
+     },
+     "kicker": {
+      "type": "string",
+      "maxLength": 30,
+      "part": "kicker"
+     },
+     "title": {
+      "type": "string",
+      "maxLength": 60,
+      "part": "title"
+     },
+     "date": {
+      "type": "string",
+      "maxLength": 40,
+      "part": "facts"
+     },
+     "venue": {
+      "type": "string",
+      "maxLength": 60,
+      "part": "facts"
+     },
+     "status": {
+      "type": "string",
+      "maxLength": 30,
+      "part": "status"
+     },
+     "tone": {
+      "type": "string",
+      "enum": [
+       "neutral",
+       "success",
+       "warning",
+       "danger"
+      ],
+      "part": "status"
+     },
+     "price": {
+      "type": "string",
+      "maxLength": 20,
+      "part": "price"
+     },
+     "price_note": {
+      "type": "string",
+      "maxLength": 40,
+      "part": "price"
+     }
+    }
+   },
+   "states": {
+    "shown": [
+     "seats left",
+     "few left",
+     "sold out",
+     "photo beside when wide",
+     "stacked when narrow",
+     "hover",
+     "focus",
+     "disabled"
+    ],
+    "edge": {
+     "empty": {
+      "status": "not_built",
+      "how": "without an event, answer in text"
+     },
+     "loading": {
+      "status": "handled",
+      "how": "the photo box keeps its 16:9 shape on the sunken surface and pulses quietly until the photo arrives",
+      "evidence": "aspect-ratio: 16 / 9"
+     },
+     "error": {
+      "status": "handled",
+      "how": "a photo that fails keeps its box, with an icon and the photo's description",
+      "evidence": "class=\"odl-img\""
+     },
+     "disabled": {
+      "status": "shown",
+      "how": "when it is sold out the app sends the button disabled; it turns quiet neutral, still readable",
+      "evidence": ".odl-btn:disabled"
+     },
+     "overflow": {
+      "status": "handled",
+      "how": "in a narrow container the photo goes on top and the price and button wrap",
+      "evidence": "@container (min-width: 36rem)"
+     },
+     "long_text": {
+      "status": "handled",
+      "how": "the name and lines wrap, long words break",
+      "evidence": "overflow-wrap: anywhere"
+     },
+     "missing_image": {
+      "status": "handled",
+      "evidence": "data-od-media",
+      "how": "the Smart UI renderer swaps a photo that fails to load for a calm tile of the same shape with an icon and its alt text"
+     }
+    }
+   },
+   "tokens": [
+    "--ds-border-width-default",
+    "--ds-color-bg-action-primary",
+    "--ds-color-bg-action-primary-hover",
+    "--ds-color-bg-neutral-subtle",
+    "--ds-color-border-default",
+    "--ds-color-border-focus",
+    "--ds-color-border-subtle",
+    "--ds-color-surface-raised",
+    "--ds-color-surface-sunken",
+    "--ds-color-text-danger",
+    "--ds-color-text-on-action",
+    "--ds-color-text-primary",
+    "--ds-color-text-secondary",
+    "--ds-color-text-success",
+    "--ds-color-text-warning",
+    "--ds-elevation-raised",
+    "--ds-focus-ring-offset",
+    "--ds-focus-ring-width",
+    "--ds-font-weight-heading",
+    "--ds-font-weight-label",
+    "--ds-icon-stroke-md",
+    "--ds-motion-duration-short",
+    "--ds-motion-easing-standard",
+    "--ds-radius-container",
+    "--ds-radius-control",
+    "--ds-radius-full",
+    "--ds-size-control-md",
+    "--ds-size-control-sm",
+    "--ds-size-icon-sm",
+    "--ds-size-target-min",
+    "--ds-space-6",
+    "--ds-space-inline-md",
+    "--ds-space-inline-sm",
+    "--ds-space-inset-lg",
+    "--ds-space-inset-sm",
+    "--ds-space-inset-xl",
+    "--ds-space-stack-sm",
+    "--ds-space-stack-xs",
+    "--ds-text-body-md",
+    "--ds-text-body-sm",
+    "--ds-text-label-lg",
+    "--ds-text-label-md",
+    "--ds-text-title-md"
+   ],
+   "a11y": {
+    "summary": "An article named by the event; date and venue are read with their labels, and seats left is words as well as colour.",
+    "roles": [
+     "article",
+     "list"
+    ],
+    "keyboard": [
+     "Tab reaches the button",
+     "Enter or Space presses it"
+    ],
+    "controls": {
+     "button": 1,
+     "input": 0,
+     "link": 0,
+     "select": 0,
+     "textarea": 0,
+     "summary": 0
+    },
+    "focus_visible": true,
+    "reduced_motion": true,
+    "min_target": true
+   },
+   "files": {
+    "html": "components/event-card/component.html",
+    "bytes": 8827,
+    "script": false
+   },
+   "source": null,
+   "photos": 1
   },
   {
    "id": "event-ticket",
@@ -15270,6 +15631,318 @@
    "photos": 0
   },
   {
+   "id": "home-listing",
+   "name": "Home listing",
+   "purpose": "A home to rent or buy: up to three photos (one large, two beside it when there is room), the price with its currency, the address, bedrooms, bathrooms and floor area, its status (available, under offer, let agreed), and a button to book a viewing.",
+   "use_when": [
+    "when someone searching for a home asks about one listing",
+    "one home with its photos, price and key facts"
+   ],
+   "avoid_when": [
+    "a holiday rental by the night: use stay-card",
+    "several homes: use result-list"
+   ],
+   "type": "commerce",
+   "style": "friendly",
+   "width": "medium",
+   "tags": {
+    "audience": "consumer",
+    "industries": [
+     "home",
+     "any"
+    ],
+    "keywords": [
+     "property",
+     "listing",
+     "photo",
+     "price",
+     "card"
+    ]
+   },
+   "root": ".odl-home-listing",
+   "parts": [
+    {
+     "name": "photos",
+     "selector": ".odl-pics",
+     "what": "up to three photos; the first is largest",
+     "slot": "list"
+    },
+    {
+     "name": "photo",
+     "selector": ".odl-pics .odl-img",
+     "what": "one photo of the home",
+     "slot": "media"
+    },
+    {
+     "name": "title",
+     "selector": ".odl-home-listing h3",
+     "what": "what the home is",
+     "slot": "text"
+    },
+    {
+     "name": "address",
+     "selector": ".odl-where",
+     "what": "the street and area",
+     "slot": "text"
+    },
+    {
+     "name": "price",
+     "selector": ".odl-price",
+     "what": "the price with its currency, and what it covers",
+     "slot": "number"
+    },
+    {
+     "name": "facts",
+     "selector": ".odl-facts",
+     "what": "bedrooms, bathrooms and floor area",
+     "slot": "text"
+    },
+    {
+     "name": "status",
+     "selector": ".odl-status",
+     "what": "available, under offer or let agreed, coloured by what it says",
+     "slot": "text"
+    },
+    {
+     "name": "viewing",
+     "selector": ".odl-btn",
+     "what": "the main action: book a viewing",
+     "slot": "action"
+    }
+   ],
+   "data": {
+    "type": "object",
+    "required": [
+     "photos",
+     "title",
+     "address",
+     "price"
+    ],
+    "properties": {
+     "photos": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "part": "photos",
+      "items": {
+       "type": "object",
+       "required": [
+        "photo"
+       ],
+       "properties": {
+        "photo": {
+         "type": "object",
+         "part": "photo",
+         "required": [
+          "src",
+          "alt"
+         ],
+         "properties": {
+          "src": {
+           "type": "string",
+           "maxLength": 2048
+          },
+          "alt": {
+           "type": "string",
+           "maxLength": 200
+          },
+          "width": {
+           "type": "integer"
+          },
+          "height": {
+           "type": "integer"
+          },
+          "ratio": {
+           "type": "string",
+           "maxLength": 12
+          },
+          "credit": {
+           "type": "string",
+           "maxLength": 120
+          }
+         }
+        }
+       }
+      }
+     },
+     "title": {
+      "type": "string",
+      "maxLength": 60,
+      "part": "title"
+     },
+     "address": {
+      "type": "string",
+      "maxLength": 60,
+      "part": "address"
+     },
+     "price": {
+      "type": "string",
+      "maxLength": 16,
+      "part": "price"
+     },
+     "price_note": {
+      "type": "string",
+      "maxLength": 40,
+      "part": "price"
+     },
+     "beds": {
+      "type": "string",
+      "maxLength": 16,
+      "part": "facts"
+     },
+     "baths": {
+      "type": "string",
+      "maxLength": 16,
+      "part": "facts"
+     },
+     "area": {
+      "type": "string",
+      "maxLength": 12,
+      "part": "facts"
+     },
+     "status": {
+      "type": "string",
+      "maxLength": 32,
+      "part": "status"
+     },
+     "tone": {
+      "type": "string",
+      "enum": [
+       "neutral",
+       "success",
+       "warning",
+       "danger"
+      ],
+      "part": "status"
+     }
+    }
+   },
+   "states": {
+    "shown": [
+     "available",
+     "under offer",
+     "let agreed",
+     "one photo when narrow",
+     "three photos when wide",
+     "hover",
+     "focus",
+     "disabled"
+    ],
+    "edge": {
+     "empty": {
+      "status": "not_built",
+      "how": "without a home, answer in text"
+     },
+     "loading": {
+      "status": "handled",
+      "how": "each photo box keeps its shape on the sunken surface and pulses quietly until the photo arrives",
+      "evidence": "aspect-ratio: 4 / 3"
+     },
+     "error": {
+      "status": "handled",
+      "how": "a photo that fails keeps its box, with an icon and the photo's description",
+      "evidence": "class=\"odl-img\""
+     },
+     "disabled": {
+      "status": "shown",
+      "how": "when viewings are closed the app sends the button disabled; it turns quiet neutral, still readable",
+      "evidence": ".odl-btn:disabled"
+     },
+     "overflow": {
+      "status": "handled",
+      "how": "in a narrow container only the first photo shows and the price goes under the title",
+      "evidence": "@container (min-width: 36rem)"
+     },
+     "long_text": {
+      "status": "handled",
+      "how": "the title and address wrap, long words break",
+      "evidence": "overflow-wrap: anywhere"
+     },
+     "missing_image": {
+      "status": "handled",
+      "evidence": "data-od-media",
+      "how": "the Smart UI renderer swaps a photo that fails to load for a calm tile of the same shape with an icon and its alt text"
+     }
+    }
+   },
+   "tokens": [
+    "--ds-border-width-default",
+    "--ds-color-bg-action-primary",
+    "--ds-color-bg-action-primary-hover",
+    "--ds-color-bg-neutral-subtle",
+    "--ds-color-border-default",
+    "--ds-color-border-focus",
+    "--ds-color-border-subtle",
+    "--ds-color-surface-raised",
+    "--ds-color-surface-sunken",
+    "--ds-color-text-danger",
+    "--ds-color-text-on-action",
+    "--ds-color-text-primary",
+    "--ds-color-text-secondary",
+    "--ds-color-text-success",
+    "--ds-color-text-warning",
+    "--ds-elevation-raised",
+    "--ds-focus-ring-offset",
+    "--ds-focus-ring-width",
+    "--ds-font-weight-heading",
+    "--ds-font-weight-label",
+    "--ds-icon-stroke-md",
+    "--ds-motion-duration-short",
+    "--ds-motion-easing-standard",
+    "--ds-radius-container",
+    "--ds-radius-control",
+    "--ds-radius-full",
+    "--ds-size-control-md",
+    "--ds-size-control-sm",
+    "--ds-size-icon-sm",
+    "--ds-size-target-min",
+    "--ds-space-2",
+    "--ds-space-6",
+    "--ds-space-inline-md",
+    "--ds-space-inline-sm",
+    "--ds-space-inset-lg",
+    "--ds-space-inset-sm",
+    "--ds-space-inset-xl",
+    "--ds-space-stack-sm",
+    "--ds-space-stack-xs",
+    "--ds-text-body-md",
+    "--ds-text-body-sm",
+    "--ds-text-label-lg",
+    "--ds-text-label-md",
+    "--ds-text-title-lg",
+    "--ds-text-title-md"
+   ],
+   "a11y": {
+    "summary": "An article named by the listing; the photos are a list, each with alt text, and the status is words as well as colour.",
+    "roles": [
+     "article",
+     "list"
+    ],
+    "keyboard": [
+     "Tab reaches Book a viewing",
+     "Enter or Space presses it"
+    ],
+    "controls": {
+     "button": 1,
+     "input": 0,
+     "link": 0,
+     "select": 0,
+     "textarea": 0,
+     "summary": 0
+    },
+    "focus_visible": true,
+    "reduced_motion": true,
+    "min_target": true
+   },
+   "files": {
+    "html": "components/home-listing/component.html",
+    "bytes": 11144,
+    "script": false
+   },
+   "source": null,
+   "photos": 3
+  },
+  {
    "id": "image-card",
    "name": "Image card",
    "purpose": "One photo with a caption, an optional credit line and an optional button, for when the answer is a picture of something.",
@@ -16993,7 +17666,7 @@
    },
    "files": {
     "html": "components/key-facts/component.html",
-    "bytes": 6052,
+    "bytes": 6113,
     "script": false
    },
    "source": null,
@@ -18849,7 +19522,7 @@
    },
    "files": {
     "html": "components/location-card/component.html",
-    "bytes": 8043,
+    "bytes": 8011,
     "script": false
    },
    "source": null,
@@ -23214,6 +23887,649 @@
    "photos": 0
   },
   {
+   "id": "place-card",
+   "name": "Place card",
+   "purpose": "One place in depth: a photo, the name and rating, area, price band and distance, whether it is open, why it fits what the person asked, the address, and a Get directions button. The photo sits beside the words when there is room.",
+   "use_when": [
+    "when an assistant recommends one place (\"where should I take my parents for lunch?\") or the person opens one from a list",
+    "one recommended place, with why it fits"
+   ],
+   "avoid_when": [
+    "three to five places to choose from: use place-list",
+    "only the address and a map: use location-card"
+   ],
+   "type": "content",
+   "style": "friendly",
+   "width": "medium",
+   "tags": {
+    "audience": "consumer",
+    "industries": [
+     "food",
+     "travel",
+     "events",
+     "any"
+    ],
+    "keywords": [
+     "place",
+     "recommendation",
+     "photo",
+     "rating",
+     "card"
+    ]
+   },
+   "root": ".odl-place-card",
+   "parts": [
+    {
+     "name": "photo",
+     "selector": ".odl-ph .odl-img",
+     "what": "a photo of the place",
+     "slot": "media"
+    },
+    {
+     "name": "rating",
+     "selector": ".odl-rate",
+     "what": "the average rating out of 5 and how many reviews",
+     "slot": "number"
+    },
+    {
+     "name": "meta",
+     "selector": ".odl-meta",
+     "what": "the area, the price band and how far it is",
+     "slot": "text"
+    },
+    {
+     "name": "status",
+     "selector": ".odl-status",
+     "what": "open now, closing soon or fully booked, coloured by the data's meaning",
+     "slot": "text"
+    },
+    {
+     "name": "name",
+     "selector": ".odl-place-card h3",
+     "what": "the place's name",
+     "slot": "text"
+    },
+    {
+     "name": "why",
+     "selector": ".odl-fit",
+     "what": "why it fits what the person asked for",
+     "slot": "text"
+    },
+    {
+     "name": "address",
+     "selector": ".odl-where",
+     "what": "the address or how to find it",
+     "slot": "text"
+    },
+    {
+     "name": "directions",
+     "selector": ".odl-go",
+     "what": "the main action: directions",
+     "slot": "action"
+    },
+    {
+     "name": "open",
+     "selector": ".odl-acts button:not(.odl-go)",
+     "what": "an optional quieter action (the menu, the website)",
+     "slot": "action"
+    }
+   ],
+   "data": {
+    "type": "object",
+    "required": [
+     "photo",
+     "name",
+     "area"
+    ],
+    "properties": {
+     "photo": {
+      "type": "object",
+      "part": "photo",
+      "required": [
+       "src",
+       "alt"
+      ],
+      "properties": {
+       "src": {
+        "type": "string",
+        "maxLength": 2048
+       },
+       "alt": {
+        "type": "string",
+        "maxLength": 200
+       },
+       "width": {
+        "type": "integer"
+       },
+       "height": {
+        "type": "integer"
+       },
+       "ratio": {
+        "type": "string",
+        "maxLength": 12
+       },
+       "credit": {
+        "type": "string",
+        "maxLength": 120
+       }
+      }
+     },
+     "name": {
+      "type": "string",
+      "maxLength": 40,
+      "part": "name"
+     },
+     "rating": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 5,
+      "part": "rating"
+     },
+     "reviews": {
+      "type": "string",
+      "maxLength": 8,
+      "part": "rating"
+     },
+     "area": {
+      "type": "string",
+      "maxLength": 32,
+      "part": "meta"
+     },
+     "price_band": {
+      "type": "string",
+      "maxLength": 6,
+      "part": "meta"
+     },
+     "distance": {
+      "type": "string",
+      "maxLength": 20,
+      "part": "meta"
+     },
+     "why": {
+      "type": "string",
+      "maxLength": 140,
+      "part": "why"
+     },
+     "status": {
+      "type": "string",
+      "maxLength": 28,
+      "part": "status"
+     },
+     "tone": {
+      "type": "string",
+      "enum": [
+       "neutral",
+       "success",
+       "warning",
+       "danger"
+      ],
+      "part": "status"
+     },
+     "address": {
+      "type": "string",
+      "maxLength": 80,
+      "part": "address"
+     }
+    }
+   },
+   "states": {
+    "shown": [
+     "open now",
+     "closing soon",
+     "fully booked",
+     "no address",
+     "hover",
+     "focus",
+     "photo on top when narrow",
+     "photo beside when wide"
+    ],
+    "edge": {
+     "empty": {
+      "status": "not_built",
+      "how": "without a place, answer in text; the card is only for one place"
+     },
+     "loading": {
+      "status": "handled",
+      "how": "the photo box keeps its shape on the sunken surface and pulses quietly until the photo arrives",
+      "evidence": "aspect-ratio: 16 / 10"
+     },
+     "error": {
+      "status": "handled",
+      "how": "a photo that fails keeps its box, with an icon and the photo's description",
+      "evidence": "class=\"odl-img\""
+     },
+     "disabled": {
+      "status": "shown",
+      "how": "a disabled button turns quiet neutral, still readable",
+      "evidence": "button:disabled"
+     },
+     "overflow": {
+      "status": "handled",
+      "how": "in a narrow container the photo goes on top and the buttons wrap",
+      "evidence": "@container (min-width: 34rem)"
+     },
+     "long_text": {
+      "status": "handled",
+      "how": "the name and lines wrap, long words break",
+      "evidence": "overflow-wrap: anywhere"
+     },
+     "missing_image": {
+      "status": "handled",
+      "evidence": "data-od-media",
+      "how": "the Smart UI renderer swaps a photo that fails to load for a calm tile of the same shape with an icon and its alt text"
+     }
+    }
+   },
+   "tokens": [
+    "--ds-border-width-default",
+    "--ds-color-bg-action-primary",
+    "--ds-color-bg-action-primary-hover",
+    "--ds-color-bg-neutral-subtle",
+    "--ds-color-border-default",
+    "--ds-color-border-focus",
+    "--ds-color-border-subtle",
+    "--ds-color-surface-raised",
+    "--ds-color-surface-sunken",
+    "--ds-color-text-danger",
+    "--ds-color-text-on-action",
+    "--ds-color-text-primary",
+    "--ds-color-text-secondary",
+    "--ds-color-text-success",
+    "--ds-color-text-tertiary",
+    "--ds-color-text-warning",
+    "--ds-elevation-raised",
+    "--ds-focus-ring-offset",
+    "--ds-focus-ring-width",
+    "--ds-font-weight-label",
+    "--ds-icon-stroke-md",
+    "--ds-motion-duration-short",
+    "--ds-motion-easing-standard",
+    "--ds-radius-container",
+    "--ds-radius-control",
+    "--ds-radius-full",
+    "--ds-radius-nested",
+    "--ds-size-control-md",
+    "--ds-size-control-sm",
+    "--ds-size-icon-sm",
+    "--ds-size-target-min",
+    "--ds-space-2",
+    "--ds-space-6",
+    "--ds-space-inline-md",
+    "--ds-space-inline-sm",
+    "--ds-space-inline-xs",
+    "--ds-space-inset-lg",
+    "--ds-space-inset-md",
+    "--ds-space-inset-sm",
+    "--ds-space-inset-xl",
+    "--ds-space-stack-sm",
+    "--ds-space-stack-xs",
+    "--ds-text-body-md",
+    "--ds-text-body-sm",
+    "--ds-text-label-lg",
+    "--ds-text-label-md",
+    "--ds-text-title-md"
+   ],
+   "a11y": {
+    "summary": "An article named by the place; the rating is read as \"Rated 4.7 out of 5\", open or closed is words as well as colour, and both buttons are real buttons.",
+    "roles": [
+     "article"
+    ],
+    "keyboard": [
+     "Tab reaches Get directions, then the second button when there is one",
+     "Enter or Space presses it"
+    ],
+    "controls": {
+     "button": 2,
+     "input": 0,
+     "link": 0,
+     "select": 0,
+     "textarea": 0,
+     "summary": 0
+    },
+    "focus_visible": true,
+    "reduced_motion": true,
+    "min_target": true
+   },
+   "files": {
+    "html": "components/place-card/component.html",
+    "bytes": 10788,
+    "script": false
+   },
+   "source": null,
+   "photos": 1
+  },
+  {
+   "id": "place-list",
+   "name": "Place list",
+   "purpose": "Three to five places with a photo each: the name, rating, area, price band, distance, a line on why it fits, and whether it is open. One row per place in a narrow space, a row of cards that scrolls sideways in a wide one.",
+   "use_when": [
+    "when someone asks for somewhere to go (\"a quiet café to work from near me\") and will pick one",
+    "a recommendation of three to five places, each with a photo"
+   ],
+   "avoid_when": [
+    "one place in depth: use place-card",
+    "only an address and directions: use location-card",
+    "more than five places: answer in text or use result-list"
+   ],
+   "type": "content",
+   "style": "friendly",
+   "width": "wide",
+   "tags": {
+    "audience": "consumer",
+    "industries": [
+     "food",
+     "travel",
+     "events",
+     "any"
+    ],
+    "keywords": [
+     "places",
+     "recommendations",
+     "photo",
+     "rating",
+     "carousel",
+     "list"
+    ]
+   },
+   "root": ".odl-place-list",
+   "parts": [
+    {
+     "name": "title",
+     "selector": ".odl-place-list h3",
+     "what": "what was asked for",
+     "slot": "text"
+    },
+    {
+     "name": "note",
+     "selector": ".odl-note",
+     "what": "how many places, and how near",
+     "slot": "text"
+    },
+    {
+     "name": "places",
+     "selector": ".odl-list",
+     "what": "the places",
+     "slot": "list"
+    },
+    {
+     "name": "photo",
+     "selector": ".odl-ph .odl-img",
+     "what": "a photo of the place",
+     "slot": "media"
+    },
+    {
+     "name": "name",
+     "selector": ".odl-name",
+     "what": "the place's name",
+     "slot": "text"
+    },
+    {
+     "name": "rating",
+     "selector": ".odl-rate",
+     "what": "the average rating out of 5 and how many reviews",
+     "slot": "number"
+    },
+    {
+     "name": "meta",
+     "selector": ".odl-meta",
+     "what": "the area, the price band and how far it is",
+     "slot": "text"
+    },
+    {
+     "name": "why",
+     "selector": ".odl-why",
+     "what": "why it fits what the person asked for, in one line",
+     "slot": "text"
+    },
+    {
+     "name": "status",
+     "selector": ".odl-status",
+     "what": "open now, closing soon or fully booked, coloured by the data's meaning",
+     "slot": "text"
+    },
+    {
+     "name": "open",
+     "selector": ".odl-open",
+     "what": "the whole card opens the place",
+     "slot": "action"
+    }
+   ],
+   "data": {
+    "type": "object",
+    "required": [
+     "title",
+     "places"
+    ],
+    "properties": {
+     "title": {
+      "type": "string",
+      "maxLength": 60,
+      "part": "title"
+     },
+     "note": {
+      "type": "string",
+      "maxLength": 60,
+      "part": "note"
+     },
+     "places": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 5,
+      "part": "places",
+      "items": {
+       "type": "object",
+       "required": [
+        "photo",
+        "name",
+        "area"
+       ],
+       "properties": {
+        "photo": {
+         "type": "object",
+         "part": "photo",
+         "required": [
+          "src",
+          "alt"
+         ],
+         "properties": {
+          "src": {
+           "type": "string",
+           "maxLength": 2048
+          },
+          "alt": {
+           "type": "string",
+           "maxLength": 200
+          },
+          "width": {
+           "type": "integer"
+          },
+          "height": {
+           "type": "integer"
+          },
+          "ratio": {
+           "type": "string",
+           "maxLength": 12
+          },
+          "credit": {
+           "type": "string",
+           "maxLength": 120
+          }
+         }
+        },
+        "name": {
+         "type": "string",
+         "maxLength": 40,
+         "part": "name"
+        },
+        "rating": {
+         "type": "number",
+         "minimum": 0,
+         "maximum": 5,
+         "part": "rating"
+        },
+        "reviews": {
+         "type": "string",
+         "maxLength": 8,
+         "part": "rating"
+        },
+        "area": {
+         "type": "string",
+         "maxLength": 32,
+         "part": "meta"
+        },
+        "price_band": {
+         "type": "string",
+         "maxLength": 6,
+         "part": "meta"
+        },
+        "distance": {
+         "type": "string",
+         "maxLength": 20,
+         "part": "meta"
+        },
+        "why": {
+         "type": "string",
+         "maxLength": 80,
+         "part": "why"
+        },
+        "status": {
+         "type": "string",
+         "maxLength": 28,
+         "part": "status"
+        },
+        "tone": {
+         "type": "string",
+         "enum": [
+          "neutral",
+          "success",
+          "warning",
+          "danger"
+         ],
+         "part": "status"
+        }
+       }
+      }
+     }
+    }
+   },
+   "states": {
+    "shown": [
+     "open now",
+     "closing soon",
+     "fully booked",
+     "no rating",
+     "hover",
+     "focus",
+     "rows when narrow",
+     "scrolling row when wide"
+    ],
+    "edge": {
+     "empty": {
+      "status": "handled",
+      "how": "no places: the list says there is nothing to show; better still, answer in text with what to change",
+      "evidence": "data-od-list=\"places\""
+     },
+     "loading": {
+      "status": "handled",
+      "how": "each photo box keeps its shape on the sunken surface and pulses quietly until the photo arrives",
+      "evidence": "aspect-ratio: 16 / 10"
+     },
+     "error": {
+      "status": "handled",
+      "how": "a photo that fails keeps its box, with an icon and the photo's description",
+      "evidence": "class=\"odl-img\""
+     },
+     "disabled": {
+      "status": "shown",
+      "how": "a place that can't be visited now says so in its status (fully booked, closed), in the danger or neutral colour",
+      "evidence": "[data-tone=\"danger\"]"
+     },
+     "overflow": {
+      "status": "handled",
+      "how": "in a narrow container each place is a row; in a wide one the cards scroll sideways and snap",
+      "evidence": "@container (min-width: 34rem)"
+     },
+     "long_text": {
+      "status": "handled",
+      "how": "names and lines wrap, long words break",
+      "evidence": "overflow-wrap: anywhere"
+     },
+     "missing_image": {
+      "status": "handled",
+      "evidence": "data-od-media",
+      "how": "the Smart UI renderer swaps a photo that fails to load for a calm tile of the same shape with an icon and its alt text"
+     }
+    }
+   },
+   "tokens": [
+    "--ds-border-width-default",
+    "--ds-color-border-default",
+    "--ds-color-border-focus",
+    "--ds-color-border-subtle",
+    "--ds-color-surface-raised",
+    "--ds-color-surface-sunken",
+    "--ds-color-text-danger",
+    "--ds-color-text-primary",
+    "--ds-color-text-secondary",
+    "--ds-color-text-success",
+    "--ds-color-text-tertiary",
+    "--ds-color-text-warning",
+    "--ds-focus-ring-width",
+    "--ds-font-weight-label",
+    "--ds-icon-stroke-md",
+    "--ds-radius-container",
+    "--ds-radius-full",
+    "--ds-size-control-sm",
+    "--ds-size-icon-sm",
+    "--ds-space-2",
+    "--ds-space-24",
+    "--ds-space-6",
+    "--ds-space-inline-md",
+    "--ds-space-inline-sm",
+    "--ds-space-inline-xs",
+    "--ds-space-inset-lg",
+    "--ds-space-inset-md",
+    "--ds-space-inset-sm",
+    "--ds-space-stack-lg",
+    "--ds-space-stack-md",
+    "--ds-space-stack-xs",
+    "--ds-text-body-md",
+    "--ds-text-body-sm",
+    "--ds-text-label-md",
+    "--ds-text-title-md"
+   ],
+   "a11y": {
+    "summary": "A list of places; each card is one button named \"View, <place>\". The rating is read as \"Rated 4.7 out of 5\", and open or closed is words as well as colour.",
+    "roles": [
+     "banner",
+     "list",
+     "region"
+    ],
+    "keyboard": [
+     "Tab moves from place to place, scrolling the row to show it",
+     "Enter or Space opens the focused place"
+    ],
+    "controls": {
+     "button": 4,
+     "input": 0,
+     "link": 0,
+     "select": 0,
+     "textarea": 0,
+     "summary": 0
+    },
+    "focus_visible": true,
+    "reduced_motion": true,
+    "min_target": false
+   },
+   "files": {
+    "html": "components/place-list/component.html",
+    "bytes": 16590,
+    "script": false
+   },
+   "source": null,
+   "photos": 3
+  },
+  {
    "id": "plan-picker",
    "name": "Plan picker",
    "purpose": "Three plans as cards you select, with a monthly or yearly switch that changes the prices and one plan marked as the common choice.",
@@ -24222,7 +25538,7 @@
     {
      "name": "stock",
      "selector": ".odl-low",
-     "what": "a low-stock note under the sizes",
+     "what": "stock as a status under the sizes, coloured by what it says (sold out is never green)",
      "slot": "text"
     },
     {
@@ -24290,6 +25606,20 @@
           "alt": {
            "type": "string",
            "maxLength": 200
+          },
+          "width": {
+           "type": "integer"
+          },
+          "height": {
+           "type": "integer"
+          },
+          "ratio": {
+           "type": "string",
+           "maxLength": 12
+          },
+          "credit": {
+           "type": "string",
+           "maxLength": 120
           }
          }
         }
@@ -24423,6 +25753,14 @@
         "detail": {
          "type": "string",
          "maxLength": 40
+        },
+        "icon": {
+         "type": "string",
+         "enum": [
+          "truck",
+          "undo",
+          "shield"
+         ]
         }
        }
       }
@@ -24438,6 +25776,16 @@
      "rating_count": {
       "type": "string",
       "maxLength": 80
+     },
+     "tone": {
+      "type": "string",
+      "enum": [
+       "neutral",
+       "success",
+       "warning",
+       "danger"
+      ],
+      "part": "stock"
      }
     }
    },
@@ -24500,7 +25848,6 @@
     "--ds-color-border-strong",
     "--ds-color-border-subtle",
     "--ds-color-icon-default",
-    "--ds-color-neutral-alpha-light-5",
     "--ds-color-neutral-light-1",
     "--ds-color-neutral-light-12",
     "--ds-color-success-light-9",
@@ -24510,7 +25857,9 @@
     "--ds-color-text-on-action",
     "--ds-color-text-primary",
     "--ds-color-text-secondary",
+    "--ds-color-text-success",
     "--ds-color-text-tertiary",
+    "--ds-color-text-warning",
     "--ds-color-warning-light-4",
     "--ds-focus-ring-offset",
     "--ds-focus-ring-width",
@@ -24535,9 +25884,11 @@
     "--ds-space-2",
     "--ds-space-24",
     "--ds-space-4",
+    "--ds-space-6",
     "--ds-space-8",
     "--ds-space-inline-md",
     "--ds-space-inline-sm",
+    "--ds-space-inline-xs",
     "--ds-space-inset-lg",
     "--ds-space-section-sm",
     "--ds-space-stack-lg",
@@ -24578,11 +25929,399 @@
    },
    "files": {
     "html": "components/product-gallery/component.html",
-    "bytes": 31275,
+    "bytes": 34149,
     "script": true
    },
    "source": null,
    "photos": 2
+  },
+  {
+   "id": "product-grid",
+   "name": "Product grid",
+   "purpose": "Four to eight products in a grid that goes one to four across by the space it has: a photo with a stock status, the name, the price with the old price struck out, colour swatches and the sizes in stock.",
+   "use_when": [
+    "when someone searches a shop (\"warm wool coats under £200 in size M\") and will open one product",
+    "a shop search or a recommendation returns four to eight products to look through"
+   ],
+   "avoid_when": [
+    "one product with all its photos and sizes: use product-gallery",
+    "two or three products side by side: use comparison",
+    "one featured product with Add to bag: use product-card"
+   ],
+   "type": "commerce",
+   "style": "friendly",
+   "width": "wide",
+   "tags": {
+    "audience": "consumer",
+    "industries": [
+     "retail",
+     "any"
+    ],
+    "keywords": [
+     "products",
+     "grid",
+     "photo",
+     "price",
+     "stock",
+     "search"
+    ]
+   },
+   "root": ".odl-product-grid",
+   "parts": [
+    {
+     "name": "title",
+     "selector": ".odl-product-grid h3",
+     "what": "what was searched, in the person's words",
+     "slot": "text"
+    },
+    {
+     "name": "note",
+     "selector": ".odl-note",
+     "what": "how many results",
+     "slot": "text"
+    },
+    {
+     "name": "items",
+     "selector": ".odl-grid",
+     "what": "the products",
+     "slot": "list"
+    },
+    {
+     "name": "photo",
+     "selector": ".odl-ph .odl-img",
+     "what": "the product photo, in a 4:5 box",
+     "slot": "media"
+    },
+    {
+     "name": "status",
+     "selector": ".odl-status",
+     "what": "stock, coloured by the data's meaning (sold out is never green)",
+     "slot": "text"
+    },
+    {
+     "name": "name",
+     "selector": ".odl-name",
+     "what": "the product name, two lines at most",
+     "slot": "text"
+    },
+    {
+     "name": "price",
+     "selector": ".odl-price",
+     "what": "the price with its currency, and the old price struck out",
+     "slot": "number"
+    },
+    {
+     "name": "colours",
+     "selector": ".odl-swatches",
+     "what": "colour swatches from the system's ramps, each named",
+     "slot": "list"
+    },
+    {
+     "name": "sizes",
+     "selector": ".odl-sizes",
+     "what": "sizes, with sold-out sizes struck out",
+     "slot": "list"
+    },
+    {
+     "name": "open",
+     "selector": ".odl-open",
+     "what": "the whole card opens the product",
+     "slot": "action"
+    }
+   ],
+   "data": {
+    "type": "object",
+    "required": [
+     "title",
+     "items"
+    ],
+    "properties": {
+     "title": {
+      "type": "string",
+      "maxLength": 60,
+      "part": "title"
+     },
+     "note": {
+      "type": "string",
+      "maxLength": 60,
+      "part": "note"
+     },
+     "items": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "part": "items",
+      "items": {
+       "type": "object",
+       "required": [
+        "photo",
+        "name",
+        "price"
+       ],
+       "properties": {
+        "photo": {
+         "type": "object",
+         "part": "photo",
+         "required": [
+          "src",
+          "alt"
+         ],
+         "properties": {
+          "src": {
+           "type": "string",
+           "maxLength": 2048
+          },
+          "alt": {
+           "type": "string",
+           "maxLength": 200
+          },
+          "width": {
+           "type": "integer"
+          },
+          "height": {
+           "type": "integer"
+          },
+          "ratio": {
+           "type": "string",
+           "maxLength": 12
+          },
+          "credit": {
+           "type": "string",
+           "maxLength": 120
+          }
+         }
+        },
+        "name": {
+         "type": "string",
+         "maxLength": 48,
+         "part": "name"
+        },
+        "price": {
+         "type": "string",
+         "maxLength": 16,
+         "part": "price"
+        },
+        "old_price": {
+         "type": "string",
+         "maxLength": 16,
+         "part": "price"
+        },
+        "status": {
+         "type": "string",
+         "maxLength": 28,
+         "part": "status"
+        },
+        "tone": {
+         "type": "string",
+         "enum": [
+          "neutral",
+          "success",
+          "warning",
+          "danger"
+         ],
+         "part": "status"
+        },
+        "colours": {
+         "type": "array",
+         "maxItems": 5,
+         "part": "colours",
+         "items": {
+          "type": "object",
+          "required": [
+           "name",
+           "swatch"
+          ],
+          "properties": {
+           "name": {
+            "type": "string",
+            "maxLength": 20
+           },
+           "swatch": {
+            "type": "string",
+            "enum": [
+             "ash",
+             "camel",
+             "chalk",
+             "charcoal",
+             "cherry",
+             "cocoa",
+             "forest",
+             "ink",
+             "midnight",
+             "moss",
+             "rose",
+             "rust",
+             "sand",
+             "sky",
+             "stone"
+            ]
+           }
+          }
+         }
+        },
+        "sizes": {
+         "type": "array",
+         "maxItems": 8,
+         "part": "sizes",
+         "items": {
+          "type": "object",
+          "required": [
+           "label"
+          ],
+          "properties": {
+           "label": {
+            "type": "string",
+            "maxLength": 10
+           },
+           "sold_out": {
+            "type": "string",
+            "enum": [
+             "false",
+             "true"
+            ]
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "states": {
+    "shown": [
+     "in stock",
+     "few left",
+     "sold out",
+     "on sale",
+     "size sold out",
+     "hover",
+     "focus",
+     "one to four across"
+    ],
+    "edge": {
+     "empty": {
+      "status": "handled",
+      "how": "no products: the list says there is nothing to show; better still, answer in text with what to change",
+      "evidence": "data-od-list=\"items\""
+     },
+     "loading": {
+      "status": "handled",
+      "how": "each photo box keeps its 4:5 shape on the sunken surface and pulses quietly until the photo arrives, then fades in",
+      "evidence": "aspect-ratio: 4 / 5"
+     },
+     "error": {
+      "status": "handled",
+      "how": "a photo that fails keeps its box, with an icon and the photo's description",
+      "evidence": "class=\"odl-img\""
+     },
+     "disabled": {
+      "status": "shown",
+      "how": "a sold-out product says so in its status; a sold-out size is struck out and read as sold out",
+      "evidence": "[data-sold_out=\"true\"]"
+     },
+     "overflow": {
+      "status": "handled",
+      "how": "the grid goes 4, 3, 2 or 1 across by the width of its container, never the window",
+      "evidence": "@container (min-width: 48rem)"
+     },
+     "long_text": {
+      "status": "handled",
+      "how": "names stop at two lines, so prices line up across a row",
+      "evidence": "-webkit-line-clamp: 2"
+     },
+     "missing_image": {
+      "status": "handled",
+      "evidence": "data-od-media",
+      "how": "the Smart UI renderer swaps a photo that fails to load for a calm tile of the same shape with an icon and its alt text"
+     }
+    }
+   },
+   "tokens": [
+    "--ds-border-width-default",
+    "--ds-color-bg-neutral-subtle",
+    "--ds-color-border-focus",
+    "--ds-color-border-strong",
+    "--ds-color-border-subtle",
+    "--ds-color-danger-light-10",
+    "--ds-color-danger-light-5",
+    "--ds-color-danger-light-9",
+    "--ds-color-info-light-12",
+    "--ds-color-info-light-6",
+    "--ds-color-neutral-light-11",
+    "--ds-color-neutral-light-12",
+    "--ds-color-neutral-light-2",
+    "--ds-color-neutral-light-6",
+    "--ds-color-neutral-light-9",
+    "--ds-color-success-light-11",
+    "--ds-color-success-light-9",
+    "--ds-color-surface-raised",
+    "--ds-color-surface-sunken",
+    "--ds-color-text-danger",
+    "--ds-color-text-primary",
+    "--ds-color-text-secondary",
+    "--ds-color-text-success",
+    "--ds-color-text-tertiary",
+    "--ds-color-text-warning",
+    "--ds-color-warning-light-11",
+    "--ds-color-warning-light-4",
+    "--ds-color-warning-light-9",
+    "--ds-elevation-raised",
+    "--ds-focus-ring-offset",
+    "--ds-focus-ring-width",
+    "--ds-font-weight-heading",
+    "--ds-font-weight-label",
+    "--ds-motion-duration-medium",
+    "--ds-motion-easing-standard",
+    "--ds-motion-scale-enter",
+    "--ds-radius-container",
+    "--ds-radius-full",
+    "--ds-size-control-sm",
+    "--ds-space-12",
+    "--ds-space-2",
+    "--ds-space-6",
+    "--ds-space-inline-md",
+    "--ds-space-inline-sm",
+    "--ds-space-inline-xs",
+    "--ds-space-inset-sm",
+    "--ds-space-stack-lg",
+    "--ds-space-stack-xs",
+    "--ds-text-body-md",
+    "--ds-text-body-sm",
+    "--ds-text-label-md",
+    "--ds-text-title-md"
+   ],
+   "a11y": {
+    "summary": "A list of products; each card is one button named \"View, <product>\". Stock is words as well as colour, the old price is read as \"was £85\", a sold-out size is read as \"L, sold out\", and colours are named.",
+    "roles": [
+     "banner",
+     "img",
+     "list",
+     "region"
+    ],
+    "keyboard": [
+     "Tab moves from card to card",
+     "Enter or Space opens the focused product"
+    ],
+    "controls": {
+     "button": 5,
+     "input": 0,
+     "link": 0,
+     "select": 0,
+     "textarea": 0,
+     "summary": 0
+    },
+    "focus_visible": true,
+    "reduced_motion": true,
+    "min_target": false
+   },
+   "files": {
+    "html": "components/product-grid/component.html",
+    "bytes": 19180,
+    "script": false
+   },
+   "source": null,
+   "photos": 4
   },
   {
    "id": "profile-card",
@@ -26957,6 +28696,311 @@
    },
    "source": "brand/showcase/product/01-quoin-payments",
    "photos": 0
+  },
+  {
+   "id": "recipe-card",
+   "name": "Recipe card",
+   "purpose": "A dish with its photo, the time it takes, how many it serves, the ingredients and numbered steps. The photo sits beside the title when there is room, and the ingredients beside the steps.",
+   "use_when": [
+    "when someone asks what to cook or how to make a dish",
+    "one recipe the person asked for, or the one the assistant recommends"
+   ],
+   "avoid_when": [
+    "several dishes to choose from: use result-list",
+    "a dish on a restaurant menu: use menu-item"
+   ],
+   "type": "content",
+   "style": "friendly",
+   "width": "medium",
+   "tags": {
+    "audience": "consumer",
+    "industries": [
+     "food",
+     "home",
+     "any"
+    ],
+    "keywords": [
+     "recipe",
+     "food",
+     "photo",
+     "steps",
+     "card"
+    ]
+   },
+   "root": ".odl-recipe-card",
+   "parts": [
+    {
+     "name": "photo",
+     "selector": ".odl-ph .odl-img",
+     "what": "the dish",
+     "slot": "media"
+    },
+    {
+     "name": "kicker",
+     "selector": ".odl-kicker",
+     "what": "a short line above the title (meal, diet)",
+     "slot": "text"
+    },
+    {
+     "name": "title",
+     "selector": ".odl-recipe-card h3",
+     "what": "the dish",
+     "slot": "text"
+    },
+    {
+     "name": "facts",
+     "selector": ".odl-facts",
+     "what": "time, servings and how hard it is, each with an icon",
+     "slot": "text"
+    },
+    {
+     "name": "intro",
+     "selector": ".odl-intro",
+     "what": "one or two lines about the dish",
+     "slot": "text"
+    },
+    {
+     "name": "ingredients",
+     "selector": ".odl-ingredients",
+     "what": "what to buy, one per line",
+     "slot": "list"
+    },
+    {
+     "name": "steps",
+     "selector": ".odl-steps",
+     "what": "numbered steps",
+     "slot": "list"
+    }
+   ],
+   "data": {
+    "type": "object",
+    "required": [
+     "photo",
+     "title",
+     "time",
+     "servings",
+     "steps"
+    ],
+    "properties": {
+     "photo": {
+      "type": "object",
+      "part": "photo",
+      "required": [
+       "src",
+       "alt"
+      ],
+      "properties": {
+       "src": {
+        "type": "string",
+        "maxLength": 2048
+       },
+       "alt": {
+        "type": "string",
+        "maxLength": 200
+       },
+       "width": {
+        "type": "integer"
+       },
+       "height": {
+        "type": "integer"
+       },
+       "ratio": {
+        "type": "string",
+        "maxLength": 12
+       },
+       "credit": {
+        "type": "string",
+        "maxLength": 120
+       }
+      }
+     },
+     "kicker": {
+      "type": "string",
+      "maxLength": 40,
+      "part": "kicker"
+     },
+     "title": {
+      "type": "string",
+      "maxLength": 60,
+      "part": "title"
+     },
+     "time": {
+      "type": "string",
+      "maxLength": 16,
+      "part": "facts"
+     },
+     "servings": {
+      "type": "string",
+      "maxLength": 16,
+      "part": "facts"
+     },
+     "level": {
+      "type": "string",
+      "maxLength": 12,
+      "part": "facts"
+     },
+     "intro": {
+      "type": "string",
+      "maxLength": 160,
+      "part": "intro"
+     },
+     "ingredients": {
+      "type": "array",
+      "maxItems": 14,
+      "part": "ingredients",
+      "items": {
+       "type": "object",
+       "required": [
+        "text"
+       ],
+       "properties": {
+        "text": {
+         "type": "string",
+         "maxLength": 60
+        }
+       }
+      }
+     },
+     "steps": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "part": "steps",
+      "items": {
+       "type": "object",
+       "required": [
+        "text"
+       ],
+       "properties": {
+        "text": {
+         "type": "string",
+         "maxLength": 200
+        }
+       }
+      }
+     }
+    }
+   },
+   "states": {
+    "shown": [
+     "with ingredients",
+     "steps only",
+     "photo beside when wide",
+     "stacked when narrow"
+    ],
+    "edge": {
+     "empty": {
+      "status": "not_built",
+      "how": "without steps, answer in text; the card is for a recipe someone will cook"
+     },
+     "loading": {
+      "status": "handled",
+      "how": "the photo box keeps its 3:2 shape on the sunken surface and pulses quietly until the photo arrives",
+      "evidence": "aspect-ratio: 3 / 2"
+     },
+     "error": {
+      "status": "handled",
+      "how": "a photo that fails keeps its box, with an icon and the photo's description",
+      "evidence": "class=\"odl-img\""
+     },
+     "disabled": {
+      "status": "not_built",
+      "how": "nothing in the card can be turned off; it has no buttons"
+     },
+     "overflow": {
+      "status": "handled",
+      "how": "in a narrow container the photo, ingredients and steps stack",
+      "evidence": "@container (min-width: 36rem)"
+     },
+     "long_text": {
+      "status": "handled",
+      "how": "steps wrap, long words break",
+      "evidence": "overflow-wrap: anywhere"
+     },
+     "missing_image": {
+      "status": "handled",
+      "evidence": "data-od-media",
+      "how": "the Smart UI renderer swaps a photo that fails to load for a calm tile of the same shape with an icon and its alt text"
+     }
+    }
+   },
+   "tokens": [
+    "--ds-border-width-default",
+    "--ds-color-bg-action-primary",
+    "--ds-color-bg-action-primary-hover",
+    "--ds-color-bg-neutral-subtle",
+    "--ds-color-border-default",
+    "--ds-color-border-focus",
+    "--ds-color-border-subtle",
+    "--ds-color-surface-raised",
+    "--ds-color-surface-sunken",
+    "--ds-color-text-danger",
+    "--ds-color-text-on-action",
+    "--ds-color-text-primary",
+    "--ds-color-text-secondary",
+    "--ds-color-text-success",
+    "--ds-color-text-tertiary",
+    "--ds-color-text-warning",
+    "--ds-elevation-raised",
+    "--ds-focus-ring-offset",
+    "--ds-focus-ring-width",
+    "--ds-font-weight-heading",
+    "--ds-font-weight-label",
+    "--ds-icon-stroke-md",
+    "--ds-motion-duration-short",
+    "--ds-motion-easing-standard",
+    "--ds-radius-container",
+    "--ds-radius-control",
+    "--ds-radius-full",
+    "--ds-radius-nested",
+    "--ds-size-control-md",
+    "--ds-size-control-sm",
+    "--ds-size-icon-sm",
+    "--ds-size-target-min",
+    "--ds-space-24",
+    "--ds-space-4",
+    "--ds-space-6",
+    "--ds-space-inline-md",
+    "--ds-space-inline-sm",
+    "--ds-space-inset-lg",
+    "--ds-space-inset-sm",
+    "--ds-space-inset-xl",
+    "--ds-space-stack-lg",
+    "--ds-space-stack-md",
+    "--ds-space-stack-sm",
+    "--ds-space-stack-xs",
+    "--ds-text-body-md",
+    "--ds-text-body-sm",
+    "--ds-text-label-lg",
+    "--ds-text-label-md",
+    "--ds-text-title-md"
+   ],
+   "a11y": {
+    "summary": "An article named by the dish; the steps are an ordered list read with their numbers, and time and servings are words beside their icons.",
+    "roles": [
+     "article",
+     "list"
+    ],
+    "keyboard": [],
+    "controls": {
+     "button": 0,
+     "input": 0,
+     "link": 0,
+     "select": 0,
+     "textarea": 0,
+     "summary": 0
+    },
+    "focus_visible": true,
+    "reduced_motion": true,
+    "min_target": true
+   },
+   "files": {
+    "html": "components/recipe-card/component.html",
+    "bytes": 11745,
+    "script": false
+   },
+   "source": null,
+   "photos": 1
   },
   {
    "id": "restaurant-card",
@@ -33303,7 +35347,7 @@
   {
    "id": "stay-card",
    "name": "Stay card",
-   "purpose": "A holiday rental or hotel listing: a swipeable photo carousel with dots, a favourite heart, the place, host and dates, the rating, and the price per night with the total.",
+   "purpose": "A holiday rental or hotel listing: in a narrow space a swipeable photo carousel with dots, in a wider one a strip of three photos; a favourite heart, the place, host and dates, the rating, the price per night with the total, and the cancellation rule shown as a status.",
    "use_when": [
     "in a list or map of places to stay, for one listing a traveller can save or open",
     "a grid of search results where each place needs several photos and a save action before the person opens it"
@@ -33315,7 +35359,7 @@
    ],
    "type": "commerce",
    "style": "friendly",
-   "width": "narrow",
+   "width": "medium",
    "tags": {
     "audience": "consumer",
     "industries": [
@@ -33386,6 +35430,12 @@
      "slot": "list"
     },
     {
+     "name": "status",
+     "selector": ".odl-status",
+     "what": "the cancellation rule as a status: free cancellation in the success colour, non-refundable in neutral or danger",
+     "slot": "text"
+    },
+    {
      "name": "price",
      "selector": ".odl-price",
      "what": "old price struck through, price a night and the total",
@@ -33446,6 +35496,20 @@
           "alt": {
            "type": "string",
            "maxLength": 200
+          },
+          "width": {
+           "type": "integer"
+          },
+          "height": {
+           "type": "integer"
+          },
+          "ratio": {
+           "type": "string",
+           "maxLength": 12
+          },
+          "credit": {
+           "type": "string",
+           "maxLength": 120
           }
          }
         }
@@ -33509,6 +35573,21 @@
       "type": "string",
       "maxLength": 18,
       "part": "price"
+     },
+     "status": {
+      "type": "string",
+      "maxLength": 40,
+      "part": "status"
+     },
+     "tone": {
+      "type": "string",
+      "enum": [
+       "neutral",
+       "success",
+       "warning",
+       "danger"
+      ],
+      "part": "status"
      }
     }
    },
@@ -33518,7 +35597,9 @@
      "saved",
      "discounted",
      "hover",
-     "focus"
+     "focus",
+     "free cancellation",
+     "non-refundable"
     ],
     "edge": {
      "empty": {
@@ -33560,17 +35641,23 @@
    "tokens": [
     "--ds-color-border-focus",
     "--ds-color-danger-light-9",
+    "--ds-color-neutral-alpha-light-7",
     "--ds-color-neutral-alpha-light-9",
     "--ds-color-neutral-light-12",
     "--ds-color-shadow-key",
+    "--ds-color-surface-raised",
     "--ds-color-surface-sunken",
+    "--ds-color-text-danger",
     "--ds-color-text-primary",
     "--ds-color-text-secondary",
+    "--ds-color-text-success",
     "--ds-color-text-tertiary",
+    "--ds-color-text-warning",
     "--ds-color-white",
     "--ds-elevation-raised",
     "--ds-focus-ring-offset",
     "--ds-focus-ring-width",
+    "--ds-font-weight-label",
     "--ds-icon-stroke-lg",
     "--ds-icon-stroke-sm",
     "--ds-motion-duration-medium",
@@ -33586,6 +35673,7 @@
     "--ds-size-icon-sm",
     "--ds-size-target-min",
     "--ds-space-2",
+    "--ds-space-24",
     "--ds-space-4",
     "--ds-space-6",
     "--ds-space-inline-sm",
@@ -33625,7 +35713,7 @@
    },
    "files": {
     "html": "components/stay-card/component.html",
-    "bytes": 13045,
+    "bytes": 15504,
     "script": true
    },
    "source": null,
