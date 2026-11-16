@@ -319,39 +319,62 @@ def a_place(c, w=560, h=420):
             f'<p class="sd-plw">{esc(why)}</p><p>{a_status(*st)}</p></div></li>')
 
 
+NB = " "  # no-break space: a number never parts from its unit
+SHORT = {"shop": "Shop", "places": "Places", "council": "Council", "review": "Review"}  # tab labels on phones
+
+
+def a_map():
+    """A quiet street-map tile of the fine's place (drawn, so no real plate or shop sign can show), stretched to fill."""
+    return ('<div class="sd-map" role="img" aria-label="Map of Mill Street with the parking bay marked">'
+            '<svg viewBox="0 0 320 140" preserveAspectRatio="xMidYMid slice" aria-hidden="true">'
+            '<rect class="m-bg" width="320" height="140"/>'
+            '<path class="m-blk" d="M0 0h96v46H0zM120 0h88v46h-88zM232 0h88v46h-88zM0 86h60v54H0zM84 86h124v54H84zM232 86h88v54h-88z"/>'
+            '<path class="m-park" d="M128 50v8M140 50v8M152 50v8M164 50v8M176 50v8M188 50v8"/>'
+            '<path class="m-rd" d="M0 66h320M108 0v140M220 0v140"/>'
+            '<rect class="m-bay" x="152" y="49" width="12" height="10" rx="2"/><circle class="m-pin" cx="158" cy="54" r="6"/></svg>'
+            '<span class="sd-maplbl" aria-hidden="true">Mill Street</span></div>')
+
+
 def a_fine():
-    rows = [("Reference", "FH40018273"), ("Date", "Fri 6 Nov 2026, 10:42"), ("Place", "Mill Street"), ("Full amount", "£70.00")]
-    kv = "".join(f"<dt>{k}</dt><dd>{v}</dd>" for k, v in rows) + "<dt>Pay by Thu 19 Nov</dt><dd><b>£35.00</b></dd>"
-    return (f'<div class="sd-card"><div class="sd-cardh"><div><p class="sd-ct">Unpaid parking fine</p><p class="sd-sub">Vehicle AB12 CDE</p></div>{a_status("warn", "Unpaid")}</div>'
-            f'<dl class="sd-kv">{kv}</dl><span class="sd-btn">Pay £35.00</span></div>')
+    rows = [("Reference", "FH40018273"), ("Date", f"Fri{NB}6{NB}Nov{NB}2026, 10:42"), ("Full amount", "£70.00")]
+    kv = "".join(f"<dt>{k}</dt><dd>{v}</dd>" for k, v in rows) + f"<dt>Pay by Thu{NB}19{NB}Nov</dt><dd><b>£35.00</b></dd>"
+    return (f'<div class="sd-card sd-fine"><div class="sd-cardh"><div><p class="sd-ct">Unpaid parking fine</p><p class="sd-sub">Vehicle AB12 CDE</p></div>{a_status("warn", "Unpaid")}</div>'
+            f'{a_map()}<dl class="sd-kv">{kv}</dl><span class="sd-btn">Pay £35.00</span></div>')
 
 
 def a_checks():
-    rows = [("ok", "Pass", "Colours all come from tokens"), ("ok", "Pass", "Body text contrast is 7.2 to 1"), ("ok", "Pass", "Spacing follows the 8 px scale"),
-            ("warn", "Look", "Two buttons use a 10 px radius, the system says 12"), ("bad", "Broken", "Plan names are cut off at 375 px")]
+    rows = [("ok", "Pass", "Colours all come from tokens"), ("ok", "Pass", f"Body text contrast is 7.2{NB}to{NB}1"), ("ok", "Pass", f"Spacing follows the 8{NB}px scale"),
+            ("warn", "Look", f"Two buttons use a 10{NB}px radius, the system says 12"), ("bad", "Broken", f"Plan names are cut off at 375{NB}px")]
     return ('<div class="sd-card sd-wide"><p class="sd-ct">Pricing page, checked against your system</p><p class="sd-sub">5 checks: 3 pass, 1 to look at, 1 broken</p><ul class="sd-checks">'
             + "".join(f"<li>{a_status(t, l)}{esc(x)}</li>" for t, l, x in rows) + "</ul></div>")
+
+
+def a_mock():
+    """A pricing-page sketch: header, title, three plans and a questions block; each marker sits on the element it means."""
+    plan = lambda i: (f'<div class="sd-pl{" w" if i == 1 else ""}"><span class="nm">' + ('<span class="sd-pin bad">2</span>' if i == 0 else "")
+                      + '</span><i class="pr"></i><i class="sh"></i><i></i><i></i><i></i><i></i><i class="sh"></i><span class="bt">' + ('<span class="sd-pin warn">1</span>' if i == 1 else "") + "</span></div>")
+    return ('<div class="sd-sk"><p class="kicker">Where on the page</p>'
+            '<div class="sd-mini" role="img" aria-label="Sketch of the pricing page: marker 1 on the middle plan\'s button, whose corners are 10 px; marker 2 on the first plan\'s name, which is cut off">'
+            '<div class="sd-mnav"><i class="lg"></i><i></i><i></i><i></i><i class="cta"></i></div>'
+            '<div class="sd-mhero"><i class="t"></i><i class="s"></i></div>'
+            f'<div class="sd-plans">{plan(0)}{plan(1)}{plan(2)}</div>'
+            '<div class="sd-faq"><i class="t"></i><i></i><i></i><i></i></div></div></div>')
 
 
 def a_part(k, v):
     if v == 2 and k == "places":
         return f'<div class="sd-feat"><ul class="sd-plist">{a_place(CAFES[0], 720, 540)}</ul><ul class="sd-plist sd-side">{"".join(a_place(c) for c in CAFES[1:])}</ul></div>'
-    if v != 3 and k == "council":
-        opts = [("Pay £35.00 today", "The lower amount ends Thursday 19 November"), ("Challenge the fine", "Send photos or a permit within 28 days"),
-                ("Ask for more time", "Up to 14 days if you ask before the 19th")]
+    if k == "council":
+        opts = [("Pay £35.00 today", f"The lower amount ends Thursday 19{NB}November"), ("Challenge the fine", f"Send photos or a permit within 28{NB}days"),
+                ("Ask for more time", f"Up to 14{NB}days if you ask before the 19th")]
         return (f'<div class="sd-duo">{a_fine()}<div class="sd-opts"><p class="kicker">What you can do</p>'
                 + "".join(f'<div class="sd-opt"><b>{t}</b><span>{d}</span></div>' for t, d in opts) + "</div></div>")
-    if v != 3 and k == "review":
-        pl = lambda w: f'<div class="sd-pl{" w" if w else ""}"><i class="nm"></i><i></i><i></i><i class="bt"></i></div>'
-        return (f'<div class="sd-duo sd-duo-sk">{a_checks()}<div class="sd-sk"><p class="kicker">Where on the page</p>'
-                f'<div class="sd-mini" role="img" aria-label="Sketch of the pricing page: finding 1, the button radius, on the middle plan; finding 2, the cut-off plan name, on the first plan">'
-                f'<div class="sd-mbar"></div><div class="sd-plans">{pl(0)}{pl(1)}{pl(0)}</div>'
-                '<span class="sd-pin warn" style="left:50%;bottom:22px">1</span><span class="sd-pin bad" style="left:16%;top:44px">2</span></div></div></div>')
+    if k == "review":
+        return f'<div class="sd-duo">{a_checks()}{a_mock()}</div>'
     if k == "shop":
-        return a_products(8, "1/1") if v == 2 else a_products(4, "1/1") if v == 3 else a_products(4, "4/5")
-    if k == "places":
-        return f'<ul class="sd-places">{"".join(a_place(c) for c in CAFES)}</ul>'
-    return a_fine() if k == "council" else a_checks()
+        # the window layout draws all eight: four on wide screens, all eight in two columns on phones
+        return a_products(8, "1/1") if v == 2 else a_products(4, "1/1") if v == 3 else a_products(8, "4/5")
+    return f'<ul class="sd-places">{"".join(a_place(c) for c in CAFES)}</ul>'
 
 
 def a_head(s):
@@ -362,29 +385,36 @@ def a_trace(s, cls):
     return f'<p class="{cls}">' + "".join(f"<span>{esc(x)}</span>" for x in (s["agent"][0], s["ui"][0], s["ui"][2])) + f'<b>Ready in {s["ms"]}</b></p>'
 
 
+def a_steps(xs):
+    return '<ul class="sd-steps">' + "".join(f"<li>{esc(x)}</li>" for x in xs) + "</ul>"
+
+
 def a_view(k, v):
     """One assistant's answer in one layout: 1 window and rail, 2 chat and canvas, 3 single window."""
     s = ASSISTANTS[k]
     chips = '<div class="sd-compose" aria-label="Other questions">' + "".join(f'<span class="sd-chip">{esc(c)}</span>' for c in s["chips"][1:]) + "</div>"
+    ready = f'<p class="sd-ready">Ready in <b>{s["ms"].replace(" ", NB)}</b></p>'
     if v == 1:
-        steps = lambda xs: '<ul class="sd-steps">' + "".join(f"<li>{esc(x)}</li>" for x in xs) + "</ul>"
-        rail = (f'<aside class="sd-rail" aria-label="Behind the answer"><p class="kicker">Behind the answer</p>'
-                f'<div class="sd-lane"><p class="kicker">Your agent</p>{steps(s["agent"])}</div><div class="sd-lane"><p class="kicker">Smart UI</p>{steps(s["ui"])}</div>'
-                f'<div class="sd-lane sd-lane-x"><p class="kicker">Checked before it shows</p>{steps(s["checks"])}</div><hr><p class="sd-ready">Ready in <b>{s["ms"]}</b></p></aside>')
+        rail = (f'<aside class="sd-rail" aria-label="Behind the answer"><div class="sd-rtop"><p class="kicker">Behind the answer</p>'
+                f'<div class="sd-lane"><p class="kicker">Your agent</p>{a_steps(s["agent"])}</div><div class="sd-lane"><p class="kicker">Smart UI</p>{a_steps(s["ui"])}</div>'
+                f'<div class="sd-lane sd-lane-x"><p class="kicker">Checked before it shows</p>{a_steps(s["checks"])}</div></div>{ready}</aside>')
         return (f'<div class="sd-win">{a_head(s)}<div class="sd-body"><div class="sd-q">{esc(s["q"])}</div><p class="sd-a">{esc(s["a"])}</p>'
                 f'<div class="sd-part">{a_part(k, 1)}</div></div>{chips}</div>{rail}')
     if v == 2:
         qs = '<div class="sd-qlist" aria-label="Other questions">' + "".join(f'<span class="sd-chip">{esc(c)}</span>' for c in s["chips"][1:]) + "</div>"
-        return (f'<div class="sd-win sd-chatcol">{a_head(s)}<div class="sd-body"><div class="sd-q">{esc(s["q"])}</div><p class="sd-a">{esc(s["a"])}</p>{qs}</div></div>'
-                f'<div class="sd-win sd-canvas"><div class="sd-body"><div class="sd-ctitle"><b>{esc(s["title"])}</b><span class="kicker">{s["count"]}</span></div>{a_part(k, 2)}</div>'
-                f'{a_trace(s, "sd-trace")}</div>')
+        behind = (f'<div class="sd-behind" aria-label="Behind the answer"><div class="sd-lane"><p class="kicker">Your agent</p>{a_steps(s["agent"])}</div>'
+                  f'<div class="sd-lane"><p class="kicker">Smart UI</p>{a_steps(s["ui"])}</div>{ready}</div>')
+        return (f'<div class="sd-win sd-chatcol">{a_head(s)}<div class="sd-body"><div class="sd-q">{esc(s["q"])}</div><p class="sd-a">{esc(s["a"])}</p>{qs}{behind}</div></div>'
+                f'<div class="sd-win sd-canvas"><div class="sd-body"><div class="sd-ctitle"><b>{esc(s["title"])}</b><span class="kicker">{s["count"]}</span></div>'
+                f'<div class="sd-part">{a_part(k, 2)}</div></div></div>')
     return (f'<div class="sd-win">{a_head(s)}<div class="sd-body"><div class="sd-q">{esc(s["q"])}</div><p class="sd-a">{esc(s["a"])}</p>'
             f'<div class="sd-part">{a_part(k, 3)}</div></div>{chips}</div>{a_trace(s, "sd-tracebar")}')
 
 
 def a_tabs(on):
     return ('<div class="sd-seg" role="group" aria-label="Example assistants">'
-            + "".join(f'<button type="button" data-k="{k}" aria-pressed="{str(k == on).lower()}">{esc(s["tab"])}</button>' for k, s in ASSISTANTS.items()) + "</div>")
+            + "".join(f'<button type="button" data-k="{k}" aria-pressed="{str(k == on).lower()}"><span class="sd-tl">{esc(s["tab"])}</span><span class="sd-ts">{SHORT[k]}</span></button>'
+                      for k, s in ASSISTANTS.items()) + "</div>")
 
 
 def a_templates():

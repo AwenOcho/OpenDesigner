@@ -59,15 +59,23 @@
       state[which] = b.dataset.k;
       press(b.parentElement, b);
       which === "hero" ? drawHero(true) : drawAny(true);
+      fades();
     } else if (b.dataset.l) {
-      state.lay = b.dataset.l; press(b.parentElement, b); drawAny(true);
+      state.lay = b.dataset.l; press(b.parentElement, b); drawAny(true); fades();
     } else if (b.dataset.o) {
-      state.look = b.dataset.o; press(b.parentElement, b); drawAny(true);
+      state.look = b.dataset.o; press(b.parentElement, b); drawAny(true); fades();
     }
   });
 
-  const redraw = () => { drawHero(false); drawAny(false); };
+  // a sideways row (tabs, chips, the look picker) fades at its end only while there is more of it to scroll to
+  const fades = () => document.querySelectorAll(".sd-seg, .sd-compose").forEach(el => {
+    el.classList.toggle("sd-fade", el.scrollWidth - el.clientWidth - el.scrollLeft > 2);
+  });
+  document.addEventListener("scroll", e => { if (e.target.matches && e.target.matches(".sd-seg, .sd-compose")) fades(); }, true);
+  addEventListener("resize", fades);
+  const redraw = () => { drawHero(false); drawAny(false); fades(); };
   if (mq.matches) redraw();  // wide screens already show the finished answers the page was built with
+  fades();
   mq.addEventListener("change", redraw);
   // a new width on a phone changes how the answers wrap: measure again before the next paint (width only, so the heights
   // this sets never call it again)
