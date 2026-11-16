@@ -1953,16 +1953,33 @@ def use_cases(root, app=None, catalog=None):
         if t in score:
             add(t, 1, f"common in {kind.replace('-', ' ')} assistants", "product: " + (product[:80] or "PRODUCT.md"))
     research = root / "opendesigner" / "research"
-    texts = [(f, f.read_text(errors="ignore").lower()) for f in sorted(research.glob("*")) if f.suffix in (".md", ".json")] if research.is_dir() else []
-    words = {"table": "table", "chart over time": "chart|trend|graph", "pictures": "photo|picture|image|gallery", "place": "map|address|location",
-             "pick a time": "booking|appointment|slot", "compare options": "compare|comparison", "answer with sources": "source|citation|cite",
-             "embed": "video|embed", "progress": "status|progress|tracking", "file": "invoice pdf|download|document"}
-    for f, t in texts:
-        for typ, pat in words.items():
-            n = len(re.findall(r"\b(" + pat + r")\b", t))
-            if n:
-                add(typ, min(3, n), f"the research mentions it {n} times", f"research: {f.name}")
-    if not texts:
+    files = sorted(f for f in research.glob("*") if f.suffix in (".md", ".json")) if research.is_dir() else []
+    known = {t for t, _, _ in ANSWER_TYPES}
+    weight = {"measured": 3, "reported": 2, "inferred": 1}
+    cited = 0
+    for f in files:  # findings that name answer types (research.py), each cited by its id
+        doc = _load_json(f) if f.suffix == ".json" else None
+        for fd in (doc or {}).get("findings") or [] if isinstance(doc, dict) else []:
+            for at in (fd.get("answer_types") or []) if isinstance(fd, dict) else []:
+                typ = at.get("type") if isinstance(at, dict) else None
+                if typ not in known:
+                    continue
+                cited += 1
+                add(typ, weight.get(fd.get("confidence"), 1), f"research {fd.get('id')}: {at.get('evidence') or fd.get('text', '')[:80]}",
+                    f"research: {f.name} {fd.get('id')}")
+    if files and not cited:  # a fallback only, and labelled as one, until the findings name answer types
+        words = {"table": "table", "chart over time": "chart|trend|graph", "pictures": "photo|picture|image|gallery", "place": "map|address|location",
+                 "pick a time": "booking|appointment|slot", "compare options": "compare|comparison", "answer with sources": "source|citation|cite",
+                 "embed": "video|embed", "progress": "status|progress|tracking", "file": "invoice pdf|download|document"}
+        for f in files:
+            t = f.read_text(errors="ignore").lower()
+            for typ, pat in words.items():
+                n = len(re.findall(r"\b(" + pat + r")\b", t))
+                if n:
+                    add(typ, 1, f"a keyword count, not a finding: the research mentions it {n} times", f"research: {f.name} (keywords)")
+        gaps.append("no research finding names an answer type, so the research counts only as keywords: add answer_types to the "
+                    "findings (research.md section 6) and run research check")
+    if not files:
         gaps.append("no research on this product's users or on what assistants in its industry show: run "
                     "`engine.py research plan --brief \"what answers do assistants for <this product> show, and which do people use\"`")
     for f in sorted(list(root.glob("web/*.html")) + list(root.glob("*.html")) + list(root.glob("src/**/*.tsx")))[:30]:

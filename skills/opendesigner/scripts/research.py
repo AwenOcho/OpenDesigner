@@ -143,6 +143,11 @@ SIGNALS = {
     "familiar-patterns": {"plain": "the apps they use daily have taught them strong patterns", "effects": {},
                           "note": "Follow the patterns of the apps they live in before inventing new ones (practices.md sections 2 and 3)."},
 }
+# Answer types: what a finding says an assistant for this product should show (Smart UI's use cases read them; the names
+# are the ones opendesigner-smart-ui/scripts/smartui.py ANSWER_TYPES uses, and test_research.py keeps the two lists equal).
+ANSWER_TYPES = ("table", "chart over time", "share of a whole", "headline numbers", "record details", "progress", "compare options",
+                "results to pick from", "pick a time", "pictures", "place", "file", "answer with sources", "form",
+                "ask before a change", "what happened", "embed")
 SINGLE = {"Q-aud-01", "Q-aud-02", "Q-aud-03"}
 PERSON_OWN = ("chosen", "confirmed_default", "reference", "asset", "research")  # a value someone said yes to; research never overwrites it
 RX_EMAIL = re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+")
@@ -328,6 +333,18 @@ def problems(rec):
                 err(f"finding {name} signal {sg!r} is not a known signal ({', '.join(SIGNALS)})")
         if conf == "inferred" and f.get("signals"):
             warn(f"finding {name} is inferred; its signals are shown, but say it is a guess when you ask")
+        types = f.get("answer_types")
+        if types is not None and not isinstance(types, list):
+            err(f"finding {name} answer_types must be a list of {{type, evidence}}")
+            types = []
+        for at in types or []:
+            if not isinstance(at, dict) or at.get("type") not in ANSWER_TYPES:
+                got = at.get("type") if isinstance(at, dict) else at
+                err(f"finding {name} answer type {got!r} is not a known answer type ({', '.join(ANSWER_TYPES)})")
+            elif not str(at.get("evidence") or "").strip():
+                err(f"finding {name} answer type {at['type']!r} needs its evidence: what in the sources shows people need it")
+        if conf == "inferred" and types:
+            warn(f"finding {name} is inferred; its answer types count for little until a source shows them")
     for i, a in enumerate(rec.get("apps") or [], 1):
         if not isinstance(a, dict) or not str(a.get("name") or "").strip():
             err(f"app {i} needs a name")
