@@ -137,9 +137,8 @@
 @media (max-width: 900px) { .sq { grid-template-columns: minmax(0, 1fr); } }
 
 /* before and after, and the same answer in two systems: three frames in a row; a strip on phones */
-.cmp { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
+.cmp { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
 .cmp-side { display: flex; flex-direction: column; min-width: 0; }
-.cmp-side .su-shot { flex: 1; }
 .cmp-chat { display: flex; flex-direction: column; gap: 12px; }
 .cmp-chat .sl-say { font-size: 14px; line-height: 21px; }
 .cmp-part { zoom: .82; }
@@ -189,8 +188,7 @@
 .rs { min-width: 0; }
 .rs .su-shot { position: relative; padding: 10px; }
 .rs .su-shot-in { position: relative; overflow: hidden; }
-.rs .su-shot-in::after { content: ""; position: absolute; inset: auto 0 0 0; height: 64px; background: linear-gradient(transparent, var(--surface)); pointer-events: none; }
-.rs img { width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; object-position: top; display: block; border-radius: max(2px, calc(var(--r-card) - 10px)); }
+.rs img { width: 100%; height: auto;  display: block; border-radius: max(2px, calc(var(--r-card) - 10px)); }
 .rs p { margin: 12px 0 0; font-size: 15px; line-height: 22px; color: var(--ink-muted); }
 .rs p b { color: var(--ink); font-weight: 500; }
 @media (max-width: 640px) {
