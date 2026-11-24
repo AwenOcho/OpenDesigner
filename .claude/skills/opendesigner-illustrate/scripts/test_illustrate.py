@@ -130,7 +130,24 @@ class Hostile(unittest.TestCase):
     def test_only_https_is_offered(self):
         with self.assertRaises(ValueError):
             il.fetch_line("file:///etc/passwd", "x.svg")
-        self.assertIn('"https://a.example/x.svg"', il.fetch_line("https://a.example/x.svg", "x.svg"))
+        self.assertIn("'https://a.example/x.svg'", il.fetch_line("https://a.example/x.svg", "x.svg"))
+
+    def test_fetch_line_runs_one_curl_whatever_the_url_holds(self):
+        """URLs come from third-party listings: a $(...), backtick or quote in one must stay part of the URL (audit 2026-11-24)."""
+        import shutil, subprocess
+        bash = shutil.which("bash")
+        if not bash:
+            self.skipTest("needs bash")
+        for url in ("https://x.example/a$(echo HACKED).svg", "https://x.example/`echo HACKED`.svg", "https://x.example/${HOME}.svg",
+                    'https://x.example/a".svg ; echo HACKED ; "', "https://x.example/it's.svg ; echo HACKED ; '"):
+            # a real shell runs the line, with curl replaced by a function that prints the words it was given
+            r = subprocess.run([bash, "-c", 'curl() { printf "%s\\n" "$@"; }; ' + il.fetch_line(url, "out/a b.svg")],
+                               capture_output=True, text=True, timeout=10)
+            words = r.stdout.split("\n")[:-1]
+            self.assertEqual(words[-3:], [url, "-o", "out/a b.svg"], url)  # the URL arrives exactly as written
+            self.assertNotIn("HACKED", [w for w in words if w != url])  # and nothing else ran
+        with self.assertRaises(ValueError):
+            il.fetch_line("https://x.example/a.svg", "a.svg", key_env="X; id")
 
     def test_network_stays_in_one_https_function(self):
         # the owner allowed this skill the network (2026-09-28), confined to http_get: HTTPS only, 3 MB cap
@@ -445,7 +462,7 @@ class Workflow(unittest.TestCase):
             self.assertNotIn("openverse:3", out)                # non-commercial is hidden
             out = run(["--dir", d, "fetch", "openverse:1", "openverse:3", "--name", "launch", "--offline"])
             self.assertIn("skip openverse:3: non-commercial", out)
-            self.assertIn('"https://x/1.svg"', out)              # step one: the download to make
+            self.assertIn("'https://x/1.svg'", out)              # step one: the download to make
             Path(d, "downloads", "openverse-1.svg").write_text(SCENE)
             out = run(["--dir", d, "fetch", "openverse:1", "--name", "launch"])
             self.assertIn("fetched launch", out)
@@ -725,7 +742,7 @@ ION_ICONS = {"prefix": "ion", "width": 512, "height": 512, "icons": {
 
 def fulfil(out, payloads):
     """Stand in for the agent: save each requested download (from the printed curl lines) with a canned body."""
-    for url, dest in re.findall(r'"(https://[^"]+)" -o "([^"]+)"', out):
+    for url, dest in re.findall(r"'(https://[^']+)' -o '([^']+)'", out):
         body = next(v for k, v in payloads.items() if k in url)
         Path(dest).parent.mkdir(parents=True, exist_ok=True)
         Path(dest).write_text(json.dumps(body))
@@ -795,7 +812,7 @@ class Icons(unittest.TestCase):
             self.assertRaises(SystemExit, run, ["--dir", d, "icons", "fetch", "../wallet", "--set", "ion"])
             out = run(["--dir", d, "icons", "fetch", "wallet", "--set", "ion", "--offline"])
             self.assertIn("https://api.iconify.design/collections?prefixes=ion", out)
-            self.assertIn("ion.json?icons=wallet,wallet-outline\"", out)                            # the outline glyph first; plain only if drawn alike
+            self.assertIn("ion.json?icons=wallet,wallet-outline'", out)                            # the outline glyph first; plain only if drawn alike
             fulfil(out, {"collections": ION_INFO, "ion.json": ION_ICONS})
             out = run(["--dir", d, "icons", "fetch", "wallet", "--set", "ion"])
             self.assertIn("drew wallet.svg <- ion:wallet-outline", out)

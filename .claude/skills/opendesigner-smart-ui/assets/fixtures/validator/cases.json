@@ -3235,6 +3235,120 @@
    ],
    "opts": {},
    "expect": []
+  },
+  {
+   "name": "backslash-tricks-host-check",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Results",
+        "items": [
+         {
+          "title": "Harbour room",
+          "photo": {
+           "src": "https://evil.example\\@img.cdn.example/p.png?d=secret",
+           "alt": "Room",
+           "ratio": "3:2"
+          },
+          "book": {
+           "label": "Book",
+           "event": {
+            "name": "book_room"
+           }
+          }
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": [
+    "R4-url@/0/createSurface/components/0/items/0/photo/src"
+   ]
+  },
+  {
+   "name": "userinfo-in-image-url",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Results",
+        "items": [
+         {
+          "title": "Harbour room",
+          "photo": {
+           "src": "https://evil.example@img.cdn.example/p.png",
+           "alt": "Room",
+           "ratio": "3:2"
+          },
+          "book": {
+           "label": "Book",
+           "event": {
+            "name": "book_room"
+           }
+          }
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": [
+    "R4-url@/0/createSurface/components/0/items/0/photo/src"
+   ]
+  },
+  {
+   "name": "space-in-image-host",
+   "answer": [
+    {
+     "version": "1.0",
+     "createSurface": {
+      "surfaceId": "s1",
+      "catalogId": "https://opendesigner.dev/catalogs/test/v1/catalog.json",
+      "components": [
+       {
+        "id": "root",
+        "component": "Results",
+        "items": [
+         {
+          "title": "Harbour room",
+          "photo": {
+           "src": "https://evil.example .cdn.example/p.png",
+           "alt": "Room",
+           "ratio": "3:2"
+          },
+          "book": {
+           "label": "Book",
+           "event": {
+            "name": "book_room"
+           }
+          }
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ],
+   "opts": {},
+   "expect": [
+    "R4-url@/0/createSurface/components/0/items/0/photo/src"
+   ]
   }
  ]
 }

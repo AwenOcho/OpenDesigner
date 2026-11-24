@@ -7,6 +7,8 @@ All notable changes to OpenDesigner are recorded here. The format follows [Keep 
 ## [Unreleased]
 
 ### Fixed
+- **Download lines can't run hidden commands** (2026-11-24). When the illustration skill hands the agent a curl line, it now puts the address and file name in single quotes. A `$(...)`, backtick or quote inside an address from an art site stays part of the address instead of running in the terminal.
+- **Smart UI picture check matches the browser** (2026-11-24). The image allow-list check now refuses addresses with a backslash, `@` or space before the path. A browser reads `https://evil.test\@img.cdn.example` as evil.test, so the old check could approve a picture from a site that was not on the list.
 - **Receipt total lines up** (2026-11-17). The receipt's paid total now sits on the card's content edge with the amount at the end, and the word "Reference" is the same size as the reference it introduces.
 - **One inset for Smart UI answer cards** (2026-11-17). Flight rows, the fare comparison, the approval and the receipt now share one card inset. The fare grid sits centred with dividers as wide as its columns, and the receipt lists its details like the approval before it, in the same typeface.
 - **One corner shape per answer** (2026-11-17). Icon tiles, the airline mark and the approval's detail and warning bands now take the buttons' corner radius instead of near-square 2 px corners, and every tag uses the same shape. The flight route has a dot at both ends. The travel demo's chips match its buttons, its mark shows a plane, and its demo settings moved under the composer.

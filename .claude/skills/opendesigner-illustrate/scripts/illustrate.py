@@ -760,13 +760,21 @@ CONNECTORS = {"openverse": (req_openverse, parse_openverse, "json"), "cocomateri
               "opendoodles": (req_listing, parse_listing, "html"), "lukaszadam": (req_listing, parse_listing, "html")}
 
 
+def _sq(s):
+    """One shell word, taken literally: single quotes, with any ' inside closed, escaped and reopened. URLs come from
+    third-party listings, and inside double quotes a shell still runs $(...) and `...` (security audit, 2026-11-24)."""
+    return "'" + str(s).replace("'", "'\\''") + "'"
+
+
 def fetch_line(url, dest, key_env=None, limit=MAX_BYTES):
     """How the agent fetches one file with its own tools. Only HTTPS URLs are ever offered. A key is named by its
-    environment variable, never printed."""
+    environment variable, never printed. Every value is quoted so the line runs exactly one curl, whatever the URL holds."""
     if not url.lower().startswith("https://"):
         raise ValueError(f"only https:// URLs are fetched, not {url[:40]!r}")
-    auth = f' -H "Authorization: ${key_env}"' if key_env else ""
-    return f'curl -sL --max-filesize {limit} -A "{UA}"{auth} "{url}" -o "{dest}"'
+    if key_env and not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", key_env):
+        raise ValueError(f"not an environment variable name: {key_env[:40]!r}")
+    auth = f' -H "Authorization: ${key_env}"' if key_env else ""  # double quotes on purpose: the shell fills in the key
+    return f"curl -sL --max-filesize {int(limit)} -A {_sq(UA)}{auth} {_sq(url)} -o {_sq(dest)}"
 
 
 def http_get(url, dest, timeout=30, key_env=None, limit=MAX_BYTES):
