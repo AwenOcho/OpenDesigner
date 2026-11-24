@@ -7,6 +7,7 @@ All notable changes to OpenDesigner are recorded here. The format follows [Keep 
 ## [Unreleased]
 
 ### Fixed
+- **No false flash warnings in a video's first second** (2026-11-24). `preflight.py video` relied on ffmpeg padding with pure black, but ffmpeg 6.1 pads 16-bit grey with video black. Every video's first second then looked like it was flashing, and a thin false "flashing" border was added on every frame. Both are fixed. Real flashing is still caught.
 - **Preflight names the same files on every computer** (2026-11-24). `preflight.py public` now sorts the files it finds in a build folder. Before, the order came from the file system, so on Linux it listed files in a different order than on a Mac and could name a different few when a list was cut short.
 - **Painting engine tools updated for two advisories** (2026-11-24). New film projects now install Playwright 1.63.0 and Vite 6.4.6. The old Playwright downloaded browsers without checking the certificate, and the old Vite could be tricked into running a command through its open-in-editor feature. p5 stays at 2.3.3. The new Playwright brings a newer Chromium, so re-check plate hashes before re-exporting an existing film.
 - **Download lines can't run hidden commands** (2026-11-24). When the illustration skill hands the agent a curl line, it now puts the address and file name in single quotes. A `$(...)`, backtick or quote inside an address from an art site stays part of the address instead of running in the terminal.

@@ -695,8 +695,11 @@ def flash_graph(src: str, aw: int, ah: int, n: int) -> str:
             f"[fa]tblend=all_mode=difference,lut=c0='if(gte(val,{0.1 * ON}),{ON},0)',{f}[fd];"  # changed by 0.1 or more
             f"[fz]tblend=all_mode=darken,lut=c0='if(lt(val,{0.8 * ON}),{ON},0)',{f}[fm];"  # the darker state is below 0.8
             f"[fd][fm]blend=all_mode=and,{f},split=2[ft][fu];"
-            # count over the last n frames; tmix fills its window with copies of the first frame, so a blank one goes first
-            f"[fu]lut=c0='if(val,{unit},0)',{f},tpad=start=1,tmix=frames={n}:weights=1:scale=1,{f},trim=start_frame=1,"
+            # count over the last n frames; tmix fills its window with copies of the first frame, so a blank one goes first.
+            # tpad pads with video black, not 0 (4112 in gray16 on ffmpeg 6.1), which filled the first second with false
+            # counts; the lut after it keeps exactly one transition and zeroes anything else, whatever black tpad uses
+            f"[fu]lut=c0='if(val,{unit},0)',{f},tpad=start=1,lut=c0='if(eq(val,{unit}),{unit},0)',{f},"
+            f"tmix=frames={n}:weights=1:scale=1,{f},trim=start_frame=1,"
             f"setpts=PTS-STARTPTS,lut=c0='if(gte(val,{6.5 * unit}),{ON},0)',{f}[fc];"
             f"[ft]setpts=PTS-STARTPTS[fn];[fn][fc]blend=all_mode=and,{f}[bad]")
 
@@ -713,7 +716,8 @@ def check_flash(r: Report, path: Path, w: int, h: int, fps: float, field="tablet
     pw, ph = aw + 2 * p + (aw % 2), ah + 2 * p + (ah % 2)  # even, so the disk's centre is the kernel's origin
     k = math.floor(rad)
     disk = sum(1 for dy in range(-k, k + 1) for dx in range(-k, k + 1) if dx * dx + dy * dy <= rad * rad)
-    g = (flash_graph("0:v", aw, ah, n) + f";[bad]pad={pw}:{ph}:{p}:{p}:black[fp];"
+    # pad paints video black (4112 in gray16), not 0, so the lut makes the margin 0 again: [bad] is only 0 or ON
+    g = (flash_graph("0:v", aw, ah, n) + f";[bad]pad={pw}:{ph}:{p}:{p}:black,lut=c0='if(gte(val,{ON}),{ON},0)',format=gray16le[fp];"
          f"color=c=black:s={pw}x{ph}:d=1:r=1,format=gray16le,"
          f"geq=lum='if(lte((X-{pw // 2})*(X-{pw // 2})+(Y-{ph // 2})*(Y-{ph // 2}),{rad * rad}),65535,0)'[fk];"
          f"[fp][fk]convolve=impulse=first,crop={aw}:{ah}:{p}:{p}")  # each pixel: share of the disk around it that flashes
