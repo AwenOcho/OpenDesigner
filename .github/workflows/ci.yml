@@ -106,6 +106,9 @@ jobs:
 
       - name: Painting bridge tests (paint.py, offline; the painting engine is not installed in CI)
         run: python3 skills/opendesigner-paint/scripts/test_paint.py
+      - name: ffmpeg for the preflight video tests (they skip without it, so the flash check went untested)
+        run: sudo apt-get update -q && sudo apt-get install -y -q ffmpeg && ffmpeg -version | head -1
+
       - name: Preflight skill tests
         run: python3 skills/opendesigner-preflight/scripts/test_preflight.py
 
