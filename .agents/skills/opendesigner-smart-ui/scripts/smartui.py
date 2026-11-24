@@ -922,7 +922,9 @@ def _err(errs, rule, path, msg, sid, fix=None):
 
 
 def _host(url):
-    m = re.match(r"^https://([^/?#:]+)(:\d+)?([/?#]|$)", url)
+    # no @, backslash or space in the host part: a browser reads "https://evil.com\\@ok.cdn.example" as evil.com
+    # while this pattern would read past the backslash, so such a URL is refused (security audit, 2026-11-24)
+    m = re.match(r"^https://([^/?#:@\\\s]+)(:\d+)?([/?#]|$)", url)
     return m.group(1).lower() if m else None
 
 
@@ -972,7 +974,7 @@ def check_value(v, schema, path, errs, sid, cat, opts, ctx):
             kind = schema.get("x-od-url", "link")
             host = _host(v)
             if not host:
-                _err(errs, "R4-url", path, "only https URLs are allowed", sid)
+                _err(errs, "R4-url", path, "only plain https URLs are allowed (no user name, backslash or space in the address)", sid)
             elif not host_allowed(host, od(cat)["allow"]["images" if kind == "image" else "links"]):
                 _err(errs, "R4-url", path, f"{host} is not on the allow-list for {kind}s", sid, "leave it out, or ask the owner to add the domain")
         elif not schema.get("x-od-code"):

@@ -167,7 +167,9 @@ const isObj = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
 const num = (s) => { const n = Number(String(s).replace(/,/g, "")); return Number.isFinite(n) ? n : null; };
 
 function host(url) {
-  const m = /^https:\/\/([^/?#:]+)(:\d+)?([/?#]|$)/.exec(url);
+  // no @, backslash or space in the host part: a browser reads "https://evil.com\\@ok.cdn.example" as evil.com,
+  // while this pattern would read past the backslash, so such a URL is refused (security audit, 2026-11-24)
+  const m = /^https:\/\/([^/?#:@\\\s]+)(:\d+)?([/?#]|$)/.exec(url);
   return m ? m[1].toLowerCase() : null;
 }
 export function hostAllowed(h, allow) {
@@ -217,7 +219,7 @@ function checkValue(v, schema, path, errs, sid, cat, opts, ctx) {
     if (schema.pattern && !new RegExp(`^(?:${schema.pattern.replace(/^\^|\$$/g, "")})$`).test(v)) err(errs, "pattern", path, `'${v}' does not match ${schema.pattern}`, sid);
     if (schema.format === "uri") {
       const kind = schema["x-od-url"] || "link", h = host(v);
-      if (!h) err(errs, "R4-url", path, "only https URLs are allowed", sid);
+      if (!h) err(errs, "R4-url", path, "only plain https URLs are allowed (no user name, backslash or space in the address)", sid);
       else if (!hostAllowed(h, od(cat).allow[kind === "image" ? "images" : "links"])) err(errs, "R4-url", path, `${h} is not on the allow-list for ${kind}s`, sid, "leave it out, or ask the owner to add the domain");
     } else if (!schema["x-od-code"]) {
       if (HTML.test(v)) err(errs, "R4-html", path, "text holds HTML; text is plain only", sid, "write the words without tags");
