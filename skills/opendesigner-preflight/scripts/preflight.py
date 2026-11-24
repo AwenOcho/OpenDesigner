@@ -889,8 +889,10 @@ def check_public(folder: Path, src=()) -> Report:
     """A build folder (public/, dist/, out/, _site/) before it is deployed: the variant picker, which is for review copies
     only (STD-process-review-taste-41); scripts and pictures no page names; dev pages nobody links; local paths."""
     r = Report()
-    served = [p for p in folder.rglob("*") if p.is_file() and not ({"node_modules", ".git", ".well-known"} & set(p.parts))
-              and not p.name.startswith(".")]
+    # sorted: rglob follows the file system's order (alphabetical on macOS, not on Linux), and the lists below are cut to
+    # their first few names, so without it the report would name different files, in a different order, per machine
+    served = sorted(p for p in folder.rglob("*") if p.is_file() and not ({"node_modules", ".git", ".well-known"} & set(p.parts))
+                    and not p.name.startswith("."))
     project = folder.resolve().parent
     readers = [p for p in served if p.suffix.lower() in READ_EXT]
     for d in [project / x for x in SOURCE_DIRS] + [Path(x) for x in src]:
